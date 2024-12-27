@@ -13,14 +13,14 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/index}">Registration and Login System</a>
+        <a class="navbar-brand" th:href="@{/index}">GAÜN Mail ve Eduroam Başvuru Formu</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" th:href="@{/register}">Register</a>
+                    <a class="nav-link active" aria-current="page" th:href="@{/register}">Kayıt</a>
                 </li>
             </ul>
         </div>
@@ -32,15 +32,15 @@
         <div class="col-md-6 offset-md-3">
 
             <div th:if="${param.error}">
-                <div class="alert alert-danger">Invalid Identity Number or Password</div>
+                <div class="alert alert-danger">Yanlış şifre veya kullanıcı numarası.</div>
             </div>
             <div th:if="${param.logout}">
-                <div class="alert alert-success"> You have been logged out.</div>
+                <div class="alert alert-success"> Çıkış yaptınız.</div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h2 class="text-center">GAÜN Eduroam - Mail Başvuru Formu</h2>
+                    <h2 class="text-center">Giriş Yap</h2>
                 </div>
                 <div class="card-body">
                     <form
@@ -56,7 +56,7 @@
                                     id="username"
                                     name="username"
                                     class="form-control"
-                                    placeholder="Enter identity number"
+                                    placeholder="Öğrenci Numaranızı veya Kimlik Numaranızı Girin"
                             />
                         </div>
 
@@ -67,13 +67,13 @@
                                     id="password"
                                     name="password"
                                     class="form-control"
-                                    placeholder="Enter password"
+                                    placeholder="Şifrenizi Girin"
                             />
                         </div>
                         <div class="form-group mb-3">
-                            <button type="submit" class="btn btn-primary" >Submit</button>
-                            <span> Not registered ?
-                                <a th:href="@{/register}">Register/Signup here</a>
+                            <button type="submit" class="btn btn-primary" >Giriş</button>
+                            <span> Kayıt Olmadınız mı ?
+                                <a th:href="@{/register}"> Sistemde Kaydınızı Oluşturmak İçin Tıklayın</a>
                             </span>
                         </div>
                     </form>

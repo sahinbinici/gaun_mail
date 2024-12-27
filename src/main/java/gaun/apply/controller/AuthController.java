@@ -70,7 +70,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login(@ModelAttribute("user") User user) {
-        System.out.println("login test"+user.getPassword());
         return "login";
     }
 }
