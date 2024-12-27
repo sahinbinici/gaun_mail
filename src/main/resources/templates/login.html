@@ -32,7 +32,7 @@
         <div class="col-md-6 offset-md-3">
 
             <div th:if="${param.error}">
-                <div class="alert alert-danger">Invalid Email or Password</div>
+                <div class="alert alert-danger">Invalid Identity Number or Password</div>
             </div>
             <div th:if="${param.logout}">
                 <div class="alert alert-success"> You have been logged out.</div>
@@ -40,7 +40,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h2 class="text-center">Login Form</h2>
+                    <h2 class="text-center">GAÜN Eduroam - Mail Başvuru Formu</h2>
                 </div>
                 <div class="card-body">
                     <form
@@ -50,18 +50,18 @@
                             class="form-horizontal"
                     >
                         <div class="form-group mb-3">
-                            <label class="control-label"> Email</label>
+                            <label class="control-label"> Kullanıcı Adı</label>
                             <input
                                     type="text"
                                     id="username"
                                     name="username"
                                     class="form-control"
-                                    placeholder="Enter email address"
+                                    placeholder="Enter identity number"
                             />
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="control-label"> Password</label>
+                            <label class="control-label"> Şifre</label>
                             <input
                                     type="password"
                                     id="password"

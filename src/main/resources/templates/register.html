@@ -74,17 +74,17 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Kullanıcı Adı</label>
                         <input
                                 class="form-control"
-                                id="email"
-                                name="email"
+                                id="identityNumber"
+                                name="identityNumber"
                                 placeholder="Enter email address"
-                                th:field="*{email}"
-                                type="email"
+                                th:field="*{identityNumber}"
+                                type="text"
                         />
-                        <p th:errors = "*{email}" class="text-danger"
-                           th:if="${#fields.hasErrors('email')}"></p>
+                        <p th:errors = "*{identityNumber}" class="text-danger"
+                           th:if="${#fields.hasErrors('identityNumber')}"></p>
                     </div>
 
                     <div class="form-group mb-3">

@@ -1,10 +1,9 @@
-package net.enjoy.springboot.registrationlogin.controller;
+package gaun.apply.controller;
 
 import jakarta.validation.Valid;
-import net.enjoy.springboot.registrationlogin.dto.UserDto;
-import net.enjoy.springboot.registrationlogin.entity.User;
-import net.enjoy.springboot.registrationlogin.service.UserService;
-import net.enjoy.springboot.registrationlogin.service.UserServiceImpl;
+import gaun.apply.dto.UserDto;
+import gaun.apply.entity.User;
+import gaun.apply.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,9 +43,9 @@ public class AuthController {
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
                                Model model) {
-        User existingUser = userService.findUserByEmail(userDto.getEmail());
+        User existingUser = userService.findByidentityNumber(userDto.getIdentityNumber());
 
-        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
+        if (existingUser != null && existingUser.getIdentityNumber() != null && !existingUser.getIdentityNumber().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");
         }
@@ -68,9 +67,10 @@ public class AuthController {
         return "users";
     }
 
-    // handler method to handle login request
+
     @GetMapping("/login")
-    public String login() {
+    public String login(@ModelAttribute("user") User user) {
+        System.out.println("login test"+user.getPassword());
         return "login";
     }
 }

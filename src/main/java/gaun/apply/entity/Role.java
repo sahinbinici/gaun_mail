@@ -1,16 +1,14 @@
-package net.enjoy.springboot.registrationlogin.entity;
+package gaun.apply.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Setter
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "roles")
@@ -24,4 +22,10 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
+
+    public Role() {}  // default constructor
+
+    public Role(String name) {
+        this.name = name;
+    }
 }

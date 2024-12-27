@@ -1,4 +1,4 @@
-package net.enjoy.springboot.registrationlogin.entity;
+package gaun.apply.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,8 +26,11 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String lastname;
+
     @Column(nullable = false, unique = true)
-    private String email;
+    private String identityNumber;
 
     @Column(nullable = false)
     private String password;

@@ -1,15 +1,17 @@
-package net.enjoy.springboot.registrationlogin.service;
+package gaun.apply.service;
 
-import net.enjoy.springboot.registrationlogin.dto.UserDto;
-import net.enjoy.springboot.registrationlogin.entity.Role;
-import net.enjoy.springboot.registrationlogin.entity.User;
-import net.enjoy.springboot.registrationlogin.repository.RoleRepository;
-import net.enjoy.springboot.registrationlogin.repository.UserRepository;
+import gaun.apply.dto.UserDto;
+import gaun.apply.entity.Role;
+import gaun.apply.entity.User;
+import gaun.apply.repository.RoleRepository;
+import gaun.apply.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static gaun.apply.util.ConvertUtil.convertEntityToDto;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,8 +28,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveUser(UserDto userDto) {
         User user = new User();
-        user.setName(userDto.getFirstName() + " " + userDto.getLastName());
-        user.setEmail(userDto.getEmail());
+        user.setName(userDto.getFirstName());
+        user.setLastname(userDto.getLastName());
+        user.setIdentityNumber(userDto.getIdentityNumber());
         //encrypt the password using spring security
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
@@ -46,8 +49,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByidentityNumber(String identityNumber) {
+        return userRepository.findByIdentityNumber(identityNumber);
     }
 
     @Override
@@ -57,12 +60,4 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    private UserDto convertEntityToDto(User user) {
-        UserDto userDto = new UserDto();
-        String[] name = user.getName().split(" ");
-        userDto.setFirstName(name[0]);
-        userDto.setLastName(name[1]);
-        userDto.setEmail(user.getEmail());
-        return userDto;
-    }
 }
