@@ -53,11 +53,11 @@ public class AuthenticationLoggingListener implements ApplicationListener<Abstra
                     StudentDto studentDto = ConvertUtil.convertJsonToStudentDto(response.getBody());
 
                     // Yeni kullanıcı oluştur
-                    user.setIdentityNumber(studentDto.getIdentityNumber());
+                    user.setIdentityNumber(studentDto.getOgrenciNo());
                     user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
                     // Diğer gerekli alanları set et
-                    user.setName(studentDto.getName());
-                    user.setLastname(studentDto.getSurname());
+                    user.setName(studentDto.getAd());
+                    user.setLastname(studentDto.getSoyad());
                     // Varsayılan rol ataması
                     List<Role> roles = new ArrayList<>();
                     roles.add(new Role("ROLE_USER"));

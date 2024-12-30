@@ -43,52 +43,51 @@
                         method="post"
                         role="form"
                         th:action="@{/register/save}"
-                        th:object="${user}"
+                        th:object="${studentDto}"
                 >
                     <div class="form-group mb-3">
-                        <label class="form-label">First Name</label>
+                        <label class="form-label">Ad</label>
                         <input
                                 class="form-control"
-                                id="firstName"
-                                name="firstName"
+                                id="ad"
+                                name="ad"
                                 placeholder="Adınızı Girin"
-                                th:field="*{firstName}"
+                                th:field="*{ad}"
                                 type="text"
                         />
-                        <p th:errors = "*{firstName}" class="text-danger"
-                           th:if="${#fields.hasErrors('firstName')}"></p>
+                        <p th:errors = "*{ad}" class="text-danger"
+                           th:if="${#fields.hasErrors('ad')}"></p>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label">Soyadı</label>
+                        <label class="form-label">Soyad</label>
                         <input
                                 class="form-control"
-                                id="lastName"
-                                name="lastName"
+                                id="soyad"
+                                name="soyad"
                                 placeholder="Soyadınızı Girin"
-                                th:field="*{lastName}"
+                                th:field="*{soyad}"
                                 type="text"
                         />
-                        <p th:errors = "*{lastName}" class="text-danger"
-                           th:if="${#fields.hasErrors('lastName')}"></p>
+                        <p th:errors = "*{soyad}" class="text-danger"
+                           th:if="${#fields.hasErrors('soyad')}"></p>
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">Kullanıcı Adı</label>
                         <input
                                 class="form-control"
-                                id="identityNumber"
-                                name="identityNumber"
+                                id="ogrenciNo"
+                                name="ogrenciNo"
                                 placeholder="Öğrenci Numaranızı veya Kimlik Numaranızı Girin"
-                                th:field="*{identityNumber}"
+                                th:field="*{ogrenciNo}"
                                 type="text"
                         />
-                        <p th:errors = "*{identityNumber}" class="text-danger"
-                           th:if="${#fields.hasErrors('identityNumber')}"></p>
+                        <p th:errors = "*{ogrenciNo}" class="text-danger"
+                           th:if="${#fields.hasErrors('ogrenciNo')}"></p>
                     </div>
-
                     <div class="form-group mb-3">
-                        <label class="form-label">Password</label>
+                        <label class="form-label">Şifre</label>
                         <input
                                 class="form-control"
                                 id="password"

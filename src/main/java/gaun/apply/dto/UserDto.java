@@ -15,11 +15,11 @@ public class UserDto {
 
     private Long id;
     @NotEmpty
-    private String firstName;
+    private String ad;
     @NotEmpty
-    private String lastName;
+    private String soyad;
     @NotEmpty(message = "IdentityNumber should not be empty")
-    private String identityNumber;
+    private String ogrenciNo;
     @NotEmpty(message = "Password should not be empty")
     private String password;
 }

@@ -1,5 +1,6 @@
 package gaun.apply.controller;
 
+import gaun.apply.dto.StudentDto;
 import jakarta.validation.Valid;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.User;
@@ -33,17 +34,17 @@ public class AuthController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         // create model object to store form data
-        UserDto user = new UserDto();
-        model.addAttribute("user", user);
+        StudentDto studentDto = new StudentDto();
+        model.addAttribute("studentDto", studentDto);
         return "register";
     }
 
     // handler method to handle user registration form submit request
     @PostMapping("/register/save")
-    public String registration(@Valid @ModelAttribute("user") UserDto userDto,
+    public String registration(@Valid @ModelAttribute("user") StudentDto studentDto,
                                BindingResult result,
                                Model model) {
-        User existingUser = userService.findByidentityNumber(userDto.getIdentityNumber());
+        User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
 
         if (existingUser != null && existingUser.getIdentityNumber() != null && !existingUser.getIdentityNumber().isEmpty()) {
             result.rejectValue("email", null,
@@ -51,11 +52,11 @@ public class AuthController {
         }
 
         if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
+            model.addAttribute("user", studentDto);
             return "/register";
         }
 
-        userService.saveUser(userDto);
+        userService.saveUser(studentDto);
         return "redirect:/register?success";
     }
 
