@@ -18,8 +18,8 @@ public class UserDto {
     private String ad;
     @NotEmpty
     private String soyad;
-    @NotEmpty(message = "IdentityNumber should not be empty")
-    private String ogrenciNo;
-    @NotEmpty(message = "Password should not be empty")
+    @NotEmpty(message = "kimlik numarası boş olamaz")
+    private String tcKimlikNo;
+    @NotEmpty(message = "şifre boş olamaz")
     private String password;
 }

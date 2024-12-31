@@ -7,7 +7,8 @@ import gaun.apply.entity.User;
 import java.util.List;
 
 public interface UserService {
-    void saveUser(StudentDto studentDto);
+    void saveUserStudent(StudentDto studentDto);
+    void saveUserStaff(UserDto userDto);
 
     User findByidentityNumber(String identityNumber);
 

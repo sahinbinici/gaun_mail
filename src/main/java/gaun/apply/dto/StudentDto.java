@@ -2,11 +2,13 @@ package gaun.apply.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class StudentDto {
+@EqualsAndHashCode(callSuper = true)
+public class StudentDto extends UserDto{
     private boolean status;
     private String error;
     @JsonProperty("OGRENCI_NO")

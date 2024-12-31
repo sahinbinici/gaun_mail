@@ -1,10 +1,8 @@
 package gaun.apply.controller;
 
-import gaun.apply.dto.StudentDto;
-import jakarta.validation.Valid;
-import gaun.apply.dto.UserDto;
-import gaun.apply.entity.User;
-import gaun.apply.service.UserService;
+import java.security.Principal;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
+import gaun.apply.dto.MailForm;
+import gaun.apply.dto.StudentDto;
+import gaun.apply.dto.UserDto;
+import gaun.apply.entity.User;
+import gaun.apply.service.UserService;
+import jakarta.validation.Valid;
 
 @Controller
 public class AuthController {
@@ -26,7 +29,11 @@ public class AuthController {
 
     // handler method to handle home page request
     @GetMapping("/index")
-    public String home() {
+    public String home(Model model, Principal principal) {
+        if (principal != null) {
+            User user = userService.findByidentityNumber(principal.getName());
+            model.addAttribute("user", user);
+        }
         return "index";
     }
 
@@ -35,20 +42,37 @@ public class AuthController {
     public String showRegistrationForm(Model model) {
         // create model object to store form data
         StudentDto studentDto = new StudentDto();
+        UserDto userDto = new UserDto();
         model.addAttribute("studentDto", studentDto);
+        model.addAttribute("userDto", userDto);
         return "register";
     }
 
+    @GetMapping("/mail/apply")
+    public String mailApply(Model model) {
+        return "mail-apply";
+    }
+
+    @PostMapping("/mail/apply")
+    public String mailApply(@Valid @ModelAttribute("mailForm") MailForm mailForm, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "index";
+        }
+        System.out.println("test-mail-apply-post");
+        return "redirect:/mail/apply?success";
+    }
+
+
     // handler method to handle user registration form submit request
-    @PostMapping("/register/save")
-    public String registration(@Valid @ModelAttribute("user") StudentDto studentDto,
+    @PostMapping("/register/save/student")
+    public String registrationStudent(@Valid @ModelAttribute("studentDto") StudentDto studentDto,
                                BindingResult result,
                                Model model) {
         User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
 
-        if (existingUser != null && existingUser.getIdentityNumber() != null && !existingUser.getIdentityNumber().isEmpty()) {
-            result.rejectValue("email", null,
-                    "There is already an account registered with the same email");
+        if (existingUser != null) {
+            result.rejectValue("ogrenciNo", null,
+                    "Bu öğrenci numarası ile daha önce kayıt yapılmış");
         }
 
         if (result.hasErrors()) {
@@ -56,7 +80,27 @@ public class AuthController {
             return "/register";
         }
 
-        userService.saveUser(studentDto);
+        userService.saveUserStudent(studentDto);
+        return "redirect:/register?success";
+    }
+
+    @PostMapping("/register/save/personnel")
+    public String registrationStaff(@Valid @ModelAttribute("userDto") UserDto userDto,
+                               BindingResult result,
+                               Model model) {
+        User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
+
+        if (existingUser != null && existingUser.getIdentityNumber() != null && !existingUser.getIdentityNumber().isEmpty()) {
+            result.rejectValue("email", null,
+                    "There is already an account registered with the same email");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("user", userDto);
+            return "/register";
+        }
+
+        userService.saveUserStaff(userDto);
         return "redirect:/register?success";
     }
 

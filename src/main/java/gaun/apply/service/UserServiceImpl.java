@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(StudentDto studentDto) {
+    public void saveUserStudent(StudentDto studentDto) {
 
         try {
             String pass = ConvertUtil.convertPasswordToMD5(studentDto.getPassword());
@@ -78,6 +78,23 @@ public class UserServiceImpl implements UserService {
         }
         user.setRoles(List.of(role));
         userRepository.save(user); */
+    }
+
+    @Override
+    public void saveUserStaff(UserDto userDto) {
+        User user = new User();
+        user.setName(userDto.getAd());
+        user.setLastname(userDto.getSoyad());
+        user.setIdentityNumber(userDto.getTcKimlikNo());
+        //encrypt the password using spring security
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        Role role = roleRepository.findByName("ROLE_ADMIN");
+        if (role == null) {
+            role = checkRoleExist();
+        }
+        user.setRoles(List.of(role));
+        userRepository.save(user);
     }
 
     private Role checkRoleExist() {

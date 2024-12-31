@@ -16,7 +16,7 @@ public class ConvertUtil {
         UserDto userDto = new UserDto();
         userDto.setAd(user.getName());
         userDto.setSoyad(user.getLastname());
-        userDto.setOgrenciNo(user.getIdentityNumber());
+        userDto.setTcKimlikNo(user.getIdentityNumber());
         return userDto;
     }
 

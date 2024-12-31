@@ -32,19 +32,27 @@
         <div class="card">
             <div class="card-header">
                 <h2 class="text-center">Kayıt Ol</h2>
+                
+                <div class="text-center mt-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="userType" id="ogrenciRadio" value="ogrenci" checked>
+                        <label class="form-check-label" for="ogrenciRadio">Öğrenci</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="userType" id="personelRadio" value="personel">
+                        <label class="form-check-label" for="personelRadio">Personel</label>
+                    </div>
+                </div>
             </div>
+
             <div th:if="${param.success}">
                 <div class="alert alert-info">
                     Başarıyla Kayıt Oldunuz!
                 </div>
             </div>
-            <div class="card-body">
-                <form
-                        method="post"
-                        role="form"
-                        th:action="@{/register/save}"
-                        th:object="${studentDto}"
-                >
+
+            <div class="card-body" id="ogrenciForm">
+                <form method="post" role="form" th:action="@{/register/save/student}" th:object="${studentDto}">
                     <div class="form-group mb-3">
                         <label class="form-label">Ad</label>
                         <input
@@ -74,12 +82,12 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label">Kullanıcı Adı</label>
+                        <label class="form-label">Öğrenci No</label>
                         <input
                                 class="form-control"
                                 id="ogrenciNo"
                                 name="ogrenciNo"
-                                placeholder="Öğrenci Numaranızı veya Kimlik Numaranızı Girin"
+                                placeholder="Öğrenci Numaranızı Girin"
                                 th:field="*{ogrenciNo}"
                                 type="text"
                         />
@@ -105,8 +113,64 @@
                     </div>
                 </form>
             </div>
+
+            <div class="card-body" id="personelForm" style="display: none;">
+                <form method="post" role="form" th:action="@{/register/save/personnel}" th:object="${userDto}">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Ad</label>
+                        <input class="form-control" name="ad" placeholder="Adınızı Girin" th:field="*{ad}" type="text"/>
+                        <p th:errors="*{ad}" class="text-danger" th:if="${#fields.hasErrors('ad')}"></p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Soyad</label>
+                        <input class="form-control" name="soyad" placeholder="Soyadınızı Girin" th:field="*{soyad}" type="text"/>
+                        <p th:errors="*{soyad}" class="text-danger" th:if="${#fields.hasErrors('soyad')}"></p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">TC Kimlik No</label>
+                        <input class="form-control" id="tcKimlikNo" name="tcKimlikNo" placeholder="Kimlik Numaranızı Girin" th:field="*{tcKimlikNo}" type="text"/>
+                        <p th:errors="*{tcKimlikNo}" class="text-danger" th:if="${#fields.hasErrors('tcKimlikNo')}"></p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Şifre</label>
+                        <input class="form-control"  name="password" placeholder="Şifrenizi Girin" th:field="*{password}" type="password"/>
+                        <p th:errors="*{password}" class="text-danger" th:if="${#fields.hasErrors('password')}"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Kayıt Ol</button>
+                        <span>Kayıt Oldunuz mu ? <a th:href="@{/login}">Giriş Yap</a></span>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ogrenciRadio = document.getElementById('ogrenciRadio');
+    const personelRadio = document.getElementById('personelRadio');
+    const ogrenciForm = document.getElementById('ogrenciForm');
+    const personelForm = document.getElementById('personelForm');
+
+    ogrenciRadio.addEventListener('change', function() {
+        if (this.checked) {
+            ogrenciForm.style.display = 'block';
+            personelForm.style.display = 'none';
+        }
+    });
+
+    personelRadio.addEventListener('change', function() {
+        if (this.checked) {
+            ogrenciForm.style.display = 'none';
+            personelForm.style.display = 'block';
+        }
+    });
+});
+</script>
 </body>
 </html>
