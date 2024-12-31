@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <h2>Bilgilerim</h2>
+        <div class="card">
+            <div class="card-body">
+                <p><strong>Öğrenci No:</strong> <span th:text="${user.identityNumber}"></span></p>
+                <p><strong>Ad:</strong> <span th:text="${user.name}"></span></p>
+                <p><strong>Soyad:</strong> <span th:text="${user.lastname}"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

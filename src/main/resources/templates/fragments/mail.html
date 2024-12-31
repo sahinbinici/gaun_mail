@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <h2>Mail Başvuru</h2>
+        <div class="card">
+            <div class="card-body">
+                <form id="mailForm" th:action="@{/mail/apply}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" 
+                               th:value="${user.identityNumber}" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mail Adresi</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" 
+                                   th:value="${user.identityNumber}" name="email" required>
+                            <span class="input-group-text">@gantep.edu.tr</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" class="form-control" 
+                               name="password" required
+                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                               title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Şifre Tekrar</label>
+                        <input type="password" class="form-control" 
+                               name="confirmPassword" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">Başvuru Yap</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Popup Modal -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Başvuru Onayı</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <p>Bu web alanını talep eden kullanıcı;</p>
+                            <ul>
+                                <li>5651 sayılı kanun ile oluşabilecek her türlü sorumluluğu,</li>
+                                <li>GÜ-BİM Kabul Edilebilir Kullanım Politikasını,</li>
+                                <li>Daire Başkanlığımızın Bilgi Güvenliği Politikasını</li>
+                            </ul>
+                            <p>peşinen kabul etmiş sayılır.</p>
+                            
+                            <p>Bu politikalara aykırı davranışta bulunmayacağını, verilerinin çeşitli akademik ve idari işlemlerin yapılması, raporlanması, analiz ve değerlendirmelerin yapılması, istatistiki ve bilimsel verileri üretilmesi gibi amaçlarla kullanılabileceğini kabul ve taahhüt eder.</p>
+                            
+                            <p class="mt-2">
+                                <small class="text-muted">Ayrıntılı bilgi için 
+                                    <a href="https://bidb.gantep.edu.tr" target="_blank">bidb.gantep.edu.tr</a> 
+                                    adresini ziyaret ediniz.
+                                </small>
+                            </p>
+                        </div>
+                        
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="confirmCheckbox">
+                            <label class="form-check-label" for="confirmCheckbox">
+                                Yukarıdaki şartları okudum ve kabul ediyorum
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="button" class="btn btn-primary" id="submitButton" disabled>Onayla ve Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mail form için JavaScript -->
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                // Modal ve form için gerekli değişkenler
+                const mailForm = document.getElementById('mailForm');
+                const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                const confirmCheckbox = document.getElementById('confirmCheckbox');
+                const submitButton = document.getElementById('submitButton');
+
+                // Popup'ı göster
+                window.showConfirmationPopup = function() {
+                    if (!mailForm.checkValidity()) {
+                        mailForm.reportValidity();
+                        return;
+                    }
+                    
+                    const password = mailForm.querySelector('input[name="password"]');
+                    const confirmPassword = mailForm.querySelector('input[name="confirmPassword"]');
+                    
+                    if (password.value !== confirmPassword.value) {
+                        alert('Şifreler eşleşmiyor!');
+                        return;
+                    }
+                    
+                    modal.show();
+                };
+
+                // Form submit kontrolü
+                mailForm.addEventListener('submit', function(e) {
+                    const password = this.querySelector('input[name="password"]');
+                    const confirmPassword = this.querySelector('input[name="confirmPassword"]');
+                    
+                    if (password.value !== confirmPassword.value) {
+                        e.preventDefault();
+                        alert('Şifreler eşleşmiyor!');
+                    }
+                });
+
+                // Checkbox durumuna göre submit butonunu aktif/pasif yap
+                confirmCheckbox.addEventListener('change', function() {
+                    submitButton.disabled = !this.checked;
+                });
+
+                // Onayla ve Gönder butonuna tıklandığında
+                submitButton.addEventListener('click', function() {
+                    modal.hide();
+                    mailForm.submit();
+                });
+            });
+        </script>
+    </div>
+</body>
+</html> 
