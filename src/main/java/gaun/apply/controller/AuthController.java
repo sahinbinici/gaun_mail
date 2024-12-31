@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import gaun.apply.dto.MailForm;
+import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.User;
@@ -54,11 +54,11 @@ public class AuthController {
     }
 
     @PostMapping("/mail/apply")
-    public String mailApply(@Valid @ModelAttribute("mailForm") MailForm mailForm, BindingResult result, Model model) {
+    public String mailApply(@Valid @ModelAttribute("mailForm") MailFormDto mailForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "index";
         }
-        System.out.println("test-mail-apply-post");
+        userService.saveMailApply(mailForm);
         return "redirect:/mail/apply?success";
     }
 

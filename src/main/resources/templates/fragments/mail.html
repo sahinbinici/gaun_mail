@@ -7,15 +7,15 @@
             <div class="card-body">
                 <form id="mailForm" th:action="@{/mail/apply}" method="post">
                     <div class="mb-3">
-                        <label class="form-label">Kullanıcı Adı</label>
+                        <label class="form-label">Öğrenci No veya TC Kimlik No</label>
                         <input type="text" class="form-control" 
-                               th:value="${user.identityNumber}" name="username" required>
+                               th:value="${user.identityNumber}" th:readonly="true" name="username" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Mail Adresi</label>
                         <div class="input-group">
                             <input type="text" class="form-control" 
-                                   th:value="${user.identityNumber}" name="email" required>
+                                    name="email" required>
                             <span class="input-group-text">@gantep.edu.tr</span>
                         </div>
                     </div>
@@ -30,6 +30,10 @@
                         <label class="form-label">Şifre Tekrar</label>
                         <input type="password" class="form-control" 
                                name="confirmPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="hidden" class="form-control"
+                               name="status" th:value="true">
                     </div>
                     <div class="alert alert-info">
                         <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>

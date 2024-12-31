@@ -1,9 +1,13 @@
 package gaun.apply.service;
 
+import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
+import gaun.apply.entity.MailFormData;
 import gaun.apply.entity.Role;
+import gaun.apply.entity.Student;
 import gaun.apply.entity.User;
+import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
 import gaun.apply.util.ConvertUtil;
@@ -29,12 +33,14 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private final MailFormRepository mailFormRepository;
 
-    public UserServiceImpl(RestTemplate restTemplate, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(RestTemplate restTemplate, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, MailFormRepository mailFormRepository) {
         this.restTemplate = restTemplate;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailFormRepository = mailFormRepository;
     }
 
     @Override
@@ -114,5 +120,17 @@ public class UserServiceImpl implements UserService {
         return users.stream().map((user) -> convertEntityToDto(user))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void saveMailApply(MailFormDto mailFormDto) {
+        MailFormData mailFormData = new MailFormData();
+        mailFormData.setUsername(mailFormDto.getUsername());
+        mailFormData.setEmail(mailFormDto.getEmail());
+        mailFormData.setPassword(mailFormDto.getPassword());
+        mailFormData.setConfirmPassword(mailFormDto.getConfirmPassword());
+        mailFormData.setStatus(mailFormDto.isStatus());
+        mailFormRepository.save(mailFormData);
+    }
+
 
 }
