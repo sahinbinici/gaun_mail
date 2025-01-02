@@ -1,23 +1,22 @@
 package gaun.apply.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "mail_form")
-@Data
 public class MailFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "username")
     private String username;
-    @Column(name = "email")
     private String email;
-    @Column(name = "password")
     private String password;
-    @Column(name = "confirm_password")
-    private String confirmPassword;
-    @Column(name = "status")
-    private boolean status=false;
+    private String applyDate;
+    private boolean status;
 }

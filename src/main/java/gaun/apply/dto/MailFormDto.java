@@ -8,5 +8,6 @@ public class MailFormDto {
     private String email;
     private String password;
     private String confirmPassword;
+    private String applyDate;
     private boolean status=false;
 } 

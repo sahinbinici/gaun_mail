@@ -7,8 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class StudentDto extends UserDto{
+public class StudentDto{
     private boolean status;
     private String error;
     @JsonProperty("OGRENCI_NO")

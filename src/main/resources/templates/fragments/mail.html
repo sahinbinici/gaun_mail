@@ -3,6 +3,12 @@
 <body>
     <div th:fragment="content">
         <h2>Mail Başvuru</h2>
+        
+        <!-- Hata mesajı gösterimi -->
+        <div th:if="${param.mailExists}" class="alert alert-warning">
+            <strong>Uyarı!</strong> Bu kullanıcı için daha önce mail başvurusu yapılmış.
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <form id="mailForm" th:action="@{/mail/apply}" method="post">
@@ -86,17 +92,38 @@
             </div>
         </div>
 
+        <!-- Mevcut Mail Modal -->
+        <div class="modal fade" id="existingMailModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Mail Adresi Mevcut</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <p>Bu kullanıcı için daha önce mail başvurusu yapılmış.</p>
+                            <p>Mail adresi: <strong id="existingMailAddress"></strong></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Mail form için JavaScript -->
         <script th:inline="javascript">
             document.addEventListener('DOMContentLoaded', function() {
-                // Modal ve form için gerekli değişkenler
                 const mailForm = document.getElementById('mailForm');
                 const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                const existingMailModal = new bootstrap.Modal(document.getElementById('existingMailModal'));
                 const confirmCheckbox = document.getElementById('confirmCheckbox');
                 const submitButton = document.getElementById('submitButton');
 
                 // Popup'ı göster
-                window.showConfirmationPopup = function() {
+                window.showConfirmationPopup = async function() {
                     if (!mailForm.checkValidity()) {
                         mailForm.reportValidity();
                         return;
@@ -104,13 +131,31 @@
                     
                     const password = mailForm.querySelector('input[name="password"]');
                     const confirmPassword = mailForm.querySelector('input[name="confirmPassword"]');
+                    const username = mailForm.querySelector('input[name="username"]').value;
                     
                     if (password.value !== confirmPassword.value) {
                         alert('Şifreler eşleşmiyor!');
                         return;
                     }
-                    
-                    modal.show();
+
+                    // Mevcut mail kontrolü
+                    try {
+                        const response = await fetch(`/check-mail-exists/${username}`);
+                        const data = await response.json();
+                        
+                        if (data.exists) {
+                            // Mevcut mail modal'ını göster
+                            document.getElementById('existingMailAddress').textContent = data.email;
+                            existingMailModal.show();
+                            return;
+                        }
+                        
+                        // Mail yoksa normal onay modal'ını göster
+                        modal.show();
+                    } catch (error) {
+                        console.error('Mail kontrolü sırasında hata:', error);
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
                 };
 
                 // Form submit kontrolü

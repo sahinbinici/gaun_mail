@@ -39,14 +39,16 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/index}">GAÜN Mail ve Eduroam Başvuru Formu</a>
+        <a class="navbar-brand" href="#">GAÜN Mail ve Eduroam Başvuru Formu</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/logout}">Çıkış Yap</a>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn btn-link nav-link">Çıkış Yap</button>
+                    </form>
                 </li>
             </ul>
         </div>
@@ -103,26 +105,44 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Tüm linklerdeki active class'ını kaldır
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            // Tıklanan linke active class'ı ekle
-            this.classList.add('active');
-            
-            // Tüm içerikleri gizle
-            document.querySelectorAll('.content-section').forEach(content => {
-                content.classList.remove('active');
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuLinks = document.querySelectorAll('.nav-link');
+        const defaultContent = document.getElementById('default-content');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('btn-link')) {  // Çıkış butonunu hariç tut
+                    e.preventDefault();
+                    
+                    // Tüm linklerdeki active class'ını kaldır
+                    menuLinks.forEach(l => {
+                        if (!l.classList.contains('btn-link')) {  // Çıkış butonunu kontrol etme
+                            l.classList.remove('active');
+                        }
+                    });
+                    
+                    // Tıklanan linke active class'ı ekle
+                    this.classList.add('active');
+                    
+                    // Tüm içerikleri gizle
+                    contentSections.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // İlgili içeriği göster
+                    const contentId = this.id + '-content';
+                    const targetContent = document.getElementById(contentId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                    
+                    // Default içeriği gizle
+                    if (defaultContent) {
+                        defaultContent.classList.remove('active');
+                    }
+                }
             });
-            
-            // İlgili içeriği göster
-            const contentId = this.id + '-content';
-            document.getElementById(contentId).classList.add('active');
-            
-            // Default içeriği gizle
-            document.getElementById('default-content').classList.remove('active');
         });
     });
 </script>
