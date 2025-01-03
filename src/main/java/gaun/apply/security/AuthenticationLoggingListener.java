@@ -1,8 +1,8 @@
 package gaun.apply.security;
 
 import gaun.apply.dto.StudentDto;
-import gaun.apply.entity.Role;
-import gaun.apply.entity.User;
+import gaun.apply.entity.user.Role;
+import gaun.apply.entity.user.User;
 import gaun.apply.repository.UserRepository;
 import gaun.apply.util.ConvertUtil;
 import org.springframework.beans.factory.annotation.Value;

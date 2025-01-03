@@ -1,4 +1,4 @@
-package gaun.apply.entity;
+package gaun.apply.entity.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

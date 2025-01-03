@@ -1,5 +1,6 @@
 package gaun.apply.service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,8 +12,8 @@ import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.MailFormData;
-import gaun.apply.entity.Role;
-import gaun.apply.entity.User;
+import gaun.apply.entity.user.Role;
+import gaun.apply.entity.user.User;
 import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
@@ -94,8 +95,9 @@ public class UserServiceImpl implements UserService {
         MailFormData mailFormData = new MailFormData();
         mailFormData.setUsername(mailFormDto.getUsername());
         mailFormData.setEmail(mailFormDto.getEmail());
-        mailFormData.setPassword(passwordEncoder.encode(mailFormDto.getPassword()));
+        mailFormData.setPassword(mailFormDto.getPassword());
         mailFormData.setStatus(mailFormDto.isStatus());
+        mailFormData.setApplyDate(LocalDate.now());
         mailFormRepository.save(mailFormData);
     }
 

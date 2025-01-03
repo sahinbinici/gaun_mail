@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.User;
-import org.springframework.beans.factory.annotation.Value;
+import gaun.apply.entity.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

@@ -1,11 +1,8 @@
 package gaun.apply.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -14,9 +11,14 @@ public class MailFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "username")
     private String username;
+    @Column(name = "email")
     private String email;
+    @Column(name = "password")
     private String password;
-    private String applyDate;
+    @Column(name = "apply_date")
+    private LocalDate applyDate;
+    @Column(name = "status")
     private boolean status;
 }

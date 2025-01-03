@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import gaun.apply.entity.Role;
-import gaun.apply.entity.User;
+import gaun.apply.entity.user.Role;
+import gaun.apply.entity.user.User;
 import gaun.apply.repository.UserRepository;
 
 @Service

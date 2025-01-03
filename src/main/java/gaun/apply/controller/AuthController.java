@@ -21,7 +21,7 @@ import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.MailFormData;
-import gaun.apply.entity.User;
+import gaun.apply.entity.user.User;
 import gaun.apply.repository.MailFormRepository;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
@@ -42,21 +42,41 @@ public class AuthController {
     // handler method to handle home page request
     @GetMapping("/index")
     public String home(Model model, Principal principal) {
-        if (principal != null) {
-            User user = userService.findByidentityNumber(principal.getName());
-            if (user != null) {
-                model.addAttribute("user", user);
-                
-                // Mail başvurusu kontrolü
-                MailFormData existingMailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
-                model.addAttribute("existingMailForm", existingMailForm);
-            } else {
+        try {
+            // Principal kontrolü
+            if (principal == null || principal.getName() == null) {
                 return "redirect:/login";
             }
-        } else {
+
+            // User kontrolü
+            User user = userService.findByidentityNumber(principal.getName());
+            if (user == null || user.getIdentityNumber() == null) {
+                return "redirect:/login";
+            }
+
+            // Model'e user bilgilerini ekle
+            model.addAttribute("user", user);
+            model.addAttribute("identityNumber", user.getIdentityNumber());
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userLastname", user.getLastname());
+
+            // Öğrenci kontrolü
+            if (user.getRoles() != null && user.getRoles().stream()
+                    .anyMatch(role -> role != null && "ROLE_USER".equals(role.getName()))) {
+                StudentDto student = studentService.findByOgrenciNo(user.getIdentityNumber());
+                if (student != null) {
+                    model.addAttribute("student", student);
+                }
+            }
+
+            // Mail başvurusu kontrolü
+            MailFormData existingMailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
+            model.addAttribute("existingMailForm", existingMailForm);
+
+            return "index";
+        } catch (Exception e) {
             return "redirect:/login";
         }
-        return "index";
     }
 
     // handler method to handle user registration form request
@@ -141,6 +161,20 @@ public class AuthController {
 
         userService.saveUserStaff(userDto);
         return "redirect:/register?success";
+    }
+
+    @GetMapping("/bilgilerim")
+    public String bilgilerim(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        StudentDto student = studentService.findByOgrenciNo(principal.getName());
+        if (student != null) {
+            model.addAttribute("student", student);
+        }
+        
+        return "bilgilerim";
     }
 
     // handler method to handle list of users

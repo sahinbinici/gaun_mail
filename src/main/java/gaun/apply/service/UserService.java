@@ -3,8 +3,7 @@ package gaun.apply.service;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.Student;
-import gaun.apply.entity.User;
+import gaun.apply.entity.user.User;
 
 import java.util.List;
 
