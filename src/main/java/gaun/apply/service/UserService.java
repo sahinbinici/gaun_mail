@@ -1,11 +1,11 @@
 package gaun.apply.service;
 
+import java.util.List;
+
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.user.User;
-
-import java.util.List;
 
 public interface UserService {
     void saveUserStudent(StudentDto studentDto);
@@ -17,4 +17,7 @@ public interface UserService {
 
     void saveMailApply(MailFormDto mailFormDto);
 
+    long countActiveUsers();
+
+    long countUsers();
 }

@@ -101,5 +101,14 @@ public class UserServiceImpl implements UserService {
         mailFormRepository.save(mailFormData);
     }
 
+    @Override
+    public long countUsers() {
+        return userRepository.count();
+    }
+
+    @Override
+    public long countActiveUsers() {
+        return userRepository.count();  // Şimdilik tüm kullanıcıları aktif sayıyoruz
+    }
 
 }

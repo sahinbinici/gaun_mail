@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/index}">GAÜN Mail ve Eduroam Başvuru Formu</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/student/mail-apply}">Mail Başvuruları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/users}">Kullanıcılar</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn btn-link nav-link">Çıkış Yap</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Sekmeler -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#wireless">Kablosuz Ağ Başvuruları</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
+            </li>
+        </ul>
+
+        <!-- Sekme İçerikleri -->
+        <div class="tab-content">
+            <!-- Mail Sekmesi -->
+            <div class="tab-pane fade show active" id="mail">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Mail Başvuru İstatistikleri</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <h5>Toplam Başvuru</h5>
+                                            <h3 th:text="${mailStats.total}">0</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-warning">
+                                            <h5>Bekleyen Başvuru</h5>
+                                            <h3 th:text="${mailStats.pending}">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Kullanıcı İstatistikleri</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-success">
+                                            <h5>Toplam Kullanıcı</h5>
+                                            <h3 th:text="${userStats.total}">0</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-primary">
+                                            <h5>Aktif Kullanıcı</h5>
+                                            <h3 th:text="${userStats.active}">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mail Başvuru Tablosu -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Son Mail Başvuruları</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Kullanıcı Adı</th>
+                                                <th>Email</th>
+                                                <th>Başvuru Tarihi</th>
+                                                <th>Durum</th>
+                                                <th>İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="mailForm : ${recentMailForms}">
+                                                <td>
+                                                    <a href="#" onclick="showUserDetails(this)" 
+                                                       th:data-username="${mailForm.username}" 
+                                                       style="text-decoration: underline;">
+                                                        <span th:text="${mailForm.username}"></span>
+                                                    </a>
+                                                </td>
+                                                <td th:text="${mailForm.email + '@gantep.edu.tr'}"></td>
+                                                <td th:text="${mailForm.applyDate}"></td>
+                                                <td>
+                                                    <span th:if="${mailForm.status}" class="badge bg-success">Aktif</span>
+                                                    <span th:unless="${mailForm.status}" class="badge bg-warning">Beklemede</span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" 
+                                                            th:if="${!mailForm.status}"
+                                                            th:onclick="'activateMailForm(\'' + ${mailForm.id} + '\')'">
+                                                        Aktifleştir
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eduroam Sekmesi -->
+            <div class="tab-pane fade" id="eduroam">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Eduroam Başvuru İstatistikleri</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <h5>Toplam Başvuru</h5>
+                                            <h3 th:text="${eduroamStats.total}">0</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-warning">
+                                            <h5>Bekleyen Başvuru</h5>
+                                            <h3 th:text="${eduroamStats.pending}">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eduroam Başvuru Tablosu -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Son Eduroam Başvuruları</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Kullanıcı Adı</th>
+                                                <th>Başvuru Tarihi</th>
+                                                <th>Durum</th>
+                                                <th>İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="eduroamForm : ${recentEduroamForms}">
+                                                <td>
+                                                    <a href="#" onclick="showUserDetails(this)" 
+                                                       th:data-username="${eduroamForm.username}" 
+                                                       style="text-decoration: underline;">
+                                                        <span th:text="${eduroamForm.username}"></span>
+                                                    </a>
+                                                </td>
+                                                <td th:text="${eduroamForm.applyDate}"></td>
+                                                <td>
+                                                    <span th:if="${eduroamForm.status}" class="badge bg-success">Aktif</span>
+                                                    <span th:unless="${eduroamForm.status}" class="badge bg-warning">Beklemede</span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" 
+                                                            th:if="${!eduroamForm.status}"
+                                                            th:onclick="'activateEduroamForm(\'' + ${eduroamForm.id} + '\')'">
+                                                        Aktifleştir
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Bilgileri Modal -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Kullanıcı Bilgileri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Öğrenci Bilgileri -->
+                    <div id="studentDetails" style="display: none;">
+                        <h6>Öğrenci Bilgileri</h6>
+                        <table class="table">
+                            <tr><td>Öğrenci No:</td><td id="ogrenciNo"></td></tr>
+                            <tr><td>Ad:</td><td id="studentAd"></td></tr>
+                            <tr><td>Soyad:</td><td id="studentSoyad"></td></tr>
+                            <tr><td>Fakülte:</td><td id="fakulte"></td></tr>
+                            <tr><td>Bölüm:</td><td id="bolum"></td></tr>
+                            <tr><td>Program:</td><td id="program"></td></tr>
+                            <tr><td>Sınıf:</td><td id="sinif"></td></tr>
+                        </table>
+                    </div>
+                    <!-- Personel Bilgileri -->
+                    <div id="staffDetails" style="display: none;">
+                        <h6>Personel Bilgileri</h6>
+                        <table class="table">
+                            <tr><td>TC Kimlik No:</td><td id="tcKimlikNo"></td></tr>
+                            <tr><td>Ad:</td><td id="staffAd"></td></tr>
+                            <tr><td>Soyad:</td><td id="staffSoyad"></td></tr>
+                            <tr><td>Birim:</td><td id="birim"></td></tr>
+                            <tr><td>Unvan:</td><td id="unvan"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function activateMailForm(id) {
+        if (confirm('Bu mail başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
+            fetch('/mail/activate/' + id, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    function activateEduroamForm(id) {
+        if (confirm('Bu eduroam başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
+            fetch('/eduroam/activate/' + id, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    function showUserDetails(element) {
+        const username = element.getAttribute('data-username');
+        
+        // Backend'den kullanıcı bilgilerini al
+        fetch(`/api/user-details/${username}`)
+            .then(response => response.json())
+            .then(data => {
+                // Öğrenci/Personel tipine göre ilgili alanları doldur ve göster
+                if (data.type === 'STUDENT') {
+                    document.getElementById('studentDetails').style.display = 'block';
+                    document.getElementById('staffDetails').style.display = 'none';
+                    
+                    // Öğrenci bilgilerini doldur
+                    document.getElementById('ogrenciNo').textContent = data.ogrenciNo;
+                    document.getElementById('studentAd').textContent = data.ad;
+                    document.getElementById('studentSoyad').textContent = data.soyad;
+                    document.getElementById('fakulte').textContent = data.fakKod;
+                    document.getElementById('bolum').textContent = data.bolumAd;
+                    document.getElementById('program').textContent = data.programAd;
+                    document.getElementById('sinif').textContent = data.sinif;
+                } else {
+                    document.getElementById('studentDetails').style.display = 'none';
+                    document.getElementById('staffDetails').style.display = 'block';
+                    
+                    // Personel bilgilerini doldur
+                    document.getElementById('tcKimlikNo').textContent = data.tcKimlikNo;
+                    document.getElementById('staffAd').textContent = data.ad;
+                    document.getElementById('staffSoyad').textContent = data.soyad;
+                    document.getElementById('birim').textContent = data.birim;
+                    document.getElementById('unvan').textContent = data.unvan;
+                }
+                
+                // Modal'ı göster
+                new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+            })
+            .catch(error => {
+                console.error('Kullanıcı bilgileri alınamadı:', error);
+                alert('Kullanıcı bilgileri alınamadı!');
+            });
+    }
+    </script>
+</body>
+</html> 

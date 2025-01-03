@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kablosuz Ağ Başvurusu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Kablosuz Ağ Başvurusu</h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/staff/wireless-network}" method="post" th:object="${wirelessNetworkForm}">
+                            <div class="mb-3">
+                                <label class="form-label">MAC Adresi</label>
+                                <input type="text" class="form-control" th:field="*{macAddress}">
+                                <div class="text-danger" th:if="${#fields.hasErrors('macAddress')}" th:errors="*{macAddress}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Cihaz Tipi</label>
+                                <select class="form-select" th:field="*{deviceType}">
+                                    <option value="laptop">Laptop</option>
+                                    <option value="desktop">Desktop</option>
+                                    <option value="mobile">Mobile</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Başvur</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

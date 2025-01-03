@@ -1,4 +1,7 @@
 package gaun.apply.service;
 
-public class StaffService {
+import gaun.apply.entity.Staff;
+
+public interface StaffService {
+    Staff findByTcKimlikNo(String tcKimlikNo);
 }

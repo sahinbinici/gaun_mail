@@ -1,5 +1,7 @@
 package gaun.apply.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,24 +12,18 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "staff")
-public class Staff {
+@Table(name = "eduroam_form")
+public class EduroamFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "tc_kimlik_no")
-    private String tcKimlikNo;
+    @Column(name = "username")
+    private String username;
     
-    @Column(name = "ad")
-    private String ad;
+    @Column(name = "apply_date")
+    private LocalDate applyDate;
     
-    @Column(name = "soyad")
-    private String soyad;
-    
-    @Column(name = "birim")
-    private String birim;
-    
-    @Column(name = "unvan")
-    private String unvan;
-}
+    @Column(name = "status")
+    private boolean status;
+} 
