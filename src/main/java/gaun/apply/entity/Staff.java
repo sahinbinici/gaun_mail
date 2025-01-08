@@ -25,8 +25,8 @@ public class Staff {
     @Column(name = "soyad")
     private String soyad;
     
-    @Column(name = "birim")
-    private String birim;
+    @Column(name = "calistigiBirim")
+    private String calistigiBirim;
     
     @Column(name = "unvan")
     private String unvan;

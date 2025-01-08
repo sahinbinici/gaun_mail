@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaun.apply.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,6 @@ import gaun.apply.repository.EduroamFormRepository;
 import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.form.IpMacFormRepository;
 import gaun.apply.repository.form.WirelessNetworkFormRepository;
-import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 
@@ -167,7 +167,7 @@ public class AdminController {
                     response.put("tcKimlikNo", staff.getTcKimlikNo());
                     response.put("ad", staff.getAd());
                     response.put("soyad", staff.getSoyad());
-                    response.put("birim", staff.getBirim());
+                    response.put("birim", staff.getCalistigiBirim());
                     response.put("unvan", staff.getUnvan());
                 }
             }

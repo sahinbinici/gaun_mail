@@ -20,6 +20,9 @@ public class EduroamFormData {
     
     @Column(name = "username")
     private String username;
+
+    @Column(name = "password")
+    private String password;
     
     @Column(name = "apply_date")
     private LocalDate applyDate;

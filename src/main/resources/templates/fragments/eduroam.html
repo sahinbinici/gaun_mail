@@ -1,19 +1,156 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="content">
-        <h2>Eduroam Başvuru</h2>
-        <div class="card">
-            <div class="card-body">
-                <form id="eduroamForm">
-                    <div class="mb-3">
-                        <label class="form-label">Eduroam Kullanıcı Adı</label>
-                        <input type="text" class="form-control" readonly th:value="${user.identityNumber + '@gantep.edu.tr'}">
+<div th:fragment="content">
+    <h2>Eduroam Başvuru</h2>
+
+    <!-- Hata mesajı gösterimi -->
+    <div th:if="${param.eduroamExists}" class="alert alert-warning">
+        <strong>Uyarı!</strong> Bu kullanıcı için daha önce Eduroam başvurusu yapılmış.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post" th:object="${eduroamFormDto}">
+                <div class="mb-3">
+                    <label class="form-label" for="eduroamUsername">Kullanıcı Adı</label>
+                    <input type="text" class="form-control" 
+                           id="eduroamUsername"
+                           th:field="*{username}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="eduroamPassword">Şifre</label>
+                    <input type="password" class="form-control"
+                           id="eduroamPassword"
+                           th:field="*{password}"
+                           pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                           title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="eduroamConfirmPassword">Şifre Tekrar</label>
+                    <input type="password" class="form-control"
+                           id="eduroamConfirmPassword"
+                           th:field="*{confirmPassword}">
+                </div>
+                <input type="hidden" id="eduroamStatus" th:field="*{status}" value="true">
+                <div class="alert alert-info">
+                    <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">Başvuru Yap</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div class="modal fade" id="eduroamConfirmationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Başvuru Onayı</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <!-- Eduroam kullanıcı sözleşmesi -->
+                        <p>Bu kullanım politikasını imzalayan taraf:</p>
+                        <ul>
+                            <li>GÜ-BİM'in kullanımını kontrol edebileceğini kabul eder</li>
+                            <li>GÜ-BİM'in servisleri kapatma hakkını saklı tutar</li>
+                            <li>Kullanım politikasının değiştirilebileceğini kabul eder</li>
+                        </ul>
+                        <!-- ... diğer sözleşme maddeleri ... -->
                     </div>
-                    <button type="submit" class="btn btn-primary">Başvuru Yap</button>
-                </form>
+                    
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="eduroamConfirmCheckbox">
+                        <label class="form-check-label" for="eduroamConfirmCheckbox">
+                            Yukarıdaki şartları okudum ve kabul ediyorum
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" id="eduroamSubmitButton" disabled>Onayla ve Gönder</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Mevcut Eduroam Modal -->
+    <div class="modal fade" id="existingEduroamModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eduroam Hesabı Mevcut</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <p>Bu kullanıcı için daha önce eduroam başvurusu yapılmış.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eduroam form için JavaScript -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const eduroamForm = document.getElementById('eduroamForm');
+            const modal = new bootstrap.Modal(document.getElementById('eduroamConfirmationModal'));
+            const existingModal = new bootstrap.Modal(document.getElementById('existingEduroamModal'));
+            const confirmCheckbox = document.getElementById('eduroamConfirmCheckbox');
+            const submitButton = document.getElementById('eduroamSubmitButton');
+
+            // Popup'ı göster
+            window.showConfirmationPopup = async function() {
+                if (!eduroamForm.checkValidity()) {
+                    eduroamForm.reportValidity();
+                    return;
+                }
+
+                const password = eduroamForm.querySelector('input[name="password"]');
+                const confirmPassword = eduroamForm.querySelector('input[name="confirmPassword"]');
+                const username = eduroamForm.querySelector('input[name="username"]').value;
+
+                if (password.value !== confirmPassword.value) {
+                    alert('Şifreler eşleşmiyor!');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/check-eduroam-exists/${username}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+
+                    if (data.exists) {
+                        existingModal.show();
+                    } else {
+                        modal.show();
+                    }
+                } catch (error) {
+                    console.error('Eduroam kontrolü sırasında hata:', error);
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            };
+
+            // Checkbox durumuna göre submit butonunu aktif/pasif yap
+            confirmCheckbox.addEventListener('change', function() {
+                submitButton.disabled = !this.checked;
+            });
+
+            // Onayla ve Gönder butonuna tıklandığında
+            submitButton.addEventListener('click', function() {
+                modal.hide();
+                eduroamForm.submit();
+            });
+        });
+    </script>
+</div>
 </body>
 </html> 

@@ -1,52 +1,28 @@
 package gaun.apply.controller;
 
+import java.security.Principal;
+
+import gaun.apply.entity.Staff;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import gaun.apply.dto.UserDto;
+import gaun.apply.dto.EduroamFormDto;
+import gaun.apply.dto.MailFormDto;
 import gaun.apply.entity.user.User;
 import gaun.apply.service.UserService;
-import jakarta.validation.Valid;
+import gaun.apply.service.StaffService;
 
 @Controller
 @RequestMapping("/staff")
 public class StaffUserController {
     private final UserService userService;
+    private final StaffService staffService;
 
-    public StaffUserController(UserService userService) {
+    public StaffUserController(UserService userService, StaffService staffService) {
         this.userService = userService;
-    }
-
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        UserDto userDto = new UserDto();
-        model.addAttribute("userDto", userDto);
-        return "register";
-    }
-
-    @PostMapping("/register/save")
-    public String registrationStaff(@Valid @ModelAttribute("userDto") UserDto userDto,
-                           BindingResult result,
-                           Model model) {
-        User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
-
-        if (existingUser != null && existingUser.getIdentityNumber() != null && !existingUser.getIdentityNumber().isEmpty()) {
-            result.rejectValue("email", null,
-                    "There is already an account registered with the same email");
-        }
-
-        if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
-            return "/register";
-        }
-
-        userService.saveUserStaff(userDto);
-        return "redirect:/register?success";
+        this.staffService = staffService;
     }
 
     @GetMapping("/wireless-network")
@@ -77,5 +53,34 @@ public class StaffUserController {
     @GetMapping("/server-setup")
     public String showServerSetupForm(Model model) {
         return "staff/server-setup";
+    }
+
+    @GetMapping("/index")
+    public String showIndex(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        String identityNumber = principal.getName();
+        User user = userService.findByidentityNumber(identityNumber);
+        Staff staff = staffService.findByTcKimlikNo(identityNumber);
+        
+        MailFormDto mailFormDto = new MailFormDto();
+        EduroamFormDto eduroamFormDto = new EduroamFormDto();
+        
+        if (user != null) {
+            model.addAttribute("user", user);
+            mailFormDto.setUsername(user.getIdentityNumber());
+            eduroamFormDto.setUsername(user.getIdentityNumber());
+        }
+        if (staff != null) {
+            model.addAttribute("staff", staff);
+        }
+        
+        model.addAttribute("userType", "STAFF");
+        model.addAttribute("mailFormDto", mailFormDto);
+        model.addAttribute("eduroamFormDto", eduroamFormDto);
+        
+        return "staff/index";
     }
 } 

@@ -2,11 +2,10 @@ package gaun.apply.service.form;
 
 import java.time.LocalDate;
 
-import gaun.apply.dto.form.WirelessNetworkFormDto;
+import gaun.apply.dto.WirelessNetworkFormDto;
 import gaun.apply.entity.form.WirelessNetworkFormData;
 import gaun.apply.repository.form.IpMacFormRepository;
 import org.springframework.stereotype.Service;
-import gaun.apply.entity.form.BaseFormData;
 import gaun.apply.repository.form.WirelessNetworkFormRepository;
 // ... diğer importlar
 

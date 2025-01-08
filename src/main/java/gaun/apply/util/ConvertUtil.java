@@ -2,6 +2,7 @@ package gaun.apply.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gaun.apply.dto.StaffDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.user.User;
@@ -22,8 +23,6 @@ public class ConvertUtil {
 
     public static UserDto convertEntityToDto(User user) {
         UserDto userDto = new UserDto();
-        userDto.setAd(user.getName());
-        userDto.setSoyad(user.getLastname());
         userDto.setTcKimlikNo(user.getIdentityNumber());
         return userDto;
     }

@@ -30,8 +30,13 @@ public class SpringSecurity {
                 authorize.requestMatchers("/register/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/users").hasRole("ADMIN")
-                        .requestMatchers("/student/mail-apply").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/student/**").hasRole("USER")
+                        .requestMatchers("/staff/**").hasRole("STAFF")
                         .requestMatchers("/mail/apply").permitAll()
+                        .requestMatchers("/eduroam/apply").permitAll()
+                        .requestMatchers("/check-mail-exists/**").permitAll()
+                        .requestMatchers("/check-eduroam-exists/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
             ).formLogin(
@@ -44,9 +49,6 @@ public class SpringSecurity {
                 logout -> logout
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                     .logoutSuccessUrl("/login?logout")
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true)
-                    .deleteCookies("JSESSIONID")
                     .permitAll()
             );
         return http.build();
@@ -55,7 +57,7 @@ public class SpringSecurity {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+            .userDetailsService(userDetailsService)
+            .passwordEncoder(passwordEncoder());
     }
 }

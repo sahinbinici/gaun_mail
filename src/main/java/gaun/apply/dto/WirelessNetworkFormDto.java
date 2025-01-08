@@ -1,4 +1,4 @@
-package gaun.apply.dto.form;
+package gaun.apply.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

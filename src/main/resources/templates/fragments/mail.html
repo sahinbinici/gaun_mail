@@ -11,46 +11,47 @@
 
         <div class="card">
             <div class="card-body">
-                <form id="mailForm" th:action="@{/mail/apply}" method="post">
+                <form id="mailForm" th:action="@{/mail/apply}" method="post" th:object="${mailFormDto}">
                     <div class="mb-3">
-                        <label class="form-label">Öğrenci No veya TC Kimlik No</label>
+                        <label class="form-label" for="mailUsername">Kullanıcı Adı</label>
                         <input type="text" class="form-control" 
-                               th:value="${user.identityNumber}" th:readonly="true" name="username" required>
+                               id="mailUsername"
+                               th:field="*{username}" readonly>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Mail Adresi</label>
+                        <label class="form-label" for="mailEmailInput">Mail Adresi</label>
                         <div class="input-group">
                             <input type="text" class="form-control" 
-                                    name="email" required>
+                                   id="mailEmailInput"
+                                   th:field="*{email}">
                             <span class="input-group-text">@gantep.edu.tr</span>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Şifre</label>
-                        <input type="password" class="form-control" 
-                               name="password" required
+                        <label class="form-label" for="mailPassword">Şifre</label>
+                        <input type="password" class="form-control"
+                               id="mailPassword"
+                               th:field="*{password}"
                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                                title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Şifre Tekrar</label>
-                        <input type="password" class="form-control" 
-                               name="confirmPassword" required>
+                        <label class="form-label" for="mailConfirmPassword">Şifre Tekrar</label>
+                        <input type="password" class="form-control"
+                               id="mailConfirmPassword"
+                               th:field="*{confirmPassword}">
                     </div>
-                    <div class="mb-3">
-                        <input type="hidden" class="form-control"
-                               name="status" th:value="true">
-                    </div>
+                    <input type="hidden" id="mailStatus" th:field="*{status}" value="true">
                     <div class="alert alert-info">
                         <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">Başvuru Yap</button>
+                    <button type="button" class="btn btn-primary" id="mailApplyButton" onclick="showMailConfirmationPopup()">Başvuru Yap</button>
                 </form>
             </div>
         </div>
 
         <!-- Popup Modal -->
-        <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal fade" id="mailConfirmationModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -78,22 +79,22 @@
                         </div>
                         
                         <div class="form-check mt-3">
-                            <input class="form-check-input" type="checkbox" id="confirmCheckbox">
-                            <label class="form-check-label" for="confirmCheckbox">
+                            <input class="form-check-input" type="checkbox" id="mailConfirmCheckbox">
+                            <label class="form-check-label" for="mailConfirmCheckbox">
                                 Yukarıdaki şartları okudum ve kabul ediyorum
                             </label>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                        <button type="button" class="btn btn-primary" id="submitButton" disabled>Onayla ve Gönder</button>
+                        <button type="button" class="btn btn-primary" id="mailSubmitButton" disabled>Onayla ve Gönder</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Mevcut Mail Modal -->
-        <div class="modal fade" id="existingMailModal" tabindex="-1">
+        <div class="modal fade" id="mailExistingModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -117,66 +118,70 @@
         <script th:inline="javascript">
             document.addEventListener('DOMContentLoaded', function() {
                 const mailForm = document.getElementById('mailForm');
-                const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-                const existingMailModal = new bootstrap.Modal(document.getElementById('existingMailModal'));
-                const confirmCheckbox = document.getElementById('confirmCheckbox');
-                const submitButton = document.getElementById('submitButton');
+                const mailModal = new bootstrap.Modal(document.getElementById('mailConfirmationModal'));
+                const mailExistingModal = new bootstrap.Modal(document.getElementById('mailExistingModal'));
+                const mailConfirmCheckbox = document.getElementById('mailConfirmCheckbox');
+                const mailSubmitButton = document.getElementById('mailSubmitButton');
+                const mailApplyButton = document.getElementById('mailApplyButton');
 
                 // Popup'ı göster
-                window.showConfirmationPopup = async function() {
+                window.showMailConfirmationPopup = async function() {
                     if (!mailForm.checkValidity()) {
                         mailForm.reportValidity();
                         return;
                     }
-                    
-                    const password = mailForm.querySelector('input[name="password"]');
-                    const confirmPassword = mailForm.querySelector('input[name="confirmPassword"]');
-                    const username = mailForm.querySelector('input[name="username"]').value;
-                    
+
+                    const password = document.getElementById('mailPassword');
+                    const confirmPassword = document.getElementById('mailConfirmPassword');
+                    const username = document.getElementById('mailUsername').value;
+                    const email = document.getElementById('mailEmailInput').value;
+
+                    // Şifre kontrolü
                     if (password.value !== confirmPassword.value) {
                         alert('Şifreler eşleşmiyor!');
                         return;
                     }
 
-                    // Mevcut mail kontrolü
+                    // Şifre pattern kontrolü
+                    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+                    if (!passwordPattern.test(password.value)) {
+                        alert('Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.');
+                        return;
+                    }
+
+                    // Email kontrolü
+                    if (!email) {
+                        alert('Mail adresi boş olamaz!');
+                        return;
+                    }
+
                     try {
                         const response = await fetch(`/check-mail-exists/${username}`);
-                        const data = await response.json();
-                        
-                        if (data.exists) {
-                            // Mevcut mail modal'ını göster
-                            document.getElementById('existingMailAddress').textContent = data.email;
-                            existingMailModal.show();
-                            return;
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
-                        
-                        // Mail yoksa normal onay modal'ını göster
-                        modal.show();
+                        const data = await response.json();
+
+                        if (data.exists) {
+                            document.getElementById('existingMailAddress').textContent = data.email + '@gantep.edu.tr';
+                            mailExistingModal.show();
+                        } else {
+                            mailModal.show();
+                        }
                     } catch (error) {
                         console.error('Mail kontrolü sırasında hata:', error);
                         alert('Bir hata oluştu. Lütfen tekrar deneyin.');
                     }
                 };
 
-                // Form submit kontrolü
-                mailForm.addEventListener('submit', function(e) {
-                    const password = this.querySelector('input[name="password"]');
-                    const confirmPassword = this.querySelector('input[name="confirmPassword"]');
-                    
-                    if (password.value !== confirmPassword.value) {
-                        e.preventDefault();
-                        alert('Şifreler eşleşmiyor!');
-                    }
-                });
-
                 // Checkbox durumuna göre submit butonunu aktif/pasif yap
-                confirmCheckbox.addEventListener('change', function() {
-                    submitButton.disabled = !this.checked;
+                mailConfirmCheckbox.addEventListener('change', function() {
+                    mailSubmitButton.disabled = !this.checked;
                 });
 
                 // Onayla ve Gönder butonuna tıklandığında
-                submitButton.addEventListener('click', function() {
-                    modal.hide();
+                mailSubmitButton.addEventListener('click', function() {
+                    mailModal.hide();
                     mailForm.submit();
                 });
             });

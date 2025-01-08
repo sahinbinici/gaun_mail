@@ -1,25 +1,13 @@
 package gaun.apply.dto;
 
-
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class UserDto {
-
-    private Long id;
-    @NotEmpty
-    private String ad;
-    @NotEmpty
-    private String soyad;
-    @NotEmpty(message = "kimlik numarası boş olamaz")
+    @NotEmpty(message = "TC Kimlik No boş olamaz")
     private String tcKimlikNo;
-    @NotEmpty(message = "şifre boş olamaz")
+    
+    @NotEmpty(message = "Şifre boş olamaz")
     private String password;
 }

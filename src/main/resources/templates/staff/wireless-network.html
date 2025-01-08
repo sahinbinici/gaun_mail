@@ -14,19 +14,26 @@
                         <h4>Kablosuz Ağ Başvurusu</h4>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/staff/wireless-network}" method="post" th:object="${wirelessNetworkForm}">
+                        <form id="wirelessNetworkForm" th:action="@{/staff/wireless-network/apply}" method="post">
                             <div class="mb-3">
-                                <label class="form-label">MAC Adresi</label>
-                                <input type="text" class="form-control" th:field="*{macAddress}">
-                                <div class="text-danger" th:if="${#fields.hasErrors('macAddress')}" th:errors="*{macAddress}"></div>
+                                <label class="form-label" for="wirelessUsername">Kullanıcı Adı</label>
+                                <input type="text" class="form-control" 
+                                       id="wirelessUsername" 
+                                       name="username" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Cihaz Tipi</label>
-                                <select class="form-select" th:field="*{deviceType}">
-                                    <option value="laptop">Laptop</option>
-                                    <option value="desktop">Desktop</option>
-                                    <option value="mobile">Mobile</option>
-                                </select>
+                                <label class="form-label" for="wirelessPassword">Şifre</label>
+                                <input type="password" class="form-control"
+                                       id="wirelessPassword"
+                                       name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="wirelessMacAddress">MAC Adresi</label>
+                                <input type="text" class="form-control"
+                                       id="wirelessMacAddress"
+                                       name="macAddress" required
+                                       pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+                                       title="Geçerli bir MAC adresi giriniz (örn: 00:11:22:33:44:55)">
                             </div>
                             <button type="submit" class="btn btn-primary">Başvur</button>
                         </form>

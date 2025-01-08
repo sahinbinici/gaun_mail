@@ -8,12 +8,16 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
+import gaun.apply.entity.EduroamFormData;
 import gaun.apply.entity.MailFormData;
+import gaun.apply.entity.Staff;
 import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
+import gaun.apply.repository.EduroamFormRepository;
 import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
@@ -24,23 +28,27 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StaffService staffService;
     private final MailFormRepository mailFormRepository;
+    private final EduroamFormRepository eduroamFormRepository;
 
     public UserServiceImpl(UserRepository userRepository,
-                          RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder,
-                          MailFormRepository mailFormRepository) {
+                         RoleRepository roleRepository,
+                         PasswordEncoder passwordEncoder,
+                         StaffService staffService,
+                         MailFormRepository mailFormRepository,
+                         EduroamFormRepository eduroamFormRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.staffService = staffService;
         this.mailFormRepository = mailFormRepository;
+        this.eduroamFormRepository = eduroamFormRepository;
     }
 
     @Override
     public void saveUserStudent(StudentDto studentDto) {
         User user = new User();
-        user.setName(studentDto.getAd());
-        user.setLastname(studentDto.getSoyad());
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
 
@@ -58,24 +66,32 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveUserStaff(UserDto userDto) {
         User user = new User();
-        user.setName(userDto.getAd());
-        user.setLastname(userDto.getSoyad());
         user.setIdentityNumber(userDto.getTcKimlikNo());
-        //encrypt the password using spring security
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        Role role = roleRepository.findByName("ROLE_ADMIN");
-        if (role == null) {
-            role = checkRoleExist();
+        // Personel kontrolü
+        Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
+        if (staff != null) {
+            // ROLE_STAFF rolünü ata
+            Role staffRole = roleRepository.findByName("ROLE_STAFF");
+            if (staffRole == null) {
+                staffRole = new Role();
+                staffRole.setName("ROLE_STAFF");
+                roleRepository.save(staffRole);
+            }
+            user.setRoles(Arrays.asList(staffRole));
+        } else {
+            // ROLE_USER rolünü ata
+            Role userRole = roleRepository.findByName("ROLE_USER");
+            if (userRole == null) {
+                userRole = new Role();
+                userRole.setName("ROLE_USER");
+                roleRepository.save(userRole);
+            }
+            user.setRoles(Arrays.asList(userRole));
         }
-        user.setRoles(List.of(role));
+        
         userRepository.save(user);
-    }
-
-    private Role checkRoleExist() {
-        Role role = new Role();
-        role.setName("ROLE_ADMIN");
-        return roleRepository.save(role);
     }
 
     @Override
@@ -99,6 +115,16 @@ public class UserServiceImpl implements UserService {
         mailFormData.setStatus(mailFormDto.isStatus());
         mailFormData.setApplyDate(LocalDate.now());
         mailFormRepository.save(mailFormData);
+    }
+
+    @Override
+    public void saveEduroamApply(EduroamFormDto eduroamFormDto) {
+        EduroamFormData eduroamFormData = new EduroamFormData();
+        eduroamFormData.setUsername(eduroamFormDto.getUsername());
+        eduroamFormData.setPassword(eduroamFormDto.getPassword());
+        eduroamFormData.setApplyDate(LocalDate.now());
+        eduroamFormData.setStatus(eduroamFormDto.isStatus());
+        eduroamFormRepository.save(eduroamFormData);
     }
 
     @Override

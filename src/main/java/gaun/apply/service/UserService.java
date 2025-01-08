@@ -2,6 +2,7 @@ package gaun.apply.service;
 
 import java.util.List;
 
+import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
@@ -16,6 +17,8 @@ public interface UserService {
     List<UserDto> findAllUsers();
 
     void saveMailApply(MailFormDto mailFormDto);
+
+    void saveEduroamApply(EduroamFormDto eduroamFormDto);
 
     long countActiveUsers();
 
