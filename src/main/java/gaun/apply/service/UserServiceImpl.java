@@ -1,6 +1,7 @@
 package gaun.apply.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,14 +73,31 @@ public class UserServiceImpl implements UserService {
         // Personel kontrolü
         Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
         if (staff != null) {
-            // ROLE_STAFF rolünü ata
+            List<Role> roles = new ArrayList<>();
+            
+            // ROLE_STAFF rolünü ekle
             Role staffRole = roleRepository.findByName("ROLE_STAFF");
             if (staffRole == null) {
                 staffRole = new Role();
                 staffRole.setName("ROLE_STAFF");
                 roleRepository.save(staffRole);
             }
-            user.setRoles(Arrays.asList(staffRole));
+            roles.add(staffRole);
+            
+            // Eğer personel admin ise ROLE_ADMIN rolünü de ekle
+            if (staff.isAdmin()) {
+                Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+                if (adminRole == null) {
+                    adminRole = new Role();
+                    adminRole.setName("ROLE_ADMIN");
+                    roleRepository.save(adminRole);
+                }
+                roles.add(adminRole);
+                System.out.println("Admin rolü eklendi: " + staff.getTcKimlikNo()); // Debug için log
+            }
+            
+            user.setRoles(roles);
+            System.out.println("Kullanıcı rolleri: " + roles); // Debug için log
         } else {
             // ROLE_USER rolünü ata
             Role userRole = roleRepository.findByName("ROLE_USER");

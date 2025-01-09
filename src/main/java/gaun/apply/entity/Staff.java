@@ -30,4 +30,7 @@ public class Staff {
     
     @Column(name = "unvan")
     private String unvan;
+    
+    @Column(name = "isAdmin")
+    private boolean isAdmin;
 }

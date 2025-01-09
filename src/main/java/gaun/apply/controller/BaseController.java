@@ -1,9 +1,14 @@
 package gaun.apply.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import gaun.apply.entity.user.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -80,13 +85,17 @@ public class BaseController {
             return "redirect:/login";
         }
 
-        // Kullanıcı rolüne göre yönlendirme
-        if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
-            return "redirect:/admin";
-        } else if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_STAFF"))) {
-            return "redirect:/staff/index";  // Personel
+        // Kullanıcı rollerine göre yönlendirme
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        if (roles.contains("ROLE_ADMIN")) {
+            return "redirect:/admin";  // Admin rolü varsa admin sayfasına
+        } else if (roles.contains("ROLE_STAFF")) {
+            return "redirect:/staff/index";  // Admin rolü yoksa ama staff rolü varsa personel sayfasına
         } else {
-            return "redirect:/student/index"; // Öğrenci
+            return "redirect:/student/index"; // Sadece user rolü varsa öğrenci sayfasına
         }
     }
 
@@ -205,13 +214,12 @@ public class BaseController {
     public String showEduroamApplyResult(@RequestParam(required = false) String success, 
                                    @RequestParam(required = false) String error,
                                    Model model) {
-        if (success != null) {
-            model.addAttribute("success", "Eduroam başvurunuz başarıyla alındı.");
-        }
+        model.addAttribute("eduroamFormDto", new EduroamFormDto());
+        
         if (error != null) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu.");
         }
-        return "student/eduroam-success";
+        return "eduroam-apply";
     }
 
     @PostMapping("/eduroam/apply")
@@ -219,21 +227,30 @@ public class BaseController {
                             BindingResult result,
                             Model model) {
         try {
+            // Validasyon hataları varsa
             if (result.hasErrors()) {
-                return "fragments/index";
+                return "eduroam-apply";
             }
 
+            // Kullanıcı adı kontrolü
             EduroamFormData existingEduroam = eduroamFormRepository.findByUsername(eduroamFormDto.getUsername());
             if (existingEduroam != null) {
-                return "redirect:/index?eduroamExists=true";
+                model.addAttribute("error", "Bu kullanıcı adı ile daha önce başvuru yapılmış");
+                return "eduroam-apply";
             }
 
             userService.saveEduroamApply(eduroamFormDto);
-            return "redirect:/eduroam/apply?success";
+            return "redirect:/eduroam/success";
             
         } catch (Exception e) {
-            return "redirect:/index?error=true";
+            model.addAttribute("error", "Başvuru sırasında bir hata oluştu.");
+            return "eduroam-apply";
         }
+    }
+
+    @GetMapping("/eduroam/success")
+    public String showEduroamSuccess() {
+        return "eduroam/apply-success";
     }
 
     @GetMapping("/check-mail-exists/{username}")
@@ -267,6 +284,43 @@ public class BaseController {
             response.put("username", null);
         }
         
+        return response;
+    }
+
+    @PostMapping("/admin/update-staff-role/{tcKimlikNo}")
+    @ResponseBody
+    public Map<String, String> updateStaffRole(@PathVariable String tcKimlikNo) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            Staff staff = staffService.findByTcKimlikNo(tcKimlikNo);
+            if (staff != null) {
+                staff.setAdmin(true);
+                staffService.save(staff);
+                
+                // Kullanıcı rollerini güncelle
+                User user = userService.findByidentityNumber(tcKimlikNo);
+                if (user != null) {
+                    List<Role> roles = new ArrayList<>(user.getRoles());
+                    Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+                    if (adminRole == null) {
+                        adminRole = new Role();
+                        adminRole.setName("ROLE_ADMIN");
+                        roleRepository.save(adminRole);
+                    }
+                    roles.add(adminRole);
+                    user.setRoles(roles);
+                    userRepository.save(user);
+                }
+                response.put("status", "success");
+                response.put("message", "Admin rolü başarıyla eklendi");
+            } else {
+                response.put("status", "error");
+                response.put("message", "Personel bulunamadı");
+            }
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "Hata: " + e.getMessage());
+        }
         return response;
     }
 } 

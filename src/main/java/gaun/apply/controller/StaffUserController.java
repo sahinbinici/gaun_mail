@@ -2,7 +2,6 @@ package gaun.apply.controller;
 
 import java.security.Principal;
 
-import gaun.apply.entity.Staff;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
+import gaun.apply.entity.Staff;
 import gaun.apply.entity.user.User;
-import gaun.apply.service.UserService;
 import gaun.apply.service.StaffService;
+import gaun.apply.service.UserService;
 
 @Controller
 @RequestMapping("/staff")

@@ -1,9 +1,9 @@
 package gaun.apply.service;
 
-import gaun.apply.dto.StaffDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import gaun.apply.dto.StaffDto;
 import gaun.apply.entity.Staff;
 import gaun.apply.repository.StaffRepository;
 
@@ -30,5 +30,9 @@ public class StaffService {
     public void saveStaff(StaffDto staffDto) {
         Staff staff=modelMapper.map(staffDto, Staff.class);
         staffRepository.save(staff);
+    }
+
+    public Staff save(Staff staff) {
+        return staffRepository.save(staff);
     }
 } 

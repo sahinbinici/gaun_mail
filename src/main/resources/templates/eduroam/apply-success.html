@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Başvuru Başarılı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-success">
+            <h2>Eduroam Başvurunuz Başarıyla Alındı!</h2>
+            <p>Başvurunuz incelendikten sonra eduroam hesabınız aktif edilecektir.</p>
+        </div>
+        
+        <!-- Rol bazlı yönlendirme -->
+        <div sec:authorize="hasRole('ROLE_STAFF')">
+            <a href="/staff/index" class="btn btn-primary">Ana Sayfaya Dön</a>
+        </div>
+        <div sec:authorize="hasRole('ROLE_USER')">
+            <a href="/student/index" class="btn btn-primary">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

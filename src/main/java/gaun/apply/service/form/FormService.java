@@ -1,36 +1,18 @@
 package gaun.apply.service.form;
 
-import java.time.LocalDate;
-
-import gaun.apply.dto.WirelessNetworkFormDto;
-import gaun.apply.entity.form.WirelessNetworkFormData;
-import gaun.apply.repository.form.IpMacFormRepository;
 import org.springframework.stereotype.Service;
-import gaun.apply.repository.form.WirelessNetworkFormRepository;
-// ... diğer importlar
+import gaun.apply.entity.EduroamFormData;
+import gaun.apply.repository.EduroamFormRepository;
 
 @Service
 public class FormService {
-    private final WirelessNetworkFormRepository wirelessNetworkFormRepository;
-    private final IpMacFormRepository ipMacFormRepository;
-    // ... diğer repository'ler
+    private final EduroamFormRepository eduroamFormRepository;
 
-    public FormService(WirelessNetworkFormRepository wirelessNetworkFormRepository,
-                      IpMacFormRepository ipMacFormRepository /* diğer repository'ler */) {
-        this.wirelessNetworkFormRepository = wirelessNetworkFormRepository;
-        this.ipMacFormRepository = ipMacFormRepository;
-        // ... diğer atamalar
+    public FormService(EduroamFormRepository eduroamFormRepository) {
+        this.eduroamFormRepository = eduroamFormRepository;
     }
 
-    public void saveWirelessNetworkForm(WirelessNetworkFormDto dto, String username) {
-        WirelessNetworkFormData form = new WirelessNetworkFormData();
-        form.setUsername(username);
-        form.setApplyDate(LocalDate.now());
-        form.setStatus(false);
-        form.setMacAddress(dto.getMacAddress());
-        form.setDeviceType(dto.getDeviceType());
-        wirelessNetworkFormRepository.save(form);
+    public EduroamFormData saveEduroamForm(EduroamFormData formData) {
+        return eduroamFormRepository.save(formData);
     }
-
-    // Diğer form kaydetme metodları...
 } 

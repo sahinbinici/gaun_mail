@@ -1,13 +1,15 @@
 package gaun.apply.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 public class WirelessNetworkFormDto {
-    @NotEmpty(message = "MAC adresi boş olamaz")
-    private String macAddress;
+    @NotEmpty(message = "Kullanıcı adı boş olamaz")
+    private String username;
     
-    @NotEmpty(message = "Cihaz tipi boş olamaz")
-    private String deviceType;
+    @NotEmpty(message = "Şifre boş olamaz")
+    private String password;
+    
+    private boolean status;
 } 

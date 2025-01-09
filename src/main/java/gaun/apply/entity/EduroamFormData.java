@@ -2,7 +2,6 @@ package gaun.apply.entity;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,21 +11,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "eduroam_form")
+@Table(name = "eduroam_form_data")
 public class EduroamFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "username")
     private String username;
-
-    @Column(name = "password")
     private String password;
-    
-    @Column(name = "apply_date")
     private LocalDate applyDate;
-    
-    @Column(name = "status")
     private boolean status;
 } 
