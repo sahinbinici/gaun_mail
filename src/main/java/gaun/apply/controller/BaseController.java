@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import gaun.apply.entity.user.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +27,7 @@ import gaun.apply.dto.UserDto;
 import gaun.apply.entity.EduroamFormData;
 import gaun.apply.entity.MailFormData;
 import gaun.apply.entity.Staff;
+import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.EduroamFormRepository;
 import gaun.apply.repository.MailFormRepository;
@@ -322,5 +322,31 @@ public class BaseController {
             response.put("message", "Hata: " + e.getMessage());
         }
         return response;
+    }
+
+    @ModelAttribute
+    public void addCommonAttributes(Model model, Principal principal) {
+        // Varsayılan değerleri false olarak ayarla
+        model.addAttribute("hasMailApplication", false);
+        model.addAttribute("hasEduroamApplication", false);
+        
+        if (principal != null) {
+            try {
+                User user = userService.findByidentityNumber(principal.getName());
+                if (user != null) {
+                    model.addAttribute("user", user);
+                    
+                    // Mail başvurusu kontrolü
+                    MailFormData mailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
+                    model.addAttribute("hasMailApplication", mailForm != null);
+                    
+                    // Eduroam başvurusu kontrolü
+                    EduroamFormData eduroamForm = eduroamFormRepository.findByUsername(user.getIdentityNumber());
+                    model.addAttribute("hasEduroamApplication", eduroamForm != null);
+                }
+            } catch (Exception e) {
+                System.err.println("Error checking applications: " + e.getMessage());
+            }
+        }
     }
 } 

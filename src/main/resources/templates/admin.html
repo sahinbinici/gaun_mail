@@ -122,6 +122,7 @@
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Email</th>
                                                 <th>Başvuru Tarihi</th>
+                                                <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
                                             </tr>
@@ -137,6 +138,7 @@
                                                 </td>
                                                 <td th:text="${mailForm.email + '@gantep.edu.tr'}"></td>
                                                 <td th:text="${mailForm.applyDate}"></td>
+                                                <td th:text="${mailForm.password}"></td>
                                                 <td>
                                                     <span th:if="${mailForm.status}" class="badge bg-success">Aktif</span>
                                                     <span th:unless="${mailForm.status}" class="badge bg-warning">Beklemede</span>
@@ -200,6 +202,7 @@
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Başvuru Tarihi</th>
+                                                <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
                                             </tr>
@@ -214,6 +217,7 @@
                                                     </a>
                                                 </td>
                                                 <td th:text="${eduroamForm.applyDate}"></td>
+                                                <td th:text="${eduroamForm.password}"></td>
                                                 <td>
                                                     <span th:if="${eduroamForm.status}" class="badge bg-success">Aktif</span>
                                                     <span th:unless="${eduroamForm.status}" class="badge bg-warning">Beklemede</span>

@@ -4,40 +4,59 @@
 <div th:fragment="content">
     <h2>Eduroam Başvuru</h2>
 
-    <!-- Hata mesajı gösterimi -->
-    <div th:if="${param.eduroamExists}" class="alert alert-warning">
-        <strong>Uyarı!</strong> Bu kullanıcı için daha önce Eduroam başvurusu yapılmış.
-    </div>
+    <!-- Başvuru durumu kontrolü -->
+    <div th:if="${user != null}">
+        <!-- Mevcut başvuru varsa başvuru durumunu göster -->
+        <div th:if="${hasEduroamApplication == true}" class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Mevcut Başvuru Durumu</h5>
+                <div th:with="eduroamForm=${@eduroamFormRepository.findByUsername(user.identityNumber)}">
+                    <div th:if="${eduroamForm != null}" th:class="${eduroamForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                        <p><strong>Başvuru Durumu:</strong> 
+                            <span th:text="${eduroamForm.status ? 'Onaylandı' : 'Beklemede'}"></span>
+                        </p>
+                        <p><strong>Başvuru Tarihi:</strong> 
+                            <span th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+                        <p><strong>Kullanıcı Adı:</strong> 
+                            <span th:text="${eduroamForm.username}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="card">
-        <div class="card-body">
-            <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post" th:object="${eduroamFormDto}">
-                <div class="mb-3">
-                    <label class="form-label" for="eduroamUsername">Kullanıcı Adı</label>
-                    <input type="text" class="form-control" 
-                           id="eduroamUsername"
-                           th:field="*{username}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="eduroamPassword">Şifre</label>
-                    <input type="password" class="form-control"
-                           id="eduroamPassword"
-                           th:field="*{password}"
-                           pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                           title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="eduroamConfirmPassword">Şifre Tekrar</label>
-                    <input type="password" class="form-control"
-                           id="eduroamConfirmPassword"
-                           th:field="*{confirmPassword}">
-                </div>
-                <input type="hidden" id="eduroamStatus" th:field="*{status}" value="true">
-                <div class="alert alert-info">
-                    <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">Başvuru Yap</button>
-            </form>
+        <!-- Başvuru yoksa başvuru formunu göster -->
+        <div th:if="${hasEduroamApplication == false}" class="card">
+            <div class="card-body">
+                <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post" th:object="${eduroamFormDto}">
+                    <div class="mb-3">
+                        <label class="form-label" for="eduroamUsername">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" 
+                               id="eduroamUsername"
+                               th:field="*{username}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="eduroamPassword">Şifre</label>
+                        <input type="password" class="form-control"
+                               id="eduroamPassword"
+                               th:field="*{password}"
+                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                               title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="eduroamConfirmPassword">Şifre Tekrar</label>
+                        <input type="password" class="form-control"
+                               id="eduroamConfirmPassword"
+                               th:field="*{confirmPassword}">
+                    </div>
+                    <input type="hidden" id="eduroamStatus" th:field="*{status}" value="false">
+                    <div class="alert alert-info">
+                        <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">Başvuru Yap</button>
+                </form>
+            </div>
         </div>
     </div>
 
