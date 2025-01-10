@@ -2,69 +2,105 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="content">
-        <h2>Mail Başvuru</h2>
-
-        <!-- Başvuru durumu kontrolü -->
-        <div th:if="${user != null}">
-            <!-- Mevcut başvuru varsa başvuru durumunu göster -->
-            <div th:if="${hasMailApplication == true}" class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Mevcut Başvuru Durumu</h5>
-                    <div th:with="mailForm=${@mailFormRepository.findByUsername(user.identityNumber)}">
-                        <div th:if="${mailForm != null}" th:class="${mailForm.status ? 'alert alert-success' : 'alert alert-warning'}">
-                            <p><strong>Başvuru Durumu:</strong> 
-                                <span th:text="${mailForm.status ? 'Onaylandı' : 'Beklemede'}"></span>
-                            </p>
-                            <p><strong>Başvuru Tarihi:</strong> 
-                                <span th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}"></span>
-                            </p>
-                            <p><strong>Mail Adresi:</strong> 
-                                <span th:text="${mailForm.email + '@gantep.edu.tr'}"></span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-envelope me-2"></i>
+                    Mail Başvuru
+                </h3>
             </div>
-
-            <!-- Başvuru yoksa başvuru formunu göster -->
-            <div th:if="${hasMailApplication == false}" class="card">
-                <div class="card-body">
-                    <form id="mailForm" th:action="@{/mail/apply}" method="post" th:object="${mailFormDto}">
-                        <div class="mb-3">
-                            <label class="form-label" for="mailUsername">Kullanıcı Adı</label>
-                            <input type="text" class="form-control" 
-                                   id="mailUsername"
-                                   th:field="*{username}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="mailEmailInput">Mail Adresi</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" 
-                                       id="mailEmailInput"
-                                       th:field="*{email}">
-                                <span class="input-group-text">@gantep.edu.tr</span>
+            <div class="card-body">
+                <!-- Başvuru durumu kontrolü -->
+                <div th:if="${user != null}">
+                    <!-- Mevcut başvuru varsa başvuru durumunu göster -->
+                    <div th:if="${hasMailApplication == true}" class="row">
+                        <div class="col-12">
+                            <div class="info-group">
+                                <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
+                                <div th:with="mailForm=${@mailFormRepository.findByUsername(user.identityNumber)}">
+                                    <div th:if="${mailForm != null}" 
+                                         th:class="${mailForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Başvuru Durumu</label>
+                                                <h5 class="mb-0">
+                                                    <span th:text="${mailForm.status ? 'Onaylandı' : 'Beklemede'}"
+                                                          th:class="${mailForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                                    </span>
+                                                </h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Başvuru Tarihi</label>
+                                                <h5 class="mb-0" th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Mail Adresi</label>
+                                                <h5 class="mb-0" th:text="${mailForm.email + '@gantep.edu.tr'}"></h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="mailPassword">Şifre</label>
-                            <input type="password" class="form-control"
-                                   id="mailPassword"
-                                   th:field="*{password}"
-                                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                                   title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="mailConfirmPassword">Şifre Tekrar</label>
-                            <input type="password" class="form-control"
-                                   id="mailConfirmPassword"
-                                   th:field="*{confirmPassword}">
-                        </div>
-                        <input type="hidden" id="mailStatus" th:field="*{status}" value="false">
-                        <div class="alert alert-info">
-                            <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">Başvuru Yap</button>
-                    </form>
+                    </div>
+
+                    <!-- Başvuru yoksa başvuru formunu göster -->
+                    <div th:if="${hasMailApplication == false}">
+                        <form id="mailForm" th:action="@{/mail/apply}" method="post" th:object="${mailFormDto}">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="mailUsername">Kullanıcı Adı</label>
+                                        <input type="text" class="form-control" 
+                                               id="mailUsername"
+                                               th:field="*{username}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="mailEmailInput">Mail Adresi</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" 
+                                                   id="mailEmailInput"
+                                                   th:field="*{email}">
+                                            <span class="input-group-text">@gantep.edu.tr</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="mailPassword">Şifre</label>
+                                        <input type="password" class="form-control"
+                                               id="mailPassword"
+                                               th:field="*{password}"
+                                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                                               title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="mailConfirmPassword">Şifre Tekrar</label>
+                                        <input type="password" class="form-control"
+                                               id="mailConfirmPassword"
+                                               th:field="*{confirmPassword}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" id="mailStatus" th:field="*{status}" value="false">
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                            </div>
+                            
+                            <div class="text-end mt-4">
+                                <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">
+                                    <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -205,6 +241,57 @@
                 });
             });
         </script>
+
+        <style>
+            .info-group {
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                height: 100%;
+            }
+            .info-group label {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+                display: block;
+            }
+            .info-group h5 {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            .card {
+                border: none;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                border-radius: 12px;
+            }
+            .card-header {
+                border-radius: 12px 12px 0 0 !important;
+                padding: 1rem 1.5rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            .badge {
+                font-size: 0.9rem;
+                padding: 0.5em 1em;
+            }
+            .form-control {
+                border-radius: 6px;
+                border: 1px solid #ced4da;
+                padding: 0.5rem 1rem;
+            }
+            .form-control:focus {
+                border-color: #80bdff;
+                box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            }
+            .input-group-text {
+                background-color: #e9ecef;
+                border: 1px solid #ced4da;
+            }
+            .btn-primary {
+                padding: 0.5rem 1.5rem;
+                font-weight: 500;
+            }
+        </style>
     </div>
 </body>
 </html> 
