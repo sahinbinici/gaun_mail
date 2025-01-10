@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import gaun.apply.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,13 +18,18 @@ import gaun.apply.dto.UserDto;
 import gaun.apply.entity.EduroamFormData;
 import gaun.apply.entity.MailFormData;
 import gaun.apply.entity.Staff;
+import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.IpMacFormData;
+import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.form.WirelessNetworkFormData;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.EduroamFormRepository;
 import gaun.apply.repository.MailFormRepository;
+import gaun.apply.repository.form.CloudAccountFormRepository;
 import gaun.apply.repository.form.IpMacFormRepository;
+import gaun.apply.repository.form.VpnFormRepository;
 import gaun.apply.repository.form.WirelessNetworkFormRepository;
+import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 
@@ -49,61 +53,106 @@ public class AdminController {
     @Autowired
     private IpMacFormRepository ipMacFormRepository;
 
+    @Autowired
+    private CloudAccountFormRepository cloudAccountFormRepository;
+
+    @Autowired
+    private VpnFormRepository vpnFormRepository;
+
     public AdminController(UserService userService, MailFormRepository mailFormRepository) {
         this.userService = userService;
         this.mailFormRepository = mailFormRepository;
     }
 
     @GetMapping("/admin")
-    public String showAdminPanel(Model model) {
-        // Mail istatistikleri
-        long totalMails = mailFormRepository.count();
-        long pendingMails = mailFormRepository.countByStatus(false);
-        
-        Map<String, Long> mailStats = new HashMap<>();
-        mailStats.put("total", totalMails);
-        mailStats.put("pending", pendingMails);
-        
-        // Eduroam istatistikleri
-        long totalEduroam = eduroamFormRepository.count();
-        long pendingEduroam = eduroamFormRepository.countByStatus(false);
-        
-        Map<String, Long> eduroamStats = new HashMap<>();
-        eduroamStats.put("total", totalEduroam);
-        eduroamStats.put("pending", pendingEduroam);
-        
+    public String showAdminPage(Model model) {
         // Kullanıcı istatistikleri
-        long totalUsers = userService.countUsers();
-        long activeUsers = userService.countActiveUsers();
-        
+        long totalUsers = userService.findAllUsers().size();
+        long activeUsers = userService.findAllUsers().stream()
+                .filter(UserDto::isEnabled)
+                .count();
         Map<String, Long> userStats = new HashMap<>();
         userStats.put("total", totalUsers);
         userStats.put("active", activeUsers);
-        
-        // Yeni form istatistikleri
-        Map<String, Long> wirelessStats = new HashMap<>();
-        wirelessStats.put("total", wirelessNetworkFormRepository.count());
-        wirelessStats.put("pending", wirelessNetworkFormRepository.countByStatus(false));
-        
-        Map<String, Long> ipMacStats = new HashMap<>();
-        ipMacStats.put("total", ipMacFormRepository.count());
-        ipMacStats.put("pending", ipMacFormRepository.countByStatus(false));
-        
-        // Son başvurular
+        model.addAttribute("userStats", userStats);
+
+        // Mail başvuruları
+        long mailPendingCount = mailFormRepository.countByStatus(false);
+        long mailApprovedCount = mailFormRepository.countByStatus(true);
         List<MailFormData> recentMailForms = mailFormRepository.findTop10ByOrderByApplyDateDesc();
-        List<EduroamFormData> recentEduroamForms = eduroamFormRepository.findTop10ByOrderByApplyDateDesc();
-        List<WirelessNetworkFormData> recentWirelessForms = wirelessNetworkFormRepository.findTop10ByOrderByApplyDateDesc();
-        List<IpMacFormData> recentIpMacForms = ipMacFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> mailStats = new HashMap<>();
+        mailStats.put("pending", mailPendingCount);
+        mailStats.put("approved", mailApprovedCount);
+        mailStats.put("total", mailPendingCount + mailApprovedCount);
         
+        // Eduroam başvuruları
+        long eduroamPendingCount = eduroamFormRepository.countByStatus(false);
+        long eduroamApprovedCount = eduroamFormRepository.countByStatus(true);
+        List<EduroamFormData> recentEduroamForms = eduroamFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> eduroamStats = new HashMap<>();
+        eduroamStats.put("pending", eduroamPendingCount);
+        eduroamStats.put("approved", eduroamApprovedCount);
+        eduroamStats.put("total", eduroamPendingCount + eduroamApprovedCount);
+        
+        // Kablosuz ağ başvuruları
+        long wirelessPendingCount = wirelessNetworkFormRepository.countByStatus(false);
+        long wirelessApprovedCount = wirelessNetworkFormRepository.countByStatus(true);
+        List<WirelessNetworkFormData> recentWirelessForms = wirelessNetworkFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> wirelessStats = new HashMap<>();
+        wirelessStats.put("pending", wirelessPendingCount);
+        wirelessStats.put("approved", wirelessApprovedCount);
+        wirelessStats.put("total", wirelessPendingCount + wirelessApprovedCount);
+        
+        // IP-MAC başvuruları
+        long ipMacPendingCount = ipMacFormRepository.countByStatus(false);
+        long ipMacApprovedCount = ipMacFormRepository.countByStatus(true);
+        List<IpMacFormData> recentIpMacForms = ipMacFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> ipMacStats = new HashMap<>();
+        ipMacStats.put("pending", ipMacPendingCount);
+        ipMacStats.put("approved", ipMacApprovedCount);
+        ipMacStats.put("total", ipMacPendingCount + ipMacApprovedCount);
+        
+        // GAUN Bulut başvuruları
+        long cloudPendingCount = cloudAccountFormRepository.countByStatus(false);
+        long cloudApprovedCount = cloudAccountFormRepository.countByStatus(true);
+        List<CloudAccountFormData> recentCloudForms = cloudAccountFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> cloudStats = new HashMap<>();
+        cloudStats.put("pending", cloudPendingCount);
+        cloudStats.put("approved", cloudApprovedCount);
+        cloudStats.put("total", cloudPendingCount + cloudApprovedCount);
+        
+        // VPN başvuruları
+        long vpnPendingCount = vpnFormRepository.countByStatus(false);
+        long vpnApprovedCount = vpnFormRepository.countByStatus(true);
+        List<VpnFormData> recentVpnForms = vpnFormRepository.findTop10ByOrderByApplyDateDesc();
+        Map<String, Long> vpnStats = new HashMap<>();
+        vpnStats.put("pending", vpnPendingCount);
+        vpnStats.put("approved", vpnApprovedCount);
+        vpnStats.put("total", vpnPendingCount + vpnApprovedCount);
+        
+        // İstatistikleri model'e ekle
         model.addAttribute("mailStats", mailStats);
         model.addAttribute("eduroamStats", eduroamStats);
-        model.addAttribute("userStats", userStats);
         model.addAttribute("wirelessStats", wirelessStats);
         model.addAttribute("ipMacStats", ipMacStats);
+        model.addAttribute("cloudStats", cloudStats);
+        model.addAttribute("vpnStats", vpnStats);
+        
+        // Son başvuruları model'e ekle
         model.addAttribute("recentMailForms", recentMailForms);
         model.addAttribute("recentEduroamForms", recentEduroamForms);
         model.addAttribute("recentWirelessForms", recentWirelessForms);
         model.addAttribute("recentIpMacForms", recentIpMacForms);
+        model.addAttribute("recentCloudForms", recentCloudForms);
+        model.addAttribute("recentVpnForms", recentVpnForms);
+        
+        // Başvuru sayılarını model'e ekle
+        model.addAttribute("hasMailForms", !recentMailForms.isEmpty());
+        model.addAttribute("hasEduroamForms", !recentEduroamForms.isEmpty());
+        model.addAttribute("hasWirelessForms", !recentWirelessForms.isEmpty());
+        model.addAttribute("hasIpMacForms", !recentIpMacForms.isEmpty());
+        model.addAttribute("hasCloudForms", !recentCloudForms.isEmpty());
+        model.addAttribute("hasVpnForms", !recentVpnForms.isEmpty());
         
         return "admin";
     }

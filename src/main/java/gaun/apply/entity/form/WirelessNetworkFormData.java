@@ -1,19 +1,25 @@
 package gaun.apply.entity.form;
 
-import jakarta.persistence.Column;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "wireless_network_form")
-public class WirelessNetworkFormData extends BaseFormData {
-    @Column(name = "mac_address")
-    private String macAddress;
+@Table(name = "wireless_network_forms")
+public class WirelessNetworkFormData {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
-    @Column(name = "device_type")
+    private String tcKimlikNo;
+    private String macAddress;
     private String deviceType;
+    private LocalDateTime applyDate;
+    private boolean status;
 } 

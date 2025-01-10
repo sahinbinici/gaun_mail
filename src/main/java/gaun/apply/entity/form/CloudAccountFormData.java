@@ -1,23 +1,20 @@
 package gaun.apply.entity.form;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "cloud_account_form_data")
+@Table(name = "cloud_account_forms")
 public class CloudAccountFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String username;
-    private String email;
-    private LocalDate applyDate;
+    private String tcKimlikNo;
+    private String purpose;
+    private String capacity;
+    private LocalDateTime applyDate;
     private boolean status;
 } 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-network-wired me-2"></i>
+                    IP-MAC İşlemleri
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Başvuru durumu kontrolü -->
+                <div th:if="${hasIpMacApplication == true}" class="row">
+                    <div class="col-12">
+                        <div class="info-group">
+                            <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
+                            <div th:if="${ipMacForm != null}" 
+                                 th:class="${ipMacForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label class="text-muted">Başvuru Durumu</label>
+                                        <h5 class="mb-0">
+                                            <span th:text="${ipMacForm.status ? 'Onaylandı' : 'Beklemede'}"
+                                                  th:class="${ipMacForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="text-muted">Başvuru Tarihi</label>
+                                        <h5 class="mb-0" th:text="${#temporals.format(ipMacForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="text-muted">MAC Adresi</label>
+                                        <h5 class="mb-0" th:text="${ipMacForm.macAddress}"></h5>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="text-muted">IP Adresi</label>
+                                        <h5 class="mb-0" th:text="${ipMacForm.ipAddress}"></h5>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="text-muted">Lokasyon</label>
+                                        <h5 class="mb-0" th:text="${ipMacForm.location}"></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Başvuru formu -->
+                <div th:if="${hasIpMacApplication == false}">
+                    <!-- Mevcut form içeriği -->
+                    <form id="ipMacForm" th:action="@{/staff/ip-mac/apply}" method="post" th:object="${ipMacFormDto}">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">TC Kimlik No</label>
+                                    <input type="text" class="form-control" th:field="*{tcKimlikNo}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">MAC Adresi</label>
+                                    <input type="text" class="form-control" th:field="*{macAddress}" 
+                                           pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+                                           placeholder="00:11:22:33:44:55">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">IP Adresi</label>
+                                    <input type="text" class="form-control" th:field="*{ipAddress}" 
+                                           pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                                           placeholder="192.168.1.1">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">Lokasyon</label>
+                                    <input type="text" class="form-control" th:field="*{location}" 
+                                           placeholder="Örn: A Blok - 101 Nolu Oda">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    MAC adresi formatı: 00:11:22:33:44:55 şeklinde olmalıdır.<br>
+                                    IP adresi formatı: 192.168.1.1 şeklinde olmalıdır.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

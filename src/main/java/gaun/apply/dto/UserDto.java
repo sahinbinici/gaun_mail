@@ -10,4 +10,6 @@ public class UserDto {
     
     @NotEmpty(message = "Şifre boş olamaz")
     private String password;
+    
+    private boolean enabled;
 }

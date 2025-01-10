@@ -1,22 +1,26 @@
 package gaun.apply.entity.form;
 
-import jakarta.persistence.Column;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "ip_mac_form")
-public class IpMacFormData extends BaseFormData {
-    @Column(name = "ip_address")
-    private String ipAddress;
+@Table(name = "ip_mac_forms")
+public class IpMacFormData {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
-    @Column(name = "mac_address")
+    private String tcKimlikNo;
     private String macAddress;
-    
-    @Column(name = "location")
+    private String ipAddress;
     private String location;
+    private LocalDateTime applyDate;
+    private boolean status;
 } 

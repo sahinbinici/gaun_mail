@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-cloud me-2"></i>
+                    GAUN Bulut Başvurusu
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Başvuru durumu kontrolü -->
+                <div th:if="${hasCloudApplication == true}" class="row">
+                    <div class="col-12">
+                        <div class="info-group">
+                            <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
+                            <div th:if="${cloudForm != null}" 
+                                 th:class="${cloudForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Başvuru Durumu</label>
+                                        <h5 class="mb-0">
+                                            <span th:text="${cloudForm.status ? 'Onaylandı' : 'Beklemede'}"
+                                                  th:class="${cloudForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Başvuru Tarihi</label>
+                                        <h5 class="mb-0" th:text="${#temporals.format(cloudForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Kapasite</label>
+                                        <h5 class="mb-0" th:text="${cloudForm.capacity}"></h5>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="text-muted">Kullanım Amacı</label>
+                                        <h5 class="mb-0" th:text="${cloudForm.purpose}"></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Başvuru formu -->
+                <div th:if="${hasCloudApplication == false}">
+                    <!-- Mevcut form içeriği -->
+                    <form id="cloudForm" th:action="@{/staff/cloud-account/apply}" method="post" th:object="${cloudAccountFormDto}">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">TC Kimlik No</label>
+                                    <input type="text" class="form-control" th:field="*{tcKimlikNo}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">Kapasite</label>
+                                    <select class="form-select" th:field="*{capacity}">
+                                        <option value="">Seçiniz</option>
+                                        <option value="5GB">5 GB</option>
+                                        <option value="10GB">10 GB</option>
+                                        <option value="20GB">20 GB</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-4">
+                                <div class="info-group">
+                                    <label class="form-label">Kullanım Amacı</label>
+                                    <textarea class="form-control" th:field="*{purpose}" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

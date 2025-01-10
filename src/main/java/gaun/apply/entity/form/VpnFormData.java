@@ -1,19 +1,20 @@
 package gaun.apply.entity.form;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "vpn_form")
-public class VpnFormData extends BaseFormData {
-    @Column(name = "purpose")
-    private String purpose;
+@Table(name = "vpn_forms")
+public class VpnFormData {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
-    @Column(name = "duration")
-    private Integer duration; // Ay cinsinden
+    private String tcKimlikNo;
+    private String purpose;
+    private String ipAddress;
+    private LocalDateTime applyDate;
+    private boolean status;
 } 

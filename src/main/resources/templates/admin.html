@@ -238,6 +238,365 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Kablosuz Ağ Sekmesi -->
+            <div class="tab-pane fade" id="wireless">
+                <!-- Başvuru varsa -->
+                <div th:if="${hasWirelessForms}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Kablosuz Ağ Başvuru İstatistikleri</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning">
+                                                <h5>Bekleyen Başvuru</h5>
+                                                <h3 th:text="${wirelessStats.pending}">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-success">
+                                                <h5>Onaylanan Başvuru</h5>
+                                                <h3 th:text="${wirelessStats.approved}">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kablosuz Ağ Başvuru Tablosu -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Son Kablosuz Ağ Başvuruları</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>TC Kimlik No</th>
+                                                    <th>MAC Adresi</th>
+                                                    <th>Cihaz Türü</th>
+                                                    <th>Başvuru Tarihi</th>
+                                                    <th>Durum</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="form : ${recentWirelessForms}">
+                                                    <td>
+                                                        <a href="#" onclick="showUserDetails(this)" 
+                                                           th:data-username="${form.tcKimlikNo}" 
+                                                           style="text-decoration: underline;">
+                                                            <span th:text="${form.tcKimlikNo}"></span>
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${form.macAddress}"></td>
+                                                    <td th:text="${form.deviceType}"></td>
+                                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:if="${!form.status}"
+                                                                th:onclick="'activateWirelessForm(\'' + ${form.id} + '\')'">
+                                                            Onayla
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru yoksa -->
+                <div th:unless="${hasWirelessForms}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Henüz kablosuz ağ başvurusu bulunmamaktadır.
+                </div>
+            </div>
+
+            <!-- IP-MAC Sekmesi -->
+            <div class="tab-pane fade" id="ip-mac">
+                <!-- Başvuru varsa -->
+                <div th:if="${hasIpMacForms}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>IP-MAC Başvuru İstatistikleri</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning">
+                                                <h5>Bekleyen Başvuru</h5>
+                                                <h3 th:text="${ipMacStats.pending}">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-success">
+                                                <h5>Onaylanan Başvuru</h5>
+                                                <h3 th:text="${ipMacStats.approved}">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Son IP-MAC Başvuruları</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>TC Kimlik No</th>
+                                                    <th>MAC Adresi</th>
+                                                    <th>IP Adresi</th>
+                                                    <th>Lokasyon</th>
+                                                    <th>Başvuru Tarihi</th>
+                                                    <th>Durum</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="form : ${recentIpMacForms}">
+                                                    <td>
+                                                        <a href="#" onclick="showUserDetails(this)" 
+                                                           th:data-username="${form.tcKimlikNo}" 
+                                                           style="text-decoration: underline;">
+                                                            <span th:text="${form.tcKimlikNo}"></span>
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${form.macAddress}"></td>
+                                                    <td th:text="${form.ipAddress}"></td>
+                                                    <td th:text="${form.location}"></td>
+                                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:if="${!form.status}"
+                                                                th:onclick="'activateIpMacForm(\'' + ${form.id} + '\')'">
+                                                            Onayla
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru yoksa -->
+                <div th:unless="${hasIpMacForms}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Henüz IP-MAC başvurusu bulunmamaktadır.
+                </div>
+            </div>
+
+            <!-- GAUN Bulut Sekmesi -->
+            <div class="tab-pane fade" id="cloud">
+                <!-- Başvuru varsa -->
+                <div th:if="${hasCloudForms}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>GAUN Bulut Başvuru İstatistikleri</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning">
+                                                <h5>Bekleyen Başvuru</h5>
+                                                <h3 th:text="${cloudStats.pending}">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-success">
+                                                <h5>Onaylanan Başvuru</h5>
+                                                <h3 th:text="${cloudStats.approved}">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Son GAUN Bulut Başvuruları</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>TC Kimlik No</th>
+                                                    <th>Kapasite</th>
+                                                    <th>Kullanım Amacı</th>
+                                                    <th>Başvuru Tarihi</th>
+                                                    <th>Durum</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="form : ${recentCloudForms}">
+                                                    <td>
+                                                        <a href="#" onclick="showUserDetails(this)" 
+                                                           th:data-username="${form.tcKimlikNo}" 
+                                                           style="text-decoration: underline;">
+                                                            <span th:text="${form.tcKimlikNo}"></span>
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${form.capacity}"></td>
+                                                    <td th:text="${form.purpose}"></td>
+                                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:if="${!form.status}"
+                                                                th:onclick="'activateCloudForm(\'' + ${form.id} + '\')'">
+                                                            Onayla
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru yoksa -->
+                <div th:unless="${hasCloudForms}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Henüz GAUN Bulut başvurusu bulunmamaktadır.
+                </div>
+            </div>
+
+            <!-- VPN Sekmesi -->
+            <div class="tab-pane fade" id="vpn">
+                <!-- Başvuru varsa -->
+                <div th:if="${hasVpnForms}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>VPN Başvuru İstatistikleri</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning">
+                                                <h5>Bekleyen Başvuru</h5>
+                                                <h3 th:text="${vpnStats.pending}">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-success">
+                                                <h5>Onaylanan Başvuru</h5>
+                                                <h3 th:text="${vpnStats.approved}">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Son VPN Başvuruları</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>TC Kimlik No</th>
+                                                    <th>IP Adresi</th>
+                                                    <th>Kullanım Amacı</th>
+                                                    <th>Başvuru Tarihi</th>
+                                                    <th>Durum</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="form : ${recentVpnForms}">
+                                                    <td>
+                                                        <a href="#" onclick="showUserDetails(this)" 
+                                                           th:data-username="${form.tcKimlikNo}" 
+                                                           style="text-decoration: underline;">
+                                                            <span th:text="${form.tcKimlikNo}"></span>
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${form.ipAddress}"></td>
+                                                    <td th:text="${form.purpose}"></td>
+                                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:if="${!form.status}"
+                                                                th:onclick="'activateVpnForm(\'' + ${form.id} + '\')'">
+                                                            Onayla
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru yoksa -->
+                <div th:unless="${hasVpnForms}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Henüz VPN başvurusu bulunmamaktadır.
+                </div>
+            </div>
         </div>
     </div>
 
