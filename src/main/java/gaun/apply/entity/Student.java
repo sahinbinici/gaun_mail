@@ -43,5 +43,7 @@ public class Student {
     private String ayrilisTarihi;
     @Column(name = "TC_KIMLIK_NO")
     private String tcKimlikNo;
+    @Column(name = "gsm1")
+    private String gsm1;
 
 }

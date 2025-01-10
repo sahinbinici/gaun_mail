@@ -1,11 +1,15 @@
 package gaun.apply.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.entity.form.MailFormData;
+import gaun.apply.repository.form.EduroamFormRepository;
+import gaun.apply.repository.form.MailFormRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,16 +17,14 @@ import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.EduroamFormData;
-import gaun.apply.entity.MailFormData;
 import gaun.apply.entity.Staff;
 import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
-import gaun.apply.repository.EduroamFormRepository;
-import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
 import static gaun.apply.util.ConvertUtil.convertEntityToDto;
+import gaun.apply.entity.Student;
+import gaun.apply.repository.StudentRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,36 +34,50 @@ public class UserServiceImpl implements UserService {
     private final StaffService staffService;
     private final MailFormRepository mailFormRepository;
     private final EduroamFormRepository eduroamFormRepository;
+    private final StudentRepository studentRepository;
 
     public UserServiceImpl(UserRepository userRepository,
                          RoleRepository roleRepository,
                          PasswordEncoder passwordEncoder,
                          StaffService staffService,
                          MailFormRepository mailFormRepository,
-                         EduroamFormRepository eduroamFormRepository) {
+                         EduroamFormRepository eduroamFormRepository,
+                         StudentRepository studentRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.staffService = staffService;
         this.mailFormRepository = mailFormRepository;
         this.eduroamFormRepository = eduroamFormRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public void saveUserStudent(StudentDto studentDto) {
+        // User kaydı
         User user = new User();
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
 
-        // Rol kontrolü ve ataması
         Role role = roleRepository.findByName("ROLE_USER");
         if (role == null) {
             role = new Role("ROLE_USER");
             roleRepository.save(role);
         }
-        
         user.setRoles(Arrays.asList(role));
         userRepository.save(user);
+/*
+        // Student kaydı
+        Student student = new Student();
+        student.setOgrenciNo(studentDto.getOgrenciNo());
+        student.setAd(studentDto.getAd());
+        student.setSoyad(studentDto.getSoyad());
+        student.setFakKod(studentDto.getFakKod());
+        student.setBolumAd(studentDto.getBolumAd());
+        student.setProgramAd(studentDto.getProgramAd());
+        student.setSinif(studentDto.getSinif());
+
+        studentRepository.save(student); */
     }
 
     @Override
@@ -131,7 +147,7 @@ public class UserServiceImpl implements UserService {
         mailFormData.setEmail(mailFormDto.getEmail());
         mailFormData.setPassword(mailFormDto.getPassword());
         mailFormData.setStatus(mailFormDto.isStatus());
-        mailFormData.setApplyDate(LocalDate.now());
+        mailFormData.setApplyDate(LocalDateTime.now());
         mailFormRepository.save(mailFormData);
     }
 
@@ -140,7 +156,7 @@ public class UserServiceImpl implements UserService {
         EduroamFormData eduroamFormData = new EduroamFormData();
         eduroamFormData.setUsername(eduroamFormDto.getUsername());
         eduroamFormData.setPassword(eduroamFormDto.getPassword());
-        eduroamFormData.setApplyDate(LocalDate.now());
+        eduroamFormData.setApplyDate(LocalDateTime.now());
         eduroamFormData.setStatus(eduroamFormDto.isStatus());
         eduroamFormRepository.save(eduroamFormData);
     }

@@ -12,15 +12,8 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "ip_mac_forms")
-public class IpMacFormData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String tcKimlikNo;
+public class IpMacFormData extends BaseFormData {
     private String macAddress;
     private String ipAddress;
     private String location;
-    private LocalDateTime applyDate;
-    private boolean status;
 } 

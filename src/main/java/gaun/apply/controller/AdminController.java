@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.EduroamFormData;
-import gaun.apply.entity.MailFormData;
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.Staff;
 import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.form.WirelessNetworkFormData;
 import gaun.apply.entity.user.User;
-import gaun.apply.repository.EduroamFormRepository;
-import gaun.apply.repository.MailFormRepository;
+import gaun.apply.repository.form.EduroamFormRepository;
+import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.repository.form.CloudAccountFormRepository;
 import gaun.apply.repository.form.IpMacFormRepository;
 import gaun.apply.repository.form.VpnFormRepository;
@@ -32,11 +32,14 @@ import gaun.apply.repository.form.WirelessNetworkFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
+import gaun.apply.service.form.FormService;
+import gaun.apply.entity.form.BaseFormData;
 
 @Controller
 public class AdminController {
     private final UserService userService;
     private final MailFormRepository mailFormRepository;
+    private final FormService formService;
     
     @Autowired
     private EduroamFormRepository eduroamFormRepository;
@@ -59,9 +62,10 @@ public class AdminController {
     @Autowired
     private VpnFormRepository vpnFormRepository;
 
-    public AdminController(UserService userService, MailFormRepository mailFormRepository) {
+    public AdminController(UserService userService, MailFormRepository mailFormRepository, FormService formService) {
         this.userService = userService;
         this.mailFormRepository = mailFormRepository;
+        this.formService = formService;
     }
 
     @GetMapping("/admin")
@@ -224,6 +228,24 @@ public class AdminController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Kullanıcı bilgileri alınamadı");
+        }
+    }
+
+    @PostMapping("/{formType}/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateForm(@PathVariable String formType, 
+                                        @PathVariable Long id) {
+        try {
+            String className = formType.substring(0, 1).toUpperCase() + 
+                              formType.substring(1) + "FormData";
+            @SuppressWarnings("unchecked")
+            Class<? extends BaseFormData> formClass = 
+                (Class<? extends BaseFormData>) Class.forName("gaun.apply.entity.form." + className);
+            formService.activateForm(id, formClass);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Form aktivasyonu başarısız: " + e.getMessage());
         }
     }
 } 

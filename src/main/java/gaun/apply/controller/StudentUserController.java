@@ -2,8 +2,8 @@ package gaun.apply.controller;
 
 import java.security.Principal;
 
-import gaun.apply.entity.EduroamFormData;
-import gaun.apply.entity.MailFormData;
+import gaun.apply.repository.form.MailFormRepository;
+import gaun.apply.repository.form.EduroamFormRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +15,8 @@ import gaun.apply.dto.StudentDto;
 import gaun.apply.entity.user.User;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
-import gaun.apply.repository.MailFormRepository;
-import gaun.apply.repository.EduroamFormRepository;
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.entity.form.MailFormData;
 
 @Controller
 @RequestMapping("/student")

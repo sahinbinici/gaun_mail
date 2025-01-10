@@ -38,4 +38,6 @@ public class StudentDto{
     private String ayrilisTarihi;
     @JsonProperty("TC_KIMLIK_NO")
     private String tcKimlikNo;
+    @JsonProperty("GSM1")
+    private String gsm1;
 }

@@ -8,6 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import gaun.apply.entity.Student;
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.entity.form.MailFormData;
+import gaun.apply.repository.form.EduroamFormRepository;
+import gaun.apply.repository.form.MailFormRepository;
+import gaun.apply.util.ConvertUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,13 +30,9 @@ import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.EduroamFormData;
-import gaun.apply.entity.MailFormData;
 import gaun.apply.entity.Staff;
 import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
-import gaun.apply.repository.EduroamFormRepository;
-import gaun.apply.repository.MailFormRepository;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
 import gaun.apply.service.StaffService;
@@ -126,10 +128,10 @@ public class BaseController {
                 model.addAttribute("userDto", new UserDto());
                 return "register";
             }
-
+            if(existingUser==null){
+                studentService.saveStudent(studentDto);
+            }
             userService.saveUserStudent(studentDto);
-            studentService.saveStudent(studentDto);
-            
             return "redirect:/register?success";
         } catch (Exception e) {
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu");

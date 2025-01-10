@@ -2,11 +2,11 @@ package gaun.apply.repository.form;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.stereotype.Repository;
 import gaun.apply.entity.form.IpMacFormData;
 
-public interface IpMacFormRepository extends JpaRepository<IpMacFormData, Long> {
+@Repository
+public interface IpMacFormRepository extends BaseFormRepository<IpMacFormData> {
     IpMacFormData findByTcKimlikNo(String tcKimlikNo);
     long countByStatus(boolean status);
     List<IpMacFormData> findTop10ByOrderByApplyDateDesc();

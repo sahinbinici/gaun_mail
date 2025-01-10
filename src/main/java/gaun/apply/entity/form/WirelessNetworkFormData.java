@@ -8,11 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import gaun.apply.entity.form.BaseFormData;
 
 @Data
 @Entity
 @Table(name = "wireless_network_forms")
-public class WirelessNetworkFormData {
+public class WirelessNetworkFormData extends BaseFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
