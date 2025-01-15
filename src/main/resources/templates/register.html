@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <title>Kayıt</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Login sayfasındaki tüm stiller buraya eklenecek */
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,.08);
+        }
+        
+        /* ... Login sayfasındaki diğer stiller ... */
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -26,10 +45,14 @@
                     <div class="card-header">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#student">Öğrenci</a>
+                                <a class="nav-link active" data-bs-toggle="tab" href="#student">
+                                    <i class="fas fa-user-graduate me-2"></i>Öğrenci
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#staff">Personel</a>
+                                <a class="nav-link" data-bs-toggle="tab" href="#staff">
+                                    <i class="fas fa-user-tie me-2"></i>Personel
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -39,24 +62,61 @@
                             <div class="tab-pane fade show active" id="student">
                                 <form th:action="@{/register/save/student}" method="post" th:object="${studentDto}">
                                     <div class="form-group mb-3">
-                                        <label class="form-label">Öğrenci No</label>
-                                        <input class="form-control" type="text" id="studentNumber"
-                                               th:field="*{ogrenciNo}" required/>
-                                        <p class="text-danger" th:if="${#fields.hasErrors('ogrenciNo')}" 
-                                           th:errors="*{ogrenciNo}"></p>
+                                        <label class="control-label">Öğrenci No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-id-card"></i>
+                                            </span>
+                                            <input type="text" 
+                                                   id="ogrenciNo" 
+                                                   name="ogrenciNo" 
+                                                   class="form-control" 
+                                                   placeholder="Öğrenci Numaranızı Girin" />
+                                        </div>
+                                        <p class="text-danger" th:if="${#fields.hasErrors('ogrenciNo')}" th:errors="*{ogrenciNo}"></p>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label class="form-label">Şifre</label>
-                                        <input class="form-control" type="password" id="studentPassword"
-                                               th:field="*{password}" required/>
-                                        <p class="text-danger" th:if="${#fields.hasErrors('password')}" 
-                                           th:errors="*{password}"></p>
+                                        <label class="control-label">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                            <input type="password" 
+                                                   id="password" 
+                                                   name="password" 
+                                                   class="form-control" 
+                                                   placeholder="Şifrenizi Girin" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="control-label">Doğum Tarihi</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                            <input type="text" 
+                                                   id="dogumTarihi" 
+                                                   name="dogumTarihi" 
+                                                   class="form-control" 
+                                                   placeholder="GG/AA/YYYY"
+                                                   pattern="\d{2}/\d{2}/\d{4}"
+                                                   required />
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Doğum tarihinizi gün/ay/yıl formatında giriniz (Örnek: 01/01/1990)
+                                        </small>
                                     </div>
 
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit">Kayıt Ol</button>
-                                        <span>Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yap</a></span>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                                        </button>
+                                        <span class="ms-3">Zaten hesabınız var mı? 
+                                            <a th:href="@{/login}">Giriş Yap</a>
+                                        </span>
                                     </div>
                                 </form>
                             </div>
@@ -65,26 +125,48 @@
                             <div class="tab-pane fade" id="staff">
                                 <form th:action="@{/register/save/staff}" method="post" th:object="${userDto}">
                                     <div class="form-group mb-3">
-                                        <label class="form-label">TC Kimlik No</label>
-                                        <input class="form-control" type="text" id="staffTcNo"
-                                               th:field="*{tcKimlikNo}" required
-                                               pattern="\d{11}" title="TC Kimlik No 11 haneli olmalıdır"/>
-                                        <p class="text-danger" th:if="${#fields.hasErrors('tcKimlikNo')}" 
-                                           th:errors="*{tcKimlikNo}"></p>
+                                        <label class="control-label">TC Kimlik No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-id-card"></i>
+                                            </span>
+                                            <input type="text" 
+                                                   id="staffTcNo"
+                                                   th:field="*{tcKimlikNo}"
+                                                   class="form-control"
+                                                   placeholder="TC Kimlik Numaranızı Girin"
+                                                   pattern="\d{11}"
+                                                   title="TC Kimlik No 11 haneli olmalıdır"
+                                                   required />
+                                        </div>
+                                        <p class="text-danger" th:if="${#fields.hasErrors('tcKimlikNo')}" th:errors="*{tcKimlikNo}"></p>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label class="form-label">Şifre</label>
-                                        <input class="form-control" type="password" id="staffPassword"
-                                               th:field="*{password}" required
-                                               minlength="6" title="Şifre en az 6 karakter olmalıdır"/>
-                                        <p class="text-danger" th:if="${#fields.hasErrors('password')}" 
-                                           th:errors="*{password}"></p>
+                                        <label class="control-label">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                            <input type="password"
+                                                   id="staffPassword"
+                                                   th:field="*{password}"
+                                                   class="form-control"
+                                                   placeholder="Şifrenizi Girin"
+                                                   minlength="6"
+                                                   title="Şifre en az 6 karakter olmalıdır"
+                                                   required />
+                                        </div>
+                                        <p class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
                                     </div>
 
                                     <div class="form-group">
-                                        <button class="btn btn-primary" type="submit">Kayıt Ol</button>
-                                        <span>Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yap</a></span>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                                        </button>
+                                        <span class="ms-3">Zaten hesabınız var mı? 
+                                            <a th:href="@{/login}">Giriş Yap</a>
+                                        </span>
                                     </div>
                                 </form>
                             </div>
@@ -93,12 +175,14 @@
                 </div>
 
                 <!-- Başarı Mesajı -->
-                <div th:if="${param.success}" class="alert alert-info mt-3">
+                <div th:if="${param.success}" class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i>
                     Kayıt işlemi başarıyla tamamlandı. <a th:href="@{/login}">Giriş yapmak için tıklayın</a>
                 </div>
 
                 <!-- Hata Mesajı -->
                 <div th:if="${param.error}" class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-circle me-2"></i>
                     <span th:text="${error}">Hata mesajı</span>
                 </div>
             </div>

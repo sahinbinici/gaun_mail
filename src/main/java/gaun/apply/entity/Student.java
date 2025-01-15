@@ -1,8 +1,10 @@
 package gaun.apply.entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
@@ -45,5 +47,6 @@ public class Student {
     private String tcKimlikNo;
     @Column(name = "gsm1")
     private String gsm1;
-
+    @Column(name = "dogum_tarihi")
+    private String dogumTarihi;
 }

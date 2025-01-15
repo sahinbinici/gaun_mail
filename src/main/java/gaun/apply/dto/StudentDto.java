@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 public class StudentDto{
@@ -40,4 +39,6 @@ public class StudentDto{
     private String tcKimlikNo;
     @JsonProperty("GSM1")
     private String gsm1;
+    @JsonProperty("DOGUM_TARIHI")
+    private String dogumTarihi;
 }
