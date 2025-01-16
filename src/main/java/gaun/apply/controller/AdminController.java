@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
@@ -158,6 +161,11 @@ public class AdminController {
         model.addAttribute("hasCloudForms", !recentCloudForms.isEmpty());
         model.addAttribute("hasVpnForms", !recentVpnForms.isEmpty());
         
+        // CSRF token'ı model'e ekle
+        CsrfToken token = (CsrfToken) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest().getAttribute(CsrfToken.class.getName());
+        model.addAttribute("_csrf", token);
+        
         return "admin";
     }
 
@@ -247,5 +255,45 @@ public class AdminController {
             return ResponseEntity.badRequest()
                 .body("Form aktivasyonu başarısız: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/wireless/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateWirelessForm(@PathVariable Long id) {
+        WirelessNetworkFormData wirelessForm = wirelessNetworkFormRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kablosuz ağ başvurusu bulunamadı"));
+        wirelessForm.setStatus(true);
+        wirelessNetworkFormRepository.save(wirelessForm);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/ip-mac/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateIpMacForm(@PathVariable Long id) {
+        IpMacFormData ipMacForm = ipMacFormRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
+        ipMacForm.setStatus(true);
+        ipMacFormRepository.save(ipMacForm);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/cloud/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateCloudForm(@PathVariable Long id) {
+        CloudAccountFormData cloudForm = cloudAccountFormRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("GAUN Bulut başvurusu bulunamadı"));
+        cloudForm.setStatus(true);
+        cloudAccountFormRepository.save(cloudForm);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/vpn/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateVpnForm(@PathVariable Long id) {
+        VpnFormData vpnForm = vpnFormRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
+        vpnForm.setStatus(true);
+        vpnFormRepository.save(vpnForm);
+        return ResponseEntity.ok().build();
     }
 } 
