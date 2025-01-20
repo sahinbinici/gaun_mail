@@ -648,7 +648,7 @@
     <script>
     function activateMailForm(id) {
         if (confirm('Bu mail başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
-            fetch('/mail/activate/' + id, {
+            fetch('/bim-basvuru/mail/activate/' + id, {
                 method: 'POST'
             }).then(response => {
                 if (response.ok) {
@@ -660,7 +660,7 @@
 
     function activateEduroamForm(id) {
         if (confirm('Bu eduroam başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
-            fetch('/eduroam/activate/' + id, {
+            fetch('/bim-basvuru/eduroam/activate/' + id, {
                 method: 'POST'
             }).then(response => {
                 if (response.ok) {

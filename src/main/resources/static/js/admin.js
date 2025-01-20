@@ -12,7 +12,7 @@ function activateWirelessForm(id) {
             headers[csrfHeader.content] = csrfToken.content;
         }
         
-        fetch(`/wireless/activate/${id}`, {
+        fetch(`/bim-basvuru/wireless/activate/${id}`, {
             method: 'POST',
             headers: headers
         })
@@ -45,7 +45,7 @@ function activateIpMacForm(id) {
             headers[csrfHeader.content] = csrfToken.content;
         }
         
-        fetch(`/ip-mac/activate/${id}`, {
+        fetch(`/bim-basvuru/ip-mac/activate/${id}`, {
             method: 'POST',
             headers: headers
         })
@@ -78,7 +78,7 @@ function activateCloudForm(id) {
             headers[csrfHeader.content] = csrfToken.content;
         }
         
-        fetch(`/cloud/activate/${id}`, {
+        fetch(`/bim-basvuru/cloud/activate/${id}`, {
             method: 'POST',
             headers: headers
         })
@@ -111,7 +111,7 @@ function activateVpnForm(id) {
             headers[csrfHeader.content] = csrfToken.content;
         }
         
-        fetch(`/vpn/activate/${id}`, {
+        fetch(`/bim-basvuru/vpn/activate/${id}`, {
             method: 'POST',
             headers: headers
         })
