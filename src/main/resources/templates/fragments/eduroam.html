@@ -175,7 +175,7 @@
                     }
 
                     try {
-                        const response = await fetch(`/check-eduroam-exists/${username}`);
+                        const response = await fetch(`/bim-basvuru/check-eduroam-exists/${username}`);
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
                         }

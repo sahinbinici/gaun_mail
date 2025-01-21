@@ -15,10 +15,10 @@
         
         <!-- Rol bazlı yönlendirme -->
         <div sec:authorize="hasRole('ROLE_STAFF')">
-            <a href="/staff/index" class="btn btn-primary">Ana Sayfaya Dön</a>
+            <a href="/bim-basvuru/staff/index" class="btn btn-primary">Ana Sayfaya Dön</a>
         </div>
         <div sec:authorize="hasRole('ROLE_USER')">
-            <a href="/student/index" class="btn btn-primary">Ana Sayfaya Dön</a>
+            <a href="/bim-basvuru/student/index" class="btn btn-primary">Ana Sayfaya Dön</a>
         </div>
     </div>
 

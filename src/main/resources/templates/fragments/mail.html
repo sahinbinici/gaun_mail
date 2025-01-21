@@ -198,7 +198,7 @@
                     }
 
                     // Şifre pattern kontrolü
-                    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+                    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
                     if (!passwordPattern.test(password.value)) {
                         alert('Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.');
                         return;
@@ -211,7 +211,7 @@
                     }
 
                     try {
-                        const response = await fetch(`/check-mail-exists/${username}`);
+                        const response = await fetch(`/bim-basvuru/check-mail-exists/${username}`);
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
                         }
