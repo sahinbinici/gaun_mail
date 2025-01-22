@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
@@ -38,6 +36,7 @@ import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 import gaun.apply.service.form.FormService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class AdminController {
@@ -73,7 +72,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String showAdminPage(Model model) {
+    public String showAdminPage(Model model, HttpServletRequest request) {
         // Kullanıcı istatistikleri
         long totalUsers = userService.findAllUsers().size();
         long activeUsers = userService.findAllUsers().stream()
@@ -162,10 +161,11 @@ public class AdminController {
         model.addAttribute("hasCloudForms", !recentCloudForms.isEmpty());
         model.addAttribute("hasVpnForms", !recentVpnForms.isEmpty());
         
-        // CSRF token'ı model'e ekle
-        CsrfToken token = (CsrfToken) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                .getRequest().getAttribute(CsrfToken.class.getName());
-        model.addAttribute("_csrf", token);
+        // CSRF token'ı ekle
+        CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if (csrf != null) {
+            model.addAttribute("_csrf", csrf);
+        }
         
         return "admin";
     }

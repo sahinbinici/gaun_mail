@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <title>Admin Paneli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSRF token meta etiketleri -->
     <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+    <!-- JavaScript dosyaları -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" th:src="@{/js/admin.js}"></script>
 </head>
 <body>
@@ -643,78 +646,5 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    function activateMailForm(id) {
-        if (confirm('Bu mail başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
-            fetch('/bim-basvuru/mail/activate/' + id, {
-                method: 'POST'
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                }
-            });
-        }
-    }
-
-    function activateEduroamForm(id) {
-        if (confirm('Bu eduroam başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
-            fetch('/bim-basvuru/eduroam/activate/' + id, {
-                method: 'POST'
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                }
-            });
-        }
-    }
-
-    function showUserDetails(element) {
-        const username = element.getAttribute('data-username');
-        
-        // Context path'i ekleyelim ve hata yönetimini geliştirelim
-        fetch(`/bim-basvuru/api/user-details/${username}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Kullanıcı bilgileri alınamadı');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Öğrenci/Personel tipine göre ilgili alanları doldur ve göster
-                if (data.type === 'STUDENT') {
-                    document.getElementById('studentDetails').style.display = 'block';
-                    document.getElementById('staffDetails').style.display = 'none';
-                    
-                    // Öğrenci bilgilerini doldur
-                    document.getElementById('ogrenciNo').textContent = data.ogrenciNo;
-                    document.getElementById('studentAd').textContent = data.ad;
-                    document.getElementById('studentSoyad').textContent = data.soyad;
-                    document.getElementById('fakulte').textContent = data.fakKod;
-                    document.getElementById('bolum').textContent = data.bolumAd;
-                    document.getElementById('program').textContent = data.programAd;
-                    document.getElementById('sinif').textContent = data.sinif;
-                } else {
-                    document.getElementById('studentDetails').style.display = 'none';
-                    document.getElementById('staffDetails').style.display = 'block';
-                    
-                    // Personel bilgilerini doldur
-                    document.getElementById('tcKimlikNo').textContent = data.tcKimlikNo;
-                    document.getElementById('staffAd').textContent = data.ad;
-                    document.getElementById('staffSoyad').textContent = data.soyad;
-                    document.getElementById('birim').textContent = data.birim;
-                    document.getElementById('unvan').textContent = data.unvan;
-                }
-                
-                // Modal'ı göster
-                new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-                alert('Kullanıcı bilgileri alınamadı: ' + error.message);
-            });
-    }
-    </script>
 </body>
 </html> 
