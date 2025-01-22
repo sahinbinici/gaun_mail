@@ -17,4 +17,5 @@ public abstract class BaseFormData {
     private String tcKimlikNo;
     private LocalDateTime applyDate;
     private boolean status;
+    private LocalDateTime approvalDate;
 } 

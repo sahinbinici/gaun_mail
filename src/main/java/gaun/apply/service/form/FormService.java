@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.time.LocalDateTime;
 
 @Service
 public class FormService {
@@ -33,6 +34,7 @@ public class FormService {
         BaseFormData form = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Form bulunamadı"));
         form.setStatus(true);
+        form.setApprovalDate(LocalDateTime.now());
         repository.save(form);
     }
 } 

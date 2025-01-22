@@ -131,6 +131,7 @@
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Email</th>
                                                 <th>Başvuru Tarihi</th>
+                                                <th>Onay Tarihi</th>
                                                 <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
@@ -146,7 +147,13 @@
                                                     </a>
                                                 </td>
                                                 <td th:text="${mailForm.email + '@gantep.edu.tr'}"></td>
-                                                <td th:text="${mailForm.applyDate}"></td>
+                                                <td th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                <td>
+                                                    <span th:if="${mailForm.approvalDate}" 
+                                                          th:text="${#temporals.format(mailForm.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                    </span>
+                                                    <span th:unless="${mailForm.approvalDate}">-</span>
+                                                </td>
                                                 <td th:text="${mailForm.password}"></td>
                                                 <td>
                                                     <span th:if="${mailForm.status}" class="badge bg-success">Aktif</span>
@@ -211,6 +218,7 @@
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Başvuru Tarihi</th>
+                                                <th>Onay Tarihi</th>
                                                 <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
@@ -225,7 +233,13 @@
                                                         <span th:text="${eduroamForm.username}"></span>
                                                     </a>
                                                 </td>
-                                                <td th:text="${eduroamForm.applyDate}"></td>
+                                                <td th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                <td>
+                                                    <span th:if="${eduroamForm.approvalDate}" 
+                                                          th:text="${#temporals.format(eduroamForm.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                    </span>
+                                                    <span th:unless="${eduroamForm.approvalDate}">-</span>
+                                                </td>
                                                 <td th:text="${eduroamForm.password}"></td>
                                                 <td>
                                                     <span th:if="${eduroamForm.status}" class="badge bg-success">Aktif</span>
@@ -294,6 +308,7 @@
                                                     <th>MAC Adresi</th>
                                                     <th>Cihaz Türü</th>
                                                     <th>Başvuru Tarihi</th>
+                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
@@ -310,6 +325,12 @@
                                                     <td th:text="${form.macAddress}"></td>
                                                     <td th:text="${form.deviceType}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.approvalDate}" 
+                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                        </span>
+                                                        <span th:unless="${form.approvalDate}">-</span>
+                                                    </td>
                                                     <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
                                                         <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
@@ -384,6 +405,7 @@
                                                     <th>IP Adresi</th>
                                                     <th>Lokasyon</th>
                                                     <th>Başvuru Tarihi</th>
+                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
@@ -401,6 +423,12 @@
                                                     <td th:text="${form.ipAddress}"></td>
                                                     <td th:text="${form.location}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.approvalDate}" 
+                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                        </span>
+                                                        <span th:unless="${form.approvalDate}">-</span>
+                                                    </td>
                                                     <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
                                                         <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
@@ -474,6 +502,7 @@
                                                     <th>Kapasite</th>
                                                     <th>Kullanım Amacı</th>
                                                     <th>Başvuru Tarihi</th>
+                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
@@ -490,6 +519,12 @@
                                                     <td th:text="${form.capacity}"></td>
                                                     <td th:text="${form.purpose}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.approvalDate}" 
+                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                        </span>
+                                                        <span th:unless="${form.approvalDate}">-</span>
+                                                    </td>
                                                     <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
                                                         <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
@@ -563,6 +598,7 @@
                                                     <th>IP Adresi</th>
                                                     <th>Kullanım Amacı</th>
                                                     <th>Başvuru Tarihi</th>
+                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
@@ -579,6 +615,12 @@
                                                     <td th:text="${form.ipAddress}"></td>
                                                     <td th:text="${form.purpose}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td>
+                                                        <span th:if="${form.approvalDate}" 
+                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
+                                                        </span>
+                                                        <span th:unless="${form.approvalDate}">-</span>
+                                                    </td>
                                                     <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
                                                         <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>

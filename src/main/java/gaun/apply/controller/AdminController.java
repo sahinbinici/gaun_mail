@@ -1,5 +1,6 @@
 package gaun.apply.controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,6 +184,7 @@ public class AdminController {
         MailFormData mailForm = mailFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
         mailForm.setStatus(true);
+        mailForm.setApprovalDate(LocalDateTime.now());
         mailFormRepository.save(mailForm);
         return ResponseEntity.ok().build();
     }
@@ -193,6 +195,7 @@ public class AdminController {
         EduroamFormData eduroamForm = eduroamFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
         eduroamForm.setStatus(true);
+        eduroamForm.setApprovalDate(LocalDateTime.now());
         eduroamFormRepository.save(eduroamForm);
         return ResponseEntity.ok().build();
     }
@@ -270,6 +273,7 @@ public class AdminController {
         WirelessNetworkFormData wirelessForm = wirelessNetworkFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kablosuz ağ başvurusu bulunamadı"));
         wirelessForm.setStatus(true);
+        wirelessForm.setApprovalDate(LocalDateTime.now());
         wirelessNetworkFormRepository.save(wirelessForm);
         return ResponseEntity.ok().build();
     }
