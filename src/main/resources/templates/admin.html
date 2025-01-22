@@ -673,9 +673,14 @@
     function showUserDetails(element) {
         const username = element.getAttribute('data-username');
         
-        // Backend'den kullanıcı bilgilerini al
-        fetch(`/api/user-details/${username}`)
-            .then(response => response.json())
+        // Context path'i ekleyelim ve hata yönetimini geliştirelim
+        fetch(`/bim-basvuru/api/user-details/${username}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Kullanıcı bilgileri alınamadı');
+                }
+                return response.json();
+            })
             .then(data => {
                 // Öğrenci/Personel tipine göre ilgili alanları doldur ve göster
                 if (data.type === 'STUDENT') {
@@ -706,8 +711,8 @@
                 new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
             })
             .catch(error => {
-                console.error('Kullanıcı bilgileri alınamadı:', error);
-                alert('Kullanıcı bilgileri alınamadı!');
+                console.error('Hata:', error);
+                alert('Kullanıcı bilgileri alınamadı: ' + error.message);
             });
     }
     </script>

@@ -5,38 +5,39 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
-import gaun.apply.entity.form.EduroamFormData;
-import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.Staff;
+import gaun.apply.entity.form.BaseFormData;
 import gaun.apply.entity.form.CloudAccountFormData;
+import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.IpMacFormData;
+import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.form.WirelessNetworkFormData;
 import gaun.apply.entity.user.User;
-import gaun.apply.repository.form.EduroamFormRepository;
-import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.repository.form.CloudAccountFormRepository;
+import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.IpMacFormRepository;
+import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.repository.form.VpnFormRepository;
 import gaun.apply.repository.form.WirelessNetworkFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 import gaun.apply.service.form.FormService;
-import gaun.apply.entity.form.BaseFormData;
 
 @Controller
 public class AdminController {
@@ -233,9 +234,15 @@ public class AdminController {
                 }
             }
             
+            if (response.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Kullanıcı bilgileri alınamadı");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Kullanıcı bilgileri alınamadı: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
