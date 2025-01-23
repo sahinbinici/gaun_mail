@@ -1,8 +1,8 @@
 package gaun.apply.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
@@ -11,8 +11,10 @@ public class StudentDto{
     private String error;
     @JsonProperty("OGRENCI_NO")
     private String ogrenciNo;
-    @JsonIgnore
+    @NotEmpty(message = "Şifre boş olamaz")
     private String password;
+    @NotEmpty(message = "Şifre tekrarı boş olamaz")
+    private String confirmPassword;
     @JsonProperty("AD")
     private String ad;
     @JsonProperty("SOYAD")

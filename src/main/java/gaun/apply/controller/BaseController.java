@@ -106,8 +106,12 @@ public class BaseController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("studentDto", new StudentDto());
-        model.addAttribute("userDto", new UserDto());
+        if (!model.containsAttribute("studentDto")) {
+            model.addAttribute("studentDto", new StudentDto());
+        }
+        if (!model.containsAttribute("userDto")) {
+            model.addAttribute("userDto", new UserDto());
+        }
         return "register";
     }
 
@@ -116,16 +120,26 @@ public class BaseController {
                                     BindingResult result,
                                     Model model) {
         try {
-            User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
-            if (existingUser != null) {
-                result.rejectValue("ogrenciNo", null, "Bu öğrenci numarası ile daha önce kayıt yapılmış");
-                return "register";
-            }
-
+            // Form validasyon hatası varsa
             if (result.hasErrors()) {
                 model.addAttribute("userDto", new UserDto());
                 return "register";
             }
+
+            User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
+            if (existingUser != null) {
+                model.addAttribute("error", "Bu öğrenci numarası ile daha önce kayıt yapılmış");
+                model.addAttribute("userDto", new UserDto());
+                return "register";
+            }
+
+            // Şifre eşleşme kontrolü
+            if (!studentDto.getPassword().equals(studentDto.getConfirmPassword())) {
+                model.addAttribute("error", "Şifreler eşleşmiyor");
+                model.addAttribute("userDto", new UserDto());
+                return "register";
+            }
+            
             if(existingUser==null){
                 studentService.saveStudent(studentDto);
             }
@@ -143,35 +157,37 @@ public class BaseController {
                                   BindingResult result,
                                   Model model) {
         try {
-            // Önce mevcut kullanıcı kontrolü
-            User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
-            if (existingUser != null) {
-                result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
-                model.addAttribute("studentDto", new StudentDto());
-                return "register";
-            }
-
-            // Form validasyon kontrolü
+            // Form validasyon hatası varsa
             if (result.hasErrors()) {
                 model.addAttribute("studentDto", new StudentDto());
                 return "register";
             }
 
-            // Personel veritabanında kontrol
-
-            Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
-            if (staff == null) {
-                result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile personel kaydı bulunamadı");
+            User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
+            if (existingUser != null) {
+                model.addAttribute("error", "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("studentDto", new StudentDto());
                 return "register";
             }
 
-            // Personel kaydını yap
+            // Şifre eşleşme kontrolü
+            if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+                model.addAttribute("error", "Şifreler eşleşmiyor");
+                model.addAttribute("studentDto", new StudentDto());
+                return "register";
+            }
+
+            Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
+            if (staff == null) {
+                model.addAttribute("error", "Bu TC kimlik numarası ile personel kaydı bulunamadı");
+                model.addAttribute("studentDto", new StudentDto());
+                return "register";
+            }
+
             userService.saveUserStaff(userDto);
             return "redirect:/register?success";
             
         } catch (Exception e) {
-            e.printStackTrace(); // Loglama için
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
             model.addAttribute("studentDto", new StudentDto());
             return "register";

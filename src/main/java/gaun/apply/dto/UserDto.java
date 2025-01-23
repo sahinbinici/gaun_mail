@@ -11,5 +11,8 @@ public class UserDto {
     @NotEmpty(message = "Şifre boş olamaz")
     private String password;
     
+    @NotEmpty(message = "Şifre tekrarı boş olamaz")
+    private String confirmPassword;
+    
     private boolean enabled;
 }
