@@ -143,6 +143,13 @@ public class BaseController {
                                   BindingResult result,
                                   Model model) {
         try {
+            // Şifre eşleşme kontrolü
+            if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+                result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
+                model.addAttribute("studentDto", new StudentDto());
+                return "register";
+            }
+
             // Önce mevcut kullanıcı kontrolü
             User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
             if (existingUser != null) {
@@ -158,7 +165,6 @@ public class BaseController {
             }
 
             // Personel veritabanında kontrol
-
             Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
             if (staff == null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile personel kaydı bulunamadı");
@@ -171,7 +177,7 @@ public class BaseController {
             return "redirect:/register?success";
             
         } catch (Exception e) {
-            e.printStackTrace(); // Loglama için
+            e.printStackTrace();
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
             model.addAttribute("studentDto", new StudentDto());
             return "register";
