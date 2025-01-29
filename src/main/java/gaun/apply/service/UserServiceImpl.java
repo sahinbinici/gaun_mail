@@ -66,18 +66,6 @@ public class UserServiceImpl implements UserService {
         }
         user.setRoles(Arrays.asList(role));
         userRepository.save(user);
-/*
-        // Student kaydı
-        Student student = new Student();
-        student.setOgrenciNo(studentDto.getOgrenciNo());
-        student.setAd(studentDto.getAd());
-        student.setSoyad(studentDto.getSoyad());
-        student.setFakKod(studentDto.getFakKod());
-        student.setBolumAd(studentDto.getBolumAd());
-        student.setProgramAd(studentDto.getProgramAd());
-        student.setSinif(studentDto.getSinif());
-
-        studentRepository.save(student); */
     }
 
     @Override

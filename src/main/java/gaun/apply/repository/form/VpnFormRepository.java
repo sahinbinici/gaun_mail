@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VpnFormRepository extends BaseFormRepository<VpnFormData> {
     VpnFormData findByTcKimlikNo(String tcKimlikNo);
-    long countByStatus(boolean status);
-    List<VpnFormData> findTop10ByOrderByApplyDateDesc();
 } 

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import gaun.apply.service.form.EduroamFormService;
+import gaun.apply.service.form.MailFormService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +40,7 @@ import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 import jakarta.validation.Valid;
 
+
 @Controller
 @RequestMapping("/")
 public class BaseController {
@@ -49,15 +52,17 @@ public class BaseController {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final MailFormService mailFormService;
+    private final EduroamFormService eduroamFormService;
 
-    public BaseController(UserService userService, 
-                         StudentService studentService,
-                         MailFormRepository mailFormRepository,
-                         EduroamFormRepository eduroamFormRepository,
-                         StaffService staffService,
-                         PasswordEncoder passwordEncoder,
-                         RoleRepository roleRepository,
-                         UserRepository userRepository) {
+    public BaseController(UserService userService,
+                          StudentService studentService,
+                          MailFormRepository mailFormRepository,
+                          EduroamFormRepository eduroamFormRepository,
+                          StaffService staffService,
+                          PasswordEncoder passwordEncoder,
+                          RoleRepository roleRepository,
+                          UserRepository userRepository, MailFormService mailFormService, EduroamFormService eduroamFormService) {
         this.userService = userService;
         this.studentService = studentService;
         this.mailFormRepository = mailFormRepository;
@@ -66,6 +71,8 @@ public class BaseController {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.mailFormService = mailFormService;
+        this.eduroamFormService = eduroamFormService;
     }
 
     @GetMapping("/")
@@ -203,7 +210,7 @@ public class BaseController {
                 return "fragments/index";
             }
 
-            MailFormData existingMailForm = mailFormRepository.findByUsername(mailFormDto.getUsername());
+            MailFormData existingMailForm = mailFormService.mailFormData(mailFormDto.getUsername());//mailFormRepository.findByUsername(mailFormDto.getUsername());
             if (existingMailForm != null) {
                 return "redirect:/index?mailExists=true";
             }
@@ -239,7 +246,7 @@ public class BaseController {
             }
 
             // Kullanıcı adı kontrolü
-            EduroamFormData existingEduroam = eduroamFormRepository.findByUsername(eduroamFormDto.getUsername());
+            EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getUsername());//eduroamFormRepository.findByUsername(eduroamFormDto.getUsername());
             if (existingEduroam != null) {
                 model.addAttribute("error", "Bu kullanıcı adı ile daha önce başvuru yapılmış");
                 return "eduroam-apply";
@@ -263,7 +270,7 @@ public class BaseController {
     @ResponseBody
     public Map<String, Object> checkMailExists(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        MailFormData existingMail = mailFormRepository.findByUsername(username);
+        MailFormData existingMail = mailFormService.mailFormData(username);//mailFormRepository.findByUsername(username);
         
         if (existingMail != null) {
             response.put("exists", true);
@@ -280,7 +287,7 @@ public class BaseController {
     @ResponseBody
     public Map<String, Object> checkEduroamExists(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        EduroamFormData existingEduroam = eduroamFormRepository.findByUsername(username);
+        EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(username);//eduroamFormRepository.findByUsername(username);
         
         if (existingEduroam != null) {
             response.put("exists", true);
@@ -343,11 +350,11 @@ public class BaseController {
                     model.addAttribute("user", user);
                     
                     // Mail başvurusu kontrolü
-                    MailFormData mailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
+                    MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
                     model.addAttribute("hasMailApplication", mailForm != null);
                     
                     // Eduroam başvurusu kontrolü
-                    EduroamFormData eduroamForm = eduroamFormRepository.findByUsername(user.getIdentityNumber());
+                    EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());//eduroamFormRepository.findByUsername(user.getIdentityNumber());
                     model.addAttribute("hasEduroamApplication", eduroamForm != null);
                 }
             } catch (Exception e) {

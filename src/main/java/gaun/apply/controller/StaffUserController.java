@@ -3,6 +3,9 @@ package gaun.apply.controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
+import gaun.apply.service.form.EduroamFormService;
+import gaun.apply.service.form.MailFormService;
+import gaun.apply.service.form.VpnFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +54,12 @@ public class StaffUserController {
     private WirelessNetworkFormRepository wirelessNetworkFormRepository;
     @Autowired
     private IpMacFormRepository ipMacFormRepository;
+    @Autowired
+    private MailFormService mailFormService;
+    @Autowired
+    private EduroamFormService eduroamFormService;
+    @Autowired
+    private VpnFormService vpnFormService;
 
     public StaffUserController(UserService userService, 
                              StaffService staffService,
@@ -186,12 +195,12 @@ public class StaffUserController {
             model.addAttribute("user", user);
             
             // Tüm başvuru durumlarını kontrol et
-            MailFormData mailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
-            EduroamFormData eduroamForm = eduroamFormRepository.findByUsername(user.getIdentityNumber());
+            MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
+            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());//eduroamFormRepository.findByUsername(user.getIdentityNumber());
             WirelessNetworkFormData wirelessForm = wirelessNetworkFormRepository.findByTcKimlikNo(identityNumber);
             IpMacFormData ipMacForm = ipMacFormRepository.findByTcKimlikNo(identityNumber);
             CloudAccountFormData cloudForm = cloudAccountFormRepository.findByTcKimlikNo(identityNumber);
-            VpnFormData vpnForm = vpnFormRepository.findByTcKimlikNo(identityNumber);
+            VpnFormData vpnForm = vpnFormService.findByTcKimlikNo(identityNumber);//vpnFormRepository.findByTcKimlikNo(identityNumber);
             
             // Başvuru durumlarını model'e ekle
             model.addAttribute("hasMailApplication", mailForm != null);

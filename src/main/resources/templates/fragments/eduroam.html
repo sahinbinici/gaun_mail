@@ -17,7 +17,7 @@
                         <div class="col-12">
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                                <div th:with="eduroamForm=${@eduroamFormRepository.findByUsername(user.identityNumber)}">
+                                <div th:with="eduroamForm=${@eduroamFormService.eduroamFormData(user.identityNumber)}">
                                     <div th:if="${eduroamForm != null}" 
                                          th:class="${eduroamForm.status ? 'alert alert-success' : 'alert alert-warning'}">
                                         <div class="row">

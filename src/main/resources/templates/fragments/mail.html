@@ -17,7 +17,7 @@
                         <div class="col-12">
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                                <div th:with="mailForm=${@mailFormRepository.findByUsername(user.identityNumber)}">
+                                <div th:with="mailForm=${@mailFormService.mailFormData(user.identityNumber)}">
                                     <div th:if="${mailForm != null}" 
                                          th:class="${mailForm.status ? 'alert alert-success' : 'alert alert-warning'}">
                                         <div class="row">

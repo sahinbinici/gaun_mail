@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -27,16 +26,17 @@ import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.form.WirelessNetworkFormData;
 import gaun.apply.entity.user.User;
-import gaun.apply.repository.form.CloudAccountFormRepository;
-import gaun.apply.repository.form.EduroamFormRepository;
-import gaun.apply.repository.form.IpMacFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
-import gaun.apply.repository.form.VpnFormRepository;
-import gaun.apply.repository.form.WirelessNetworkFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
+import gaun.apply.service.form.CloudAccountFormService;
+import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.FormService;
+import gaun.apply.service.form.IpMacFormService;
+import gaun.apply.service.form.MailFormService;
+import gaun.apply.service.form.VpnFormService;
+import gaun.apply.service.form.WirelessNetworkFormService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -44,32 +44,27 @@ public class AdminController {
     private final UserService userService;
     private final MailFormRepository mailFormRepository;
     private final FormService formService;
-    
-    @Autowired
-    private EduroamFormRepository eduroamFormRepository;
+    private final StudentService studentService;
+    private final StaffService staffService;
+    private final MailFormService mailFormService;
+    private final EduroamFormService eduroamFormService;
+    private final VpnFormService vpnFormService;
+    private final WirelessNetworkFormService wirelessNetworkFormService;
+    private final CloudAccountFormService cloudAccountFormService;
+    private final IpMacFormService ipMacFormService;
 
-    @Autowired
-    private StudentService studentService;
-
-    @Autowired
-    private StaffService staffService;
-
-    @Autowired
-    private WirelessNetworkFormRepository wirelessNetworkFormRepository;
-
-    @Autowired
-    private IpMacFormRepository ipMacFormRepository;
-
-    @Autowired
-    private CloudAccountFormRepository cloudAccountFormRepository;
-
-    @Autowired
-    private VpnFormRepository vpnFormRepository;
-
-    public AdminController(UserService userService, MailFormRepository mailFormRepository, FormService formService) {
+    public AdminController(UserService userService, MailFormRepository mailFormRepository, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, WirelessNetworkFormService wirelessNetworkFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService) {
         this.userService = userService;
         this.mailFormRepository = mailFormRepository;
         this.formService = formService;
+        this.studentService = studentService;
+        this.staffService = staffService;
+        this.mailFormService = mailFormService;
+        this.eduroamFormService = eduroamFormService;
+        this.vpnFormService = vpnFormService;
+        this.wirelessNetworkFormService = wirelessNetworkFormService;
+        this.cloudAccountFormService = cloudAccountFormService;
+        this.ipMacFormService = ipMacFormService;
     }
 
     @GetMapping("/admin")
@@ -85,54 +80,54 @@ public class AdminController {
         model.addAttribute("userStats", userStats);
 
         // Mail başvuruları
-        long mailPendingCount = mailFormRepository.countByStatus(false);
-        long mailApprovedCount = mailFormRepository.countByStatus(true);
-        List<MailFormData> recentMailForms = mailFormRepository.findTop10ByOrderByApplyDateDesc();
+        long mailPendingCount = mailFormService.countByStatus(false);//mailFormRepository.countByStatus(false);
+        long mailApprovedCount = mailFormService.countByStatus(true);//mailFormRepository.countByStatus(true);
+        List<MailFormData> recentMailForms = mailFormService.findTop10ByOrderByApplyDateDesc();//mailFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> mailStats = new HashMap<>();
         mailStats.put("pending", mailPendingCount);
         mailStats.put("approved", mailApprovedCount);
         mailStats.put("total", mailPendingCount + mailApprovedCount);
         
         // Eduroam başvuruları
-        long eduroamPendingCount = eduroamFormRepository.countByStatus(false);
-        long eduroamApprovedCount = eduroamFormRepository.countByStatus(true);
-        List<EduroamFormData> recentEduroamForms = eduroamFormRepository.findTop10ByOrderByApplyDateDesc();
+        long eduroamPendingCount = eduroamFormService.countByStatus(false);//eduroamFormRepository.countByStatus(false);
+        long eduroamApprovedCount = eduroamFormService.countByStatus(true);//eduroamFormRepository.countByStatus(true);
+        List<EduroamFormData> recentEduroamForms = eduroamFormService.findTop10ByOrderByApplyDateDesc();//eduroamFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> eduroamStats = new HashMap<>();
         eduroamStats.put("pending", eduroamPendingCount);
         eduroamStats.put("approved", eduroamApprovedCount);
         eduroamStats.put("total", eduroamPendingCount + eduroamApprovedCount);
         
         // Kablosuz ağ başvuruları
-        long wirelessPendingCount = wirelessNetworkFormRepository.countByStatus(false);
-        long wirelessApprovedCount = wirelessNetworkFormRepository.countByStatus(true);
-        List<WirelessNetworkFormData> recentWirelessForms = wirelessNetworkFormRepository.findTop10ByOrderByApplyDateDesc();
+        long wirelessPendingCount = wirelessNetworkFormService.countByStatus(false);//wirelessNetworkFormRepository.countByStatus(false);
+        long wirelessApprovedCount = wirelessNetworkFormService.countByStatus(true);//wirelessNetworkFormRepository.countByStatus(true);
+        List<WirelessNetworkFormData> recentWirelessForms = wirelessNetworkFormService.findTop10ByOrderByApplyDateDesc();//wirelessNetworkFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> wirelessStats = new HashMap<>();
         wirelessStats.put("pending", wirelessPendingCount);
         wirelessStats.put("approved", wirelessApprovedCount);
         wirelessStats.put("total", wirelessPendingCount + wirelessApprovedCount);
         
         // IP-MAC başvuruları
-        long ipMacPendingCount = ipMacFormRepository.countByStatus(false);
-        long ipMacApprovedCount = ipMacFormRepository.countByStatus(true);
-        List<IpMacFormData> recentIpMacForms = ipMacFormRepository.findTop10ByOrderByApplyDateDesc();
+        long ipMacPendingCount = ipMacFormService.countByStatus(false);//ipMacFormRepository.countByStatus(false);
+        long ipMacApprovedCount = ipMacFormService.countByStatus(true);//ipMacFormRepository.countByStatus(true);
+        List<IpMacFormData> recentIpMacForms = ipMacFormService.findTop10ByOrderByApplyDateDesc();//ipMacFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> ipMacStats = new HashMap<>();
         ipMacStats.put("pending", ipMacPendingCount);
         ipMacStats.put("approved", ipMacApprovedCount);
         ipMacStats.put("total", ipMacPendingCount + ipMacApprovedCount);
         
         // GAUN Bulut başvuruları
-        long cloudPendingCount = cloudAccountFormRepository.countByStatus(false);
-        long cloudApprovedCount = cloudAccountFormRepository.countByStatus(true);
-        List<CloudAccountFormData> recentCloudForms = cloudAccountFormRepository.findTop10ByOrderByApplyDateDesc();
+        long cloudPendingCount = cloudAccountFormService.countByStatus(false);//cloudAccountFormRepository.countByStatus(false);
+        long cloudApprovedCount = cloudAccountFormService.countByStatus(true);//cloudAccountFormRepository.countByStatus(true);
+        List<CloudAccountFormData> recentCloudForms = cloudAccountFormService.findTop10ByOrderByApplyDateDesc();//cloudAccountFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> cloudStats = new HashMap<>();
         cloudStats.put("pending", cloudPendingCount);
         cloudStats.put("approved", cloudApprovedCount);
         cloudStats.put("total", cloudPendingCount + cloudApprovedCount);
         
         // VPN başvuruları
-        long vpnPendingCount = vpnFormRepository.countByStatus(false);
-        long vpnApprovedCount = vpnFormRepository.countByStatus(true);
-        List<VpnFormData> recentVpnForms = vpnFormRepository.findTop10ByOrderByApplyDateDesc();
+        long vpnPendingCount = vpnFormService.countByStatus(false);//vpnFormRepository.countByStatus(false);
+        long vpnApprovedCount = vpnFormService.countByStatus(true);//vpnFormRepository.countByStatus(true);
+        List<VpnFormData> recentVpnForms = vpnFormService.findTop10ByOrderByApplyDateDesc();//vpnFormRepository.findTop10ByOrderByApplyDateDesc();
         Map<String, Long> vpnStats = new HashMap<>();
         vpnStats.put("pending", vpnPendingCount);
         vpnStats.put("approved", vpnApprovedCount);
@@ -181,22 +176,22 @@ public class AdminController {
     @PostMapping("/mail/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateMailForm(@PathVariable Long id) {
-        MailFormData mailForm = mailFormRepository.findById(id)
+        MailFormData mailForm = mailFormService.findById(id)//mailFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
         mailForm.setStatus(true);
         mailForm.setApprovalDate(LocalDateTime.now());
-        mailFormRepository.save(mailForm);
+        mailFormService.saveMailFormData(mailForm);//mailFormRepository.save(mailForm);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/eduroam/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateEduroamForm(@PathVariable Long id) {
-        EduroamFormData eduroamForm = eduroamFormRepository.findById(id)
+        EduroamFormData eduroamForm = eduroamFormService.findById(id)//eduroamFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
         eduroamForm.setStatus(true);
         eduroamForm.setApprovalDate(LocalDateTime.now());
-        eduroamFormRepository.save(eduroamForm);
+        eduroamFormService.saveEduroamFormData(eduroamForm);//eduroamFormRepository.save(eduroamForm);
         return ResponseEntity.ok().build();
     }
 
@@ -270,41 +265,44 @@ public class AdminController {
     @PostMapping("/wireless/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateWirelessForm(@PathVariable Long id) {
-        WirelessNetworkFormData wirelessForm = wirelessNetworkFormRepository.findById(id)
+        WirelessNetworkFormData wirelessForm = wirelessNetworkFormService.findById(id)//wirelessNetworkFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kablosuz ağ başvurusu bulunamadı"));
         wirelessForm.setStatus(true);
         wirelessForm.setApprovalDate(LocalDateTime.now());
-        wirelessNetworkFormRepository.save(wirelessForm);
+        wirelessNetworkFormService.saveWirelessNetworkFormData(wirelessForm);//wirelessNetworkFormRepository.save(wirelessForm);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/ip-mac/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateIpMacForm(@PathVariable Long id) {
-        IpMacFormData ipMacForm = ipMacFormRepository.findById(id)
+        IpMacFormData ipMacForm = ipMacFormService.findById(id)
                 .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
         ipMacForm.setStatus(true);
-        ipMacFormRepository.save(ipMacForm);
+        ipMacForm.setApprovalDate(LocalDateTime.now());
+        ipMacFormService.saveIpMacFormData(ipMacForm);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/cloud/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateCloudForm(@PathVariable Long id) {
-        CloudAccountFormData cloudForm = cloudAccountFormRepository.findById(id)
+        CloudAccountFormData cloudForm = cloudAccountFormService.findById(id)
                 .orElseThrow(() -> new RuntimeException("GAUN Bulut başvurusu bulunamadı"));
         cloudForm.setStatus(true);
-        cloudAccountFormRepository.save(cloudForm);
+        cloudForm.setApprovalDate(LocalDateTime.now());
+        cloudAccountFormService.saveCloudAccountFormData(cloudForm);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/vpn/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateVpnForm(@PathVariable Long id) {
-        VpnFormData vpnForm = vpnFormRepository.findById(id)
+        VpnFormData vpnForm = vpnFormService.findById(id)
                 .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
         vpnForm.setStatus(true);
-        vpnFormRepository.save(vpnForm);
+        vpnForm.setApprovalDate(LocalDateTime.now());
+        vpnFormService.saveVpnFormData(vpnForm);
         return ResponseEntity.ok().build();
     }
 } 

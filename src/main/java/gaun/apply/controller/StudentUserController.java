@@ -2,6 +2,8 @@ package gaun.apply.controller;
 
 import java.security.Principal;
 
+import gaun.apply.service.form.EduroamFormService;
+import gaun.apply.service.form.MailFormService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,15 +27,19 @@ public class StudentUserController {
     private final StudentService studentService;
     private final MailFormRepository mailFormRepository;
     private final EduroamFormRepository eduroamFormRepository;
+    private final MailFormService mailFormService;
+    private final EduroamFormService eduroamFormService;
 
-    public StudentUserController(UserService userService, 
-                               StudentService studentService,
-                               MailFormRepository mailFormRepository,
-                               EduroamFormRepository eduroamFormRepository) {
+    public StudentUserController(UserService userService,
+                                 StudentService studentService,
+                                 MailFormRepository mailFormRepository,
+                                 EduroamFormRepository eduroamFormRepository, MailFormService mailFormService, EduroamFormService eduroamFormService) {
         this.userService = userService;
         this.studentService = studentService;
         this.mailFormRepository = mailFormRepository;
         this.eduroamFormRepository = eduroamFormRepository;
+        this.mailFormService = mailFormService;
+        this.eduroamFormService = eduroamFormService;
     }
 
     @GetMapping("/index")
@@ -53,11 +59,11 @@ public class StudentUserController {
         if (user != null) {
             model.addAttribute("user", user);
             // Mail başvurusu kontrolü
-            MailFormData mailForm = mailFormRepository.findByUsername(user.getIdentityNumber());
+            MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
             hasMailApp = (mailForm != null);
             
             // Eduroam başvurusu kontrolü
-            EduroamFormData eduroamForm = eduroamFormRepository.findByUsername(user.getIdentityNumber());
+            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());//eduroamFormRepository.findByUsername(user.getIdentityNumber());
             hasEduroamApp = (eduroamForm != null);
             
             // Form DTO'ları için kullanıcı adını set et

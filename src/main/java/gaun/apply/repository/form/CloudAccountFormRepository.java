@@ -9,7 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CloudAccountFormRepository extends BaseFormRepository<CloudAccountFormData> {
-    CloudAccountFormData findByTcKimlikNo(String tcKimlikNo);
-    long countByStatus(boolean status);
-    List<CloudAccountFormData> findTop10ByOrderByApplyDateDesc();
+
 } 
