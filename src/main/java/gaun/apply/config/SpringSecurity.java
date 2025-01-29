@@ -37,7 +37,7 @@ public class SpringSecurity {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/**").hasRole("STAFF")
                         .requestMatchers("/student/**").hasRole("USER")
-                        .requestMatchers("/mail/apply").permitAll()
+                        .requestMatchers("/mail/apply", "/mail/apply-success").permitAll()
                         .requestMatchers("/eduroam/apply", "/eduroam/apply-success").permitAll()
                         .requestMatchers("/check-mail-exists/**").permitAll()
                         .requestMatchers("/check-eduroam-exists/**").permitAll()

@@ -3,9 +3,6 @@ package gaun.apply.controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
-import gaun.apply.service.form.EduroamFormService;
-import gaun.apply.service.form.MailFormService;
-import gaun.apply.service.form.VpnFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +34,9 @@ import gaun.apply.repository.form.VpnFormRepository;
 import gaun.apply.repository.form.WirelessNetworkFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.UserService;
+import gaun.apply.service.form.EduroamFormService;
+import gaun.apply.service.form.MailFormService;
+import gaun.apply.service.form.VpnFormService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -127,7 +127,7 @@ public class StaffUserController {
             formData.setStatus(false);
             
             cloudAccountFormRepository.save(formData);
-            return "redirect:/staff/index?cloudSuccess";
+            return "redirect:/staff/cloud-account/success";
         } catch (Exception e) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
             return "fragments/cloud-account :: content";
@@ -164,7 +164,7 @@ public class StaffUserController {
             formData.setStatus(false);
             
             vpnFormRepository.save(formData);
-            return "redirect:/staff/index?vpnSuccess";
+            return "redirect:/staff/vpn/success";
         } catch (Exception e) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
             return "fragments/vpn :: content";
@@ -272,7 +272,7 @@ public class StaffUserController {
             formData.setStatus(false);
             
             wirelessNetworkFormRepository.save(formData);
-            return "redirect:/staff/index?wirelessSuccess";
+            return "redirect:/staff/wireless-network/success";
         } catch (Exception e) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
             return "fragments/wireless-network :: content";
@@ -297,10 +297,31 @@ public class StaffUserController {
             formData.setStatus(false);
             
             ipMacFormRepository.save(formData);
-            return "redirect:/staff/index?ipMacSuccess";
+            return "redirect:/staff/ip-mac/success";
         } catch (Exception e) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
             return "fragments/ip-mac :: content";
         }
+    }
+
+    // Success page mappings
+    @GetMapping("/wireless-network/success")
+    public String showWirelessNetworkSuccess() {
+        return "wireless-network/apply-success";
+    }
+
+    @GetMapping("/ip-mac/success")
+    public String showIpMacSuccess() {
+        return "ip-mac/apply-success";
+    }
+
+    @GetMapping("/cloud-account/success")
+    public String showCloudAccountSuccess() {
+        return "cloud-account/apply-success";
+    }
+
+    @GetMapping("/vpn/success")
+    public String showVpnSuccess() {
+        return "vpn/apply-success";
     }
 } 
