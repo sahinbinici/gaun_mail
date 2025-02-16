@@ -49,9 +49,33 @@
                     </div>
                     <div class="tab-pane fade" id="mail">
                         <div th:replace="fragments/mail :: content"></div>
+                        <!-- Update form status display -->
+                        <div th:if="${mailForm != null}" class="alert" 
+                             th:classappend="${mailForm.status ? 'alert-success' : (mailForm.rejected ? 'alert-danger' : 'alert-warning')}">
+                            <strong>Mail Başvurusu Durumu:</strong>
+                            <span th:if="${mailForm.status}">Onaylandı</span>
+                            <span th:if="${!mailForm.status and !mailForm.rejected}">Beklemede</span>
+                            <span th:if="${mailForm.rejected}">
+                                Reddedildi
+                                <br>
+                                <strong>Red Sebebi:</strong> <span th:text="${mailForm.rejectionReason}"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="eduroam">
                         <div th:replace="fragments/eduroam :: content"></div>
+                        <!-- Repeat similar blocks for other form types -->
+                        <div th:if="${eduroamForm != null}" class="alert"
+                             th:classappend="${eduroamForm.status ? 'alert-success' : (eduroamForm.rejected ? 'alert-danger' : 'alert-warning')}">
+                            <strong>Eduroam Başvurusu Durumu:</strong>
+                            <span th:if="${eduroamForm.status}">Onaylandı</span>
+                            <span th:if="${!eduroamForm.status and !eduroamForm.rejected}">Beklemede</span>
+                            <span th:if="${eduroamForm.rejected}">
+                                Reddedildi
+                                <br>
+                                <strong>Red Sebebi:</strong> <span th:text="${eduroamForm.rejectionReason}"></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

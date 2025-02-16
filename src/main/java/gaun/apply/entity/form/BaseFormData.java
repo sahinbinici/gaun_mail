@@ -18,4 +18,7 @@ public abstract class BaseFormData {
     private LocalDateTime applyDate;
     private boolean status;
     private LocalDateTime approvalDate;
+    private boolean rejected;
+    private String rejectionReason;
+    private LocalDateTime rejectionDate;
 } 

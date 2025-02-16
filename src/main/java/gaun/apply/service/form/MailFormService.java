@@ -1,11 +1,12 @@
 package gaun.apply.service.form;
 
-import gaun.apply.entity.form.MailFormData;
-import gaun.apply.repository.form.MailFormRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import gaun.apply.entity.form.MailFormData;
+import gaun.apply.repository.form.MailFormRepository;
 
 @Service
 public class MailFormService {
@@ -32,5 +33,9 @@ public class MailFormService {
 
     public void saveMailFormData(MailFormData mailFormData){
         mailFormRepository.save(mailFormData);
+    }
+
+    public List<MailFormData> getAllMailForms() {
+        return mailFormRepository.findAll();
     }
 }

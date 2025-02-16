@@ -15,19 +15,16 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/")
                 .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-                .setCachePeriod(31556926)
                 .resourceChain(true);
 
         registry.addResourceHandler("/js/**")
                 .addResourceLocations("classpath:/static/js/")
                 .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-                .setCachePeriod(31556926)
                 .resourceChain(true);
 
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-                .setCachePeriod(31556926)
                 .resourceChain(true);
     }
 } 

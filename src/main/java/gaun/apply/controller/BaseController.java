@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import gaun.apply.service.form.EduroamFormService;
-import gaun.apply.service.form.MailFormService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +36,8 @@ import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
+import gaun.apply.service.form.EduroamFormService;
+import gaun.apply.service.form.MailFormService;
 import jakarta.validation.Valid;
 
 
@@ -92,18 +92,22 @@ public class BaseController {
             return "redirect:/login";
         }
 
-        // Kullanıcı rollerine göre yönlendirme
+        // Get user roles and check in order of priority
         Set<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toSet());
 
+        // Check roles in priority order: ADMIN > STAFF > USER
         if (roles.contains("ROLE_ADMIN")) {
-            return "redirect:/admin";  // Admin rolü varsa admin sayfasına
+            return "redirect:/admin";
         } else if (roles.contains("ROLE_STAFF")) {
-            return "redirect:/staff/index";  // Admin rolü yoksa ama staff rolü varsa personel sayfasına
-        } else {
-            return "redirect:/student/index"; // Sadece user rolü varsa öğrenci sayfasına
+            return "redirect:/staff/index";
+        } else if (roles.contains("ROLE_USER")) {
+            return "redirect:/student/index";
         }
+
+        // Fallback to login if no valid role found
+        return "redirect:/login";
     }
 
     @GetMapping("/login")

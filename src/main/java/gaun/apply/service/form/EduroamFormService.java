@@ -1,11 +1,12 @@
 package gaun.apply.service.form;
 
-import gaun.apply.entity.form.EduroamFormData;
-import gaun.apply.repository.form.EduroamFormRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.repository.form.EduroamFormRepository;
 
 @Service
 public class EduroamFormService {
@@ -32,5 +33,9 @@ public class EduroamFormService {
 
     public Optional<EduroamFormData> findById(Long id) {
         return eduroamFormRepository.findById(id);
+    }
+
+    public List<EduroamFormData> getAllEduroamForms() {
+        return eduroamFormRepository.findAll();
     }
 }

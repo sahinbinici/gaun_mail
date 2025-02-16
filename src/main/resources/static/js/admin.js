@@ -1,219 +1,183 @@
 // CSRF token işlemleri için yardımcı fonksiyon
 function getCsrfToken() {
-    const tokenElement = document.querySelector("meta[name='_csrf']");
-    const headerElement = document.querySelector("meta[name='_csrf_header']");
+    const token = $("meta[name='_csrf']").attr("content");
+    const header = $("meta[name='_csrf_header']").attr("content");
     
-    if (!tokenElement || !headerElement) {
-        console.warn('CSRF token meta etiketleri bulunamadı');
-        return {};
-    }
-    
-    const token = tokenElement.getAttribute("content");
-    const header = headerElement.getAttribute("content");
-    
-    if (!token || !header) {
-        console.warn('CSRF token değerleri bulunamadı');
-        return {};
-    }
+    // Debug için token bilgilerini konsola yazdır
+    console.log('CSRF Token:', token);
+    console.log('CSRF Header:', header);
     
     return { token, header };
 }
 
 // Form aktivasyon fonksiyonları
-function activateMailForm(id) {
-    if (confirm('Bu mail başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
+function activateForm(formType, id) {
+    if (confirm(`Bu ${formType} başvurusunu aktifleştirmek istediğinize emin misiniz?`)) {
         const { token, header } = getCsrfToken();
-        const headers = new Headers();
-        
+        const headers = {};
         if (token && header) {
-            headers.append(header, token);
-            headers.append('Content-Type', 'application/json');
+            headers[header] = token;
         }
+        headers['Content-Type'] = 'application/json';
         
-        fetch('/bim-basvuru/mail/activate/' + id, {
+        const url = `/bim-basvuru/admin/${formType}/activate/${id}`;
+        console.log('Request URL:', url);
+        console.log('Headers:', headers);
+        
+        fetch(url, {
             method: 'POST',
             headers: headers,
-            credentials: 'same-origin'
+            credentials: 'include'
         }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response:', text);
+                    throw new Error('İşlem başarısız oldu');
+                });
             }
+            location.reload();
         }).catch(error => {
-            console.error('Hata:', error);
+            console.error('Error:', error);
             alert('Başvuru aktifleştirilemedi: ' + error.message);
         });
     }
+}
+
+// Her form tipi için aktivasyon fonksiyonları
+function activateMailForm(id) {
+    activateForm('mail', id);
 }
 
 function activateEduroamForm(id) {
-    if (confirm('Bu eduroam başvurusunu aktifleştirmek istediğinize emin misiniz?')) {
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        
-        if (token && header) {
-            headers[header] = token;
-        }
-        
-        fetch('/bim-basvuru/eduroam/activate/' + id, {
-            method: 'POST',
-            headers: headers
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
-            }
-        }).catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru aktifleştirilemedi: ' + error.message);
-        });
-    }
-}
-
-function activateWirelessForm(id) {
-    if (confirm('Bu kablosuz ağ başvurusunu onaylamak istediğinize emin misiniz?')) {
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        
-        if (token && header) {
-            headers[header] = token;
-        }
-        
-        fetch('/bim-basvuru/wireless/activate/' + id, {
-            method: 'POST',
-            headers: headers
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
-            }
-        }).catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru aktifleştirilemedi: ' + error.message);
-        });
-    }
+    activateForm('eduroam', id);
 }
 
 function activateIpMacForm(id) {
-    if (confirm('Bu IP-MAC başvurusunu onaylamak istediğinize emin misiniz?')) {
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        
-        if (token && header) {
-            headers[header] = token;
-        }
-        
-        fetch('/bim-basvuru/ip-mac/activate/' + id, {
-            method: 'POST',
-            headers: headers
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
-            }
-        }).catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru aktifleştirilemedi: ' + error.message);
-        });
-    }
+    activateForm('ipmac', id);
 }
 
 function activateCloudForm(id) {
-    if (confirm('Bu GAUN Bulut başvurusunu onaylamak istediğinize emin misiniz?')) {
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        
-        if (token && header) {
-            headers[header] = token;
-        }
-        
-        fetch('/bim-basvuru/cloud/activate/' + id, {
-            method: 'POST',
-            headers: headers
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
-            }
-        }).catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru aktifleştirilemedi: ' + error.message);
-        });
-    }
+    activateForm('cloud', id);
 }
 
 function activateVpnForm(id) {
-    if (confirm('Bu VPN başvurusunu onaylamak istediğinize emin misiniz?')) {
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        
-        if (token && header) {
-            headers[header] = token;
-        }
-        
-        fetch('/bim-basvuru/vpn/activate/' + id, {
-            method: 'POST',
-            headers: headers
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('İşlem başarısız oldu');
-            }
-        }).catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru aktifleştirilemedi: ' + error.message);
-        });
-    }
+    activateForm('vpn', id);
+}
+
+function activateWebAcademicForm(id) {
+    activateForm('webacademic', id);
+}
+
+function activateServerSetupForm(id) {
+    activateForm('serversetup', id);
 }
 
 // Kullanıcı detayları modalı için fonksiyonlar
 function showUserDetails(element) {
     const username = element.getAttribute('data-username');
     
-    fetch(`/bim-basvuru/api/user-details/${username}`)
+    fetch(`/bim-basvuru/admin/user-details/${username}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Kullanıcı bilgileri alınamadı');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.type === 'STUDENT') {
+            document.getElementById('studentDetails').style.display = 'block';
+            document.getElementById('staffDetails').style.display = 'none';
+            
+            // Öğrenci bilgilerini güncelle
+            document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo;
+            document.getElementById('student_ad').textContent = data.ad;
+            document.getElementById('student_soyad').textContent = data.soyad;
+            document.getElementById('student_fakulte').textContent = data.fakKod;
+            document.getElementById('student_bolum').textContent = data.bolumAd;
+            document.getElementById('student_program').textContent = data.programAd;
+            document.getElementById('student_sinif').textContent = data.sinif;
+        } else {
+            document.getElementById('studentDetails').style.display = 'none';
+            document.getElementById('staffDetails').style.display = 'block';
+            
+            // Personel bilgilerini güncelle
+            document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo;
+            document.getElementById('staff_ad').textContent = data.ad;
+            document.getElementById('staff_soyad').textContent = data.soyad;
+            document.getElementById('staff_birim').textContent = data.birim;
+            document.getElementById('staff_unvan').textContent = data.unvan;
+        }
+        
+        new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+    })
+    .catch(error => {
+        console.error('Hata:', error);
+        alert('Kullanıcı bilgileri alınamadı: ' + error.message);
+    });
+}
+
+// Reddetme işlemleri için modal ve form yönetimi
+$(document).ready(function() {
+    const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+
+    // Red butonu tıklandığında
+    $('.reject-btn').click(function() {
+        const formId = $(this).data('form-id');
+        const formType = $(this).data('form-type');
+        
+        // Form verilerini modal'a aktar
+        $('#formId').val(formId);
+        $('#formType').val(formType);
+        
+        // Modal'ı göster
+        rejectModal.show();
+    });
+
+    // Reddet butonuna tıklandığında
+    $('#confirmReject').click(function() {
+        const formId = $('#formId').val();
+        const formType = $('#formType').val();
+        const reason = $('#rejectionReason').val();
+
+        if (!reason) {
+            alert('Lütfen red sebebi giriniz');
+            return;
+        }
+
+        // CSRF token ve headers
+        const { token, header } = getCsrfToken();
+        const headers = {};
+        if (token && header) {
+            headers[header] = token;
+        }
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+
+        // Reddetme isteği gönder
+        fetch(`/bim-basvuru/admin/${formType}/reject/${formId}`, {
+            method: 'POST',
+            headers: headers,
+            body: `reason=${encodeURIComponent(reason)}`
+        })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Kullanıcı bilgileri alınamadı');
+                throw new Error('İşlem başarısız oldu');
             }
-            return response.json();
+            return response.text();
         })
-        .then(data => {
-            // Öğrenci/Personel tipine göre ilgili alanları doldur ve göster
-            if (data.type === 'STUDENT') {
-                document.getElementById('studentDetails').style.display = 'block';
-                document.getElementById('staffDetails').style.display = 'none';
-                
-                // Öğrenci bilgilerini doldur
-                document.getElementById('ogrenciNo').textContent = data.ogrenciNo;
-                document.getElementById('studentAd').textContent = data.ad;
-                document.getElementById('studentSoyad').textContent = data.soyad;
-                document.getElementById('fakulte').textContent = data.fakKod;
-                document.getElementById('bolum').textContent = data.bolumAd;
-                document.getElementById('program').textContent = data.programAd;
-                document.getElementById('sinif').textContent = data.sinif;
-            } else {
-                document.getElementById('studentDetails').style.display = 'none';
-                document.getElementById('staffDetails').style.display = 'block';
-                
-                // Personel bilgilerini doldur
-                document.getElementById('tcKimlikNo').textContent = data.tcKimlikNo;
-                document.getElementById('staffAd').textContent = data.ad;
-                document.getElementById('staffSoyad').textContent = data.soyad;
-                document.getElementById('birim').textContent = data.birim;
-                document.getElementById('unvan').textContent = data.unvan;
-            }
-            
-            // Modal'ı göster
-            new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+        .then(() => {
+            rejectModal.hide();
+            location.reload();
         })
         .catch(error => {
             console.error('Hata:', error);
-            alert('Kullanıcı bilgileri alınamadı: ' + error.message);
+            alert('Başvuru reddedilemedi: ' + error.message);
         });
-} 
+    });
+}); 

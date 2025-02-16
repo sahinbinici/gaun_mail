@@ -17,26 +17,26 @@ import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.IpMacFormDto;
 import gaun.apply.dto.MailFormDto;
 import gaun.apply.dto.VpnFormDto;
-import gaun.apply.dto.WirelessNetworkFormDto;
+import gaun.apply.dto.WebAcademicFormDto;
 import gaun.apply.entity.Staff;
 import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.VpnFormData;
-import gaun.apply.entity.form.WirelessNetworkFormData;
+import gaun.apply.entity.form.WebAcademicFormData;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.form.CloudAccountFormRepository;
 import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.IpMacFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.repository.form.VpnFormRepository;
-import gaun.apply.repository.form.WirelessNetworkFormRepository;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.UserService;
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.MailFormService;
 import gaun.apply.service.form.VpnFormService;
+import gaun.apply.service.form.WebAcademicFormService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -51,8 +51,6 @@ public class StaffUserController {
     @Autowired
     private VpnFormRepository vpnFormRepository;
     @Autowired
-    private WirelessNetworkFormRepository wirelessNetworkFormRepository;
-    @Autowired
     private IpMacFormRepository ipMacFormRepository;
     @Autowired
     private MailFormService mailFormService;
@@ -60,6 +58,8 @@ public class StaffUserController {
     private EduroamFormService eduroamFormService;
     @Autowired
     private VpnFormService vpnFormService;
+    @Autowired
+    private WebAcademicFormService webAcademicFormService;
 
     public StaffUserController(UserService userService, 
                              StaffService staffService,
@@ -69,19 +69,6 @@ public class StaffUserController {
         this.staffService = staffService;
         this.mailFormRepository = mailFormRepository;
         this.eduroamFormRepository = eduroamFormRepository;
-    }
-
-    @GetMapping("/wireless-network")
-    public String showWirelessNetworkForm(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
-        
-        WirelessNetworkFormDto formDto = new WirelessNetworkFormDto();
-        formDto.setTcKimlikNo(principal.getName());
-        model.addAttribute("wirelessNetworkFormDto", formDto);
-        
-        return "fragments/wireless-network :: content";
     }
 
     @GetMapping("/ip-mac")
@@ -172,8 +159,49 @@ public class StaffUserController {
     }
 
     @GetMapping("/web-academic")
-    public String showWebAcademicForm(Model model) {
-        return "staff/web-academic";
+    public String showWebAcademicForm(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        WebAcademicFormDto formDto = new WebAcademicFormDto();
+        formDto.setTcKimlikNo(principal.getName());
+        model.addAttribute("webAcademicFormDto", formDto);
+        
+        // Mevcut başvuruyu kontrol et
+        WebAcademicFormData existingForm = webAcademicFormService.findByTcKimlikNo(principal.getName());
+        if (existingForm != null) {
+            model.addAttribute("webAcademicForm", existingForm);
+        }
+        
+        return "fragments/web-academic :: content";
+    }
+
+    @PostMapping("/web-academic/apply")
+    public String applyWebAcademic(@Valid @ModelAttribute("webAcademicFormDto") WebAcademicFormDto formDto,
+                                  BindingResult result,
+                                  Model model) {
+        if (result.hasErrors()) {
+            return "fragments/web-academic :: content";
+        }
+
+        try {
+            WebAcademicFormData formData = new WebAcademicFormData();
+            formData.setTcKimlikNo(formDto.getTcKimlikNo());
+            formData.setDomainName(formDto.getDomainName());
+            formData.setFtpUsername(formDto.getFtpUsername());
+            formData.setMysqlUsername(formDto.getMysqlUsername());
+            formData.setPurpose(formDto.getPurpose());
+            formData.setHostingType(formDto.getHostingType());
+            formData.setApplyDate(LocalDateTime.now());
+            formData.setStatus(false);
+            
+            webAcademicFormService.saveWebAcademicFormData(formData);
+            return "redirect:/staff/web-academic/success";
+        } catch (Exception e) {
+            model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
+            return "fragments/web-academic :: content";
+        }
     }
 
     @GetMapping("/server-setup")
@@ -195,28 +223,28 @@ public class StaffUserController {
             model.addAttribute("user", user);
             
             // Tüm başvuru durumlarını kontrol et
-            MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
-            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());//eduroamFormRepository.findByUsername(user.getIdentityNumber());
-            WirelessNetworkFormData wirelessForm = wirelessNetworkFormRepository.findByTcKimlikNo(identityNumber);
+            MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());
+            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());
             IpMacFormData ipMacForm = ipMacFormRepository.findByTcKimlikNo(identityNumber);
             CloudAccountFormData cloudForm = cloudAccountFormRepository.findByTcKimlikNo(identityNumber);
-            VpnFormData vpnForm = vpnFormService.findByTcKimlikNo(identityNumber);//vpnFormRepository.findByTcKimlikNo(identityNumber);
+            VpnFormData vpnForm = vpnFormService.findByTcKimlikNo(identityNumber);
+            WebAcademicFormData webAcademicForm = webAcademicFormService.findByTcKimlikNo(identityNumber);
             
             // Başvuru durumlarını model'e ekle
             model.addAttribute("hasMailApplication", mailForm != null);
             model.addAttribute("hasEduroamApplication", eduroamForm != null);
-            model.addAttribute("hasWirelessApplication", wirelessForm != null);
             model.addAttribute("hasIpMacApplication", ipMacForm != null);
             model.addAttribute("hasCloudApplication", cloudForm != null);
             model.addAttribute("hasVpnApplication", vpnForm != null);
+            model.addAttribute("hasWebAcademicApplication", webAcademicForm != null);
             
             // Form verilerini model'e ekle
             model.addAttribute("mailForm", mailForm);
             model.addAttribute("eduroamForm", eduroamForm);
-            model.addAttribute("wirelessForm", wirelessForm);
             model.addAttribute("ipMacForm", ipMacForm);
             model.addAttribute("cloudForm", cloudForm);
             model.addAttribute("vpnForm", vpnForm);
+            model.addAttribute("webAcademicForm", webAcademicForm);
             
             // Form DTO'larını ekle
             addFormDtosToModel(model, identityNumber);
@@ -233,50 +261,26 @@ public class StaffUserController {
     private void addFormDtosToModel(Model model, String tcKimlikNo) {
         MailFormDto mailFormDto = new MailFormDto();
         EduroamFormDto eduroamFormDto = new EduroamFormDto();
-        WirelessNetworkFormDto wirelessFormDto = new WirelessNetworkFormDto();
         IpMacFormDto ipMacFormDto = new IpMacFormDto();
         CloudAccountFormDto cloudFormDto = new CloudAccountFormDto();
         VpnFormDto vpnFormDto = new VpnFormDto();
+        WebAcademicFormDto webAcademicFormDto = new WebAcademicFormDto();
         
         // TC Kimlik No'yu set et
         mailFormDto.setUsername(tcKimlikNo);
         eduroamFormDto.setUsername(tcKimlikNo);
-        wirelessFormDto.setTcKimlikNo(tcKimlikNo);
         ipMacFormDto.setTcKimlikNo(tcKimlikNo);
         cloudFormDto.setTcKimlikNo(tcKimlikNo);
         vpnFormDto.setTcKimlikNo(tcKimlikNo);
+        webAcademicFormDto.setTcKimlikNo(tcKimlikNo);
         
         // Model'e ekle
         model.addAttribute("mailFormDto", mailFormDto);
         model.addAttribute("eduroamFormDto", eduroamFormDto);
-        model.addAttribute("wirelessNetworkFormDto", wirelessFormDto);
         model.addAttribute("ipMacFormDto", ipMacFormDto);
         model.addAttribute("cloudAccountFormDto", cloudFormDto);
         model.addAttribute("vpnFormDto", vpnFormDto);
-    }
-
-    @PostMapping("/wireless-network/apply")
-    public String applyWirelessNetwork(@Valid @ModelAttribute("wirelessNetworkFormDto") WirelessNetworkFormDto formDto,
-                                     BindingResult result,
-                                     Model model) {
-        if (result.hasErrors()) {
-            return "fragments/wireless-network :: content";
-        }
-
-        try {
-            WirelessNetworkFormData formData = new WirelessNetworkFormData();
-            formData.setTcKimlikNo(formDto.getTcKimlikNo());
-            formData.setMacAddress(formDto.getMacAddress());
-            formData.setDeviceType(formDto.getDeviceType());
-            formData.setApplyDate(LocalDateTime.now());
-            formData.setStatus(false);
-            
-            wirelessNetworkFormRepository.save(formData);
-            return "redirect:/staff/wireless-network/success";
-        } catch (Exception e) {
-            model.addAttribute("error", "Başvuru sırasında bir hata oluştu");
-            return "fragments/wireless-network :: content";
-        }
+        model.addAttribute("webAcademicFormDto", webAcademicFormDto);
     }
 
     @PostMapping("/ip-mac/apply")
@@ -305,11 +309,6 @@ public class StaffUserController {
     }
 
     // Success page mappings
-    @GetMapping("/wireless-network/success")
-    public String showWirelessNetworkSuccess() {
-        return "wireless-network/apply-success";
-    }
-
     @GetMapping("/ip-mac/success")
     public String showIpMacSuccess() {
         return "ip-mac/apply-success";
@@ -323,5 +322,10 @@ public class StaffUserController {
     @GetMapping("/vpn/success")
     public String showVpnSuccess() {
         return "vpn/apply-success";
+    }
+
+    @GetMapping("/web-academic/success")
+    public String showWebAcademicSuccess() {
+        return "web-academic/apply-success";
     }
 } 

@@ -1,11 +1,12 @@
 package gaun.apply.service.form;
 
-import gaun.apply.entity.form.VpnFormData;
-import gaun.apply.repository.form.VpnFormRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import gaun.apply.entity.form.VpnFormData;
+import gaun.apply.repository.form.VpnFormRepository;
 
 @Service
 public class VpnFormService {
@@ -33,5 +34,9 @@ public class VpnFormService {
 
     public void saveVpnFormData(VpnFormData vpnFormData){
         vpnFormRepository.save(vpnFormData);
+    }
+
+    public List<VpnFormData> getAllVpnForms() {
+        return vpnFormRepository.findAll();
     }
 }

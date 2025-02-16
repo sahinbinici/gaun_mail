@@ -1,11 +1,12 @@
 package gaun.apply.service.form;
 
-import gaun.apply.entity.form.CloudAccountFormData;
-import gaun.apply.repository.form.CloudAccountFormRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import gaun.apply.entity.form.CloudAccountFormData;
+import gaun.apply.repository.form.CloudAccountFormRepository;
 
 @Service
 public class CloudAccountFormService {
@@ -33,5 +34,9 @@ public class CloudAccountFormService {
 
     public void saveCloudAccountFormData(CloudAccountFormData cloudAccountFormData){
         cloudAccountFormRepository.save(cloudAccountFormData);
+    }
+
+    public List<CloudAccountFormData> getAllCloudAccountForms() {
+        return cloudAccountFormRepository.findAll();
     }
 }

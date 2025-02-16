@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <title>Admin Paneli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
     <!-- CSRF token meta etiketleri -->
     <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
     <!-- JavaScript dosyaları -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" th:src="@{/js/admin.js}"></script>
 </head>
@@ -46,9 +48,6 @@
                 <a class="nav-link" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#wireless">Kablosuz Ağ Başvuruları</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
             </li>
             <li class="nav-item">
@@ -56,6 +55,12 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#web-academic">Web Akademik Başvuruları</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#server-setup">Sunucu Kurulum Başvuruları</a>
             </li>
         </ul>
 
@@ -128,40 +133,41 @@
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Email</th>
                                                 <th>Başvuru Tarihi</th>
-                                                <th>Onay Tarihi</th>
-                                                <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="mailForm : ${recentMailForms}">
+                                            <tr th:each="form : ${mailForms}">
                                                 <td>
                                                     <a href="#" onclick="showUserDetails(this)" 
-                                                       th:data-username="${mailForm.username}" 
+                                                       th:data-username="${form.username}" 
                                                        style="text-decoration: underline;">
-                                                        <span th:text="${mailForm.username}"></span>
+                                                        <span th:text="${form.username}"></span>
                                                     </a>
                                                 </td>
-                                                <td th:text="${mailForm.email + '@gantep.edu.tr'}"></td>
-                                                <td th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
-                                                    <span th:if="${mailForm.approvalDate}" 
-                                                          th:text="${#temporals.format(mailForm.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                    </span>
-                                                    <span th:unless="${mailForm.approvalDate}">-</span>
-                                                </td>
-                                                <td th:text="${mailForm.password}"></td>
-                                                <td>
-                                                    <span th:if="${mailForm.status}" class="badge bg-success">Aktif</span>
-                                                    <span th:unless="${mailForm.status}" class="badge bg-warning">Beklemede</span>
+                                                    <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                    <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                                    <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-success" 
-                                                            th:if="${!mailForm.status}"
-                                                            th:onclick="'activateMailForm(\'' + ${mailForm.id} + '\')'">
-                                                        Aktifleştir
-                                                    </button>
+                                                    <div th:if="${!form.status and !form.rejected}">
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:onclick="|activateForm('mail', '${form.id}')|">
+                                                            Onayla
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger reject-btn"
+                                                                th:data-form-id="${form.id}"
+                                                                th:data-form-type="mail">
+                                                            Reddet
+                                                        </button>
+                                                    </div>
+                                                    <div th:if="${form.rejected}">
+                                                        <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -215,39 +221,40 @@
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
                                                 <th>Başvuru Tarihi</th>
-                                                <th>Onay Tarihi</th>
-                                                <th>Şifre</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="eduroamForm : ${recentEduroamForms}">
+                                            <tr th:each="form : ${eduroamForms}">
                                                 <td>
                                                     <a href="#" onclick="showUserDetails(this)" 
-                                                       th:data-username="${eduroamForm.username}" 
+                                                       th:data-username="${form.username}" 
                                                        style="text-decoration: underline;">
-                                                        <span th:text="${eduroamForm.username}"></span>
+                                                        <span th:text="${form.username}"></span>
                                                     </a>
                                                 </td>
-                                                <td th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
-                                                    <span th:if="${eduroamForm.approvalDate}" 
-                                                          th:text="${#temporals.format(eduroamForm.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                    </span>
-                                                    <span th:unless="${eduroamForm.approvalDate}">-</span>
-                                                </td>
-                                                <td th:text="${eduroamForm.password}"></td>
-                                                <td>
-                                                    <span th:if="${eduroamForm.status}" class="badge bg-success">Aktif</span>
-                                                    <span th:unless="${eduroamForm.status}" class="badge bg-warning">Beklemede</span>
+                                                    <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                                    <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                                    <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-success" 
-                                                            th:if="${!eduroamForm.status}"
-                                                            th:onclick="'activateEduroamForm(\'' + ${eduroamForm.id} + '\')'">
-                                                        Aktifleştir
-                                                    </button>
+                                                    <div th:if="${!form.status and !form.rejected}">
+                                                        <button class="btn btn-sm btn-success" 
+                                                                th:onclick="|activateForm('eduroam', '${form.id}')|">
+                                                            Onayla
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger reject-btn"
+                                                                th:data-form-id="${form.id}"
+                                                                th:data-form-type="eduroam">
+                                                            Reddet
+                                                        </button>
+                                                    </div>
+                                                    <div th:if="${form.rejected}">
+                                                        <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -258,104 +265,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Kablosuz Ağ Sekmesi -->
-            <div class="tab-pane fade" id="wireless">
-                <!-- Başvuru varsa -->
-                <div th:if="${hasWirelessForms}">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4>Kablosuz Ağ Başvuru İstatistikleri</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="alert alert-warning">
-                                                <h5>Bekleyen Başvuru</h5>
-                                                <h3 th:text="${wirelessStats.pending}">0</h3>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="alert alert-success">
-                                                <h5>Onaylanan Başvuru</h5>
-                                                <h3 th:text="${wirelessStats.approved}">0</h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kablosuz Ağ Başvuru Tablosu -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4>Son Kablosuz Ağ Başvuruları</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>TC Kimlik No</th>
-                                                    <th>MAC Adresi</th>
-                                                    <th>Cihaz Türü</th>
-                                                    <th>Başvuru Tarihi</th>
-                                                    <th>Onay Tarihi</th>
-                                                    <th>Durum</th>
-                                                    <th>İşlemler</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr th:each="form : ${recentWirelessForms}">
-                                                    <td>
-                                                        <a href="#" onclick="showUserDetails(this)" 
-                                                           th:data-username="${form.tcKimlikNo}" 
-                                                           style="text-decoration: underline;">
-                                                            <span th:text="${form.tcKimlikNo}"></span>
-                                                        </a>
-                                                    </td>
-                                                    <td th:text="${form.macAddress}"></td>
-                                                    <td th:text="${form.deviceType}"></td>
-                                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
-                                                    <td>
-                                                        <span th:if="${form.approvalDate}" 
-                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                        </span>
-                                                        <span th:unless="${form.approvalDate}">-</span>
-                                                    </td>
-                                                    <td>
-                                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-success" 
-                                                                th:if="${!form.status}"
-                                                                th:onclick="'activateWirelessForm(\'' + ${form.id} + '\')'">
-                                                            Onayla
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Başvuru yoksa -->
-                <div th:unless="${hasWirelessForms}" class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Henüz kablosuz ağ başvurusu bulunmamaktadır.
-                </div>
-            </div>
-
             <!-- IP-MAC Sekmesi -->
             <div class="tab-pane fade" id="ip-mac">
                 <!-- Başvuru varsa -->
@@ -402,13 +311,12 @@
                                                     <th>IP Adresi</th>
                                                     <th>Lokasyon</th>
                                                     <th>Başvuru Tarihi</th>
-                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr th:each="form : ${recentIpMacForms}">
+                                                <tr th:each="form : ${ipMacForms}">
                                                     <td>
                                                         <a href="#" onclick="showUserDetails(this)" 
                                                            th:data-username="${form.tcKimlikNo}" 
@@ -421,21 +329,25 @@
                                                     <td th:text="${form.location}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                     <td>
-                                                        <span th:if="${form.approvalDate}" 
-                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                        </span>
-                                                        <span th:unless="${form.approvalDate}">-</span>
-                                                    </td>
-                                                    <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                        <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                                        <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-success" 
-                                                                th:if="${!form.status}"
-                                                                th:onclick="'activateIpMacForm(\'' + ${form.id} + '\')'">
-                                                            Onayla
-                                                        </button>
+                                                        <div th:if="${!form.status and !form.rejected}">
+                                                            <button class="btn btn-sm btn-success" 
+                                                                    th:onclick="|activateForm('ipmac', '${form.id}')|">
+                                                                Onayla
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger reject-btn"
+                                                                    th:data-form-id="${form.id}"
+                                                                    th:data-form-type="ipmac">
+                                                                Reddet
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${form.rejected}">
+                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -499,13 +411,12 @@
                                                     <th>Kapasite</th>
                                                     <th>Kullanım Amacı</th>
                                                     <th>Başvuru Tarihi</th>
-                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr th:each="form : ${recentCloudForms}">
+                                                <tr th:each="form : ${cloudForms}">
                                                     <td>
                                                         <a href="#" onclick="showUserDetails(this)" 
                                                            th:data-username="${form.tcKimlikNo}" 
@@ -517,21 +428,25 @@
                                                     <td th:text="${form.purpose}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                     <td>
-                                                        <span th:if="${form.approvalDate}" 
-                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                        </span>
-                                                        <span th:unless="${form.approvalDate}">-</span>
-                                                    </td>
-                                                    <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                        <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                                        <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-success" 
-                                                                th:if="${!form.status}"
-                                                                th:onclick="'activateCloudForm(\'' + ${form.id} + '\')'">
-                                                            Onayla
-                                                        </button>
+                                                        <div th:if="${!form.status and !form.rejected}">
+                                                            <button class="btn btn-sm btn-success" 
+                                                                    th:onclick="|activateForm('cloud', '${form.id}')|">
+                                                                Onayla
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger reject-btn"
+                                                                    th:data-form-id="${form.id}"
+                                                                    th:data-form-type="cloud">
+                                                                Reddet
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${form.rejected}">
+                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -595,13 +510,12 @@
                                                     <th>IP Adresi</th>
                                                     <th>Kullanım Amacı</th>
                                                     <th>Başvuru Tarihi</th>
-                                                    <th>Onay Tarihi</th>
                                                     <th>Durum</th>
                                                     <th>İşlemler</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr th:each="form : ${recentVpnForms}">
+                                                <tr th:each="form : ${vpnForms}">
                                                     <td>
                                                         <a href="#" onclick="showUserDetails(this)" 
                                                            th:data-username="${form.tcKimlikNo}" 
@@ -613,21 +527,25 @@
                                                     <td th:text="${form.purpose}"></td>
                                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                     <td>
-                                                        <span th:if="${form.approvalDate}" 
-                                                              th:text="${#temporals.format(form.approvalDate, 'dd/MM/yyyy HH:mm')}">
-                                                        </span>
-                                                        <span th:unless="${form.approvalDate}">-</span>
-                                                    </td>
-                                                    <td>
                                                         <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                                        <span th:unless="${form.status}" class="badge bg-warning">Beklemede</span>
+                                                        <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                                        <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-success" 
-                                                                th:if="${!form.status}"
-                                                                th:onclick="'activateVpnForm(\'' + ${form.id} + '\')'">
-                                                            Onayla
-                                                        </button>
+                                                        <div th:if="${!form.status and !form.rejected}">
+                                                            <button class="btn btn-sm btn-success" 
+                                                                    th:onclick="|activateForm('vpn', '${form.id}')|">
+                                                                Onayla
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger reject-btn"
+                                                                    th:data-form-id="${form.id}"
+                                                                    th:data-form-type="vpn">
+                                                                Reddet
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${form.rejected}">
+                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -645,6 +563,118 @@
                     Henüz VPN başvurusu bulunmamaktadır.
                 </div>
             </div>
+
+            <!-- Web Akademik Sekmesi -->
+            <div class="tab-pane fade" id="web-academic">
+                <!-- İstatistikler -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Web Akademik Başvuru İstatistikleri</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="alert alert-info">
+                                            <h5>Toplam Başvuru</h5>
+                                            <h3 th:text="${webAcademicStats.total}">0</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-warning">
+                                            <h5>Bekleyen</h5>
+                                            <h3 th:text="${webAcademicStats.pending}">0</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-success">
+                                            <h5>Onaylanan</h5>
+                                            <h3 th:text="${webAcademicStats.approved}">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Başvuru Tablosu -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Web Akademik Başvuruları</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>TC Kimlik No</th>
+                                        <th>Domain Adı</th>
+                                        <th>FTP Kullanıcı</th>
+                                        <th>MySQL Kullanıcı</th>
+                                        <th>Hosting Tipi</th>
+                                        <th>Başvuru Tarihi</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="form : ${webAcademicForms}">
+                                        <td>
+                                            <a href="#" onclick="showUserDetails(this)" 
+                                               th:data-username="${form.tcKimlikNo}" 
+                                               style="text-decoration: underline;">
+                                                <span th:text="${form.tcKimlikNo}"></span>
+                                            </a>
+                                        </td>
+                                        <td th:text="${form.domainName}"></td>
+                                        <td th:text="${form.ftpUsername}"></td>
+                                        <td th:text="${form.mysqlUsername}"></td>
+                                        <td>
+                                            <span th:if="${form.hostingType == 'SHARED'}" class="badge bg-info">Paylaşımlı</span>
+                                            <span th:if="${form.hostingType == 'DEDICATED'}" class="badge bg-primary">Özel</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td>
+                                            <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                            <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                            <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
+                                        </td>
+                                        <td>
+                                            <div th:if="${!form.status and !form.rejected}">
+                                                <button class="btn btn-sm btn-success" 
+                                                        th:onclick="|activateForm('webacademic', '${form.id}')|">
+                                                    Onayla
+                                                </button>
+                                                <button class="btn btn-sm btn-danger reject-btn"
+                                                        th:data-form-id="${form.id}"
+                                                        th:data-form-type="webacademic">
+                                                    Reddet
+                                                </button>
+                                            </div>
+                                            <div th:if="${form.rejected}">
+                                                <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Başvuru yoksa -->
+                <div th:unless="${hasWebAcademicForms}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Henüz Web Akademik başvurusu bulunmamaktadır.
+                </div>
+            </div>
+
+            <!-- Sunucu Kurulum Sekmesi -->
+            <div class="tab-pane fade" id="server-setup">
+                <!-- Sunucu Kurulum başvuruları için benzer yapı -->
+            </div>
         </div>
     </div>
 
@@ -661,26 +691,52 @@
                     <div id="studentDetails" style="display: none;">
                         <h6>Öğrenci Bilgileri</h6>
                         <table class="table">
-                            <tr><td>Öğrenci No:</td><td id="ogrenciNo"></td></tr>
-                            <tr><td>Ad:</td><td id="studentAd"></td></tr>
-                            <tr><td>Soyad:</td><td id="studentSoyad"></td></tr>
-                            <tr><td>Fakülte:</td><td id="fakulte"></td></tr>
-                            <tr><td>Bölüm:</td><td id="bolum"></td></tr>
-                            <tr><td>Program:</td><td id="program"></td></tr>
-                            <tr><td>Sınıf:</td><td id="sinif"></td></tr>
+                            <tr><td>Öğrenci No:</td><td id="student_ogrenciNo"></td></tr>
+                            <tr><td>Ad:</td><td id="student_ad"></td></tr>
+                            <tr><td>Soyad:</td><td id="student_soyad"></td></tr>
+                            <tr><td>Fakülte:</td><td id="student_fakulte"></td></tr>
+                            <tr><td>Bölüm:</td><td id="student_bolum"></td></tr>
+                            <tr><td>Program:</td><td id="student_program"></td></tr>
+                            <tr><td>Sınıf:</td><td id="student_sinif"></td></tr>
                         </table>
                     </div>
                     <!-- Personel Bilgileri -->
                     <div id="staffDetails" style="display: none;">
                         <h6>Personel Bilgileri</h6>
                         <table class="table">
-                            <tr><td>TC Kimlik No:</td><td id="tcKimlikNo"></td></tr>
-                            <tr><td>Ad:</td><td id="staffAd"></td></tr>
-                            <tr><td>Soyad:</td><td id="staffSoyad"></td></tr>
-                            <tr><td>Birim:</td><td id="birim"></td></tr>
-                            <tr><td>Unvan:</td><td id="unvan"></td></tr>
+                            <tr><td>TC Kimlik No:</td><td id="staff_tcKimlikNo"></td></tr>
+                            <tr><td>Ad:</td><td id="staff_ad"></td></tr>
+                            <tr><td>Soyad:</td><td id="staff_soyad"></td></tr>
+                            <tr><td>Birim:</td><td id="staff_birim"></td></tr>
+                            <tr><td>Unvan:</td><td id="staff_unvan"></td></tr>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update the reject modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Başvuruyu Reddet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rejectForm">
+                        <input type="hidden" id="formId">
+                        <input type="hidden" id="formType">
+                        <div class="mb-3">
+                            <label for="rejectionReason" class="form-label">Red Sebebi</label>
+                            <textarea class="form-control" id="rejectionReason" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" id="confirmReject">Reddet</button>
                 </div>
             </div>
         </div>

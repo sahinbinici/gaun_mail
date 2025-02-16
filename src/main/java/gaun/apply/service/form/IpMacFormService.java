@@ -1,11 +1,12 @@
 package gaun.apply.service.form;
 
-import gaun.apply.entity.form.IpMacFormData;
-import gaun.apply.repository.form.IpMacFormRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import gaun.apply.entity.form.IpMacFormData;
+import gaun.apply.repository.form.IpMacFormRepository;
 
 @Service
 public class IpMacFormService {
@@ -33,5 +34,9 @@ public class IpMacFormService {
 
     public void saveIpMacFormData(IpMacFormData ipMacFormData){
         ipMacFormRepository.save(ipMacFormData);
+    }
+
+    public List<IpMacFormData> getAllIpMacForms() {
+        return ipMacFormRepository.findAll();
     }
 }

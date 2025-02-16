@@ -14,7 +14,13 @@ public class WebAcademicFormData extends BaseFormData {
     @Column(name = "domain_name")
     private String domainName;
     
-    @Column(name = "purpose")
+    @Column(name = "ftp_username")
+    private String ftpUsername;
+    
+    @Column(name = "mysql_username")
+    private String mysqlUsername;
+    
+    @Column(name = "purpose", columnDefinition = "TEXT")
     private String purpose;
     
     @Column(name = "hosting_type")
