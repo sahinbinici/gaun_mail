@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <div th:fragment="content">
         <div class="card">
@@ -18,20 +19,27 @@
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
                                 <div th:with="eduroamForm=${@eduroamFormService.eduroamFormData(user.identityNumber)}">
-                                    <div th:if="${eduroamForm != null}" 
-                                         th:class="${eduroamForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                                    <div th:if="${eduroamForm != null}"
+                                        th:class="${eduroamForm.status ? 'alert alert-success' : (!eduroamForm.rejected ? 'alert alert-warning' : 'alert alert-danger')}">
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Durumu</label>
                                                 <h5 class="mb-0">
-                                                    <span th:text="${eduroamForm.status ? 'Onaylandı' : 'Beklemede'}"
-                                                          th:class="${eduroamForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                                    <span
+                                                        th:text="${eduroamForm.status ? 'Onaylandı' : (!eduroamForm.rejected ? 'Beklemede' : 'Reddedildi')}"
+                                                        th:class="${eduroamForm.status ? 'badge bg-success' : (!eduroamForm.rejected ? 'badge bg-warning' : 'badge bg-danger')}">
                                                     </span>
                                                 </h5>
+                                                <span th:if="${eduroamForm.rejected}">
+                                                        <br>
+                                                       <strong>Red Sebebi : </strong><span th:text="${eduroamForm.rejectionReason}"></span>
+                                                    </span>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Tarihi</label>
-                                                <h5 class="mb-0" th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                                <h5 class="mb-0"
+                                                    th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}">
+                                                </h5>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Kullanıcı Adı</label>
@@ -46,43 +54,41 @@
 
                     <!-- Başvuru yoksa başvuru formunu göster -->
                     <div th:if="${hasEduroamApplication == false}">
-                        <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post" th:object="${eduroamFormDto}">
+                        <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post"
+                            th:object="${eduroamFormDto}">
                             <div class="row">
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="eduroamUsername">Kullanıcı Adı</label>
-                                        <input type="text" class="form-control" 
-                                               id="eduroamUsername"
-                                               th:field="*{username}" readonly>
+                                        <input type="text" class="form-control" id="eduroamUsername"
+                                            th:field="*{username}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="eduroamPassword">Şifre</label>
-                                        <input type="password" class="form-control"
-                                               id="eduroamPassword"
-                                               th:field="*{password}"
-                                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                                               title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                                        <input type="password" class="form-control" id="eduroamPassword"
+                                            th:field="*{password}" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                                            title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="eduroamConfirmPassword">Şifre Tekrar</label>
-                                        <input type="password" class="form-control"
-                                               id="eduroamConfirmPassword"
-                                               th:field="*{confirmPassword}">
+                                        <input type="password" class="form-control" id="eduroamConfirmPassword"
+                                            th:field="*{confirmPassword}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <input type="hidden" id="eduroamStatus" th:field="*{status}" value="false">
-                            
+
                             <div class="alert alert-info mt-3">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam
+                                    içermelidir.</small>
                             </div>
-                            
+
                             <div class="text-end mt-4">
                                 <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">
                                     <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
@@ -113,7 +119,7 @@
                             </ul>
                             <!-- ... diğer sözleşme maddeleri ... -->
                         </div>
-                        
+
                         <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" id="eduroamConfirmCheckbox">
                             <label class="form-check-label" for="eduroamConfirmCheckbox">
@@ -123,7 +129,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                        <button type="button" class="btn btn-primary" id="eduroamSubmitButton" disabled>Onayla ve Gönder</button>
+                        <button type="button" class="btn btn-primary" id="eduroamSubmitButton" disabled>Onayla ve
+                            Gönder</button>
                     </div>
                 </div>
             </div>
@@ -151,7 +158,7 @@
 
         <!-- Eduroam form için JavaScript -->
         <script th:inline="javascript">
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const eduroamForm = document.getElementById('eduroamForm');
                 const modal = new bootstrap.Modal(document.getElementById('eduroamConfirmationModal'));
                 const existingModal = new bootstrap.Modal(document.getElementById('existingEduroamModal'));
@@ -159,7 +166,7 @@
                 const submitButton = document.getElementById('eduroamSubmitButton');
 
                 // Popup'ı göster
-                window.showConfirmationPopup = async function() {
+                window.showConfirmationPopup = async function () {
                     if (!eduroamForm.checkValidity()) {
                         eduroamForm.reportValidity();
                         return;
@@ -193,12 +200,12 @@
                 };
 
                 // Checkbox durumuna göre submit butonunu aktif/pasif yap
-                confirmCheckbox.addEventListener('change', function() {
+                confirmCheckbox.addEventListener('change', function () {
                     submitButton.disabled = !this.checked;
                 });
 
                 // Onayla ve Gönder butonuna tıklandığında
-                submitButton.addEventListener('click', function() {
+                submitButton.addEventListener('click', function () {
                     modal.hide();
                     eduroamForm.submit();
                 });
@@ -212,40 +219,49 @@
                 border-radius: 8px;
                 height: 100%;
             }
+
             .info-group label {
                 font-size: 0.9rem;
                 margin-bottom: 5px;
                 display: block;
             }
+
             .info-group h5 {
                 color: #2c3e50;
                 font-weight: 600;
             }
+
             .card {
                 border: none;
-                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
                 border-radius: 12px;
             }
+
             .card-header {
                 border-radius: 12px 12px 0 0 !important;
                 padding: 1rem 1.5rem;
             }
+
             .card-body {
                 padding: 1.5rem;
             }
+
             .badge {
                 font-size: 0.9rem;
                 padding: 0.5em 1em;
             }
+
             .form-control {
                 border-radius: 6px;
                 border: 1px solid #ced4da;
                 padding: 0.5rem 1rem;
             }
+
             .form-control:focus {
                 border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
             }
+
             .btn-primary {
                 padding: 0.5rem 1.5rem;
                 font-weight: 500;
@@ -253,4 +269,5 @@
         </style>
     </div>
 </body>
-</html> 
+
+</html>

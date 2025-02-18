@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <div th:fragment="content">
         <div class="card">
@@ -18,20 +19,28 @@
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
                                 <div th:with="mailForm=${@mailFormService.mailFormData(user.identityNumber)}">
-                                    <div th:if="${mailForm != null}" 
-                                         th:class="${mailForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                                    <div th:if="${mailForm != null}"
+                                        th:classappend="${mailForm.status ? 'alert alert-success' : (mailForm.rejected ? 'alert alert-danger' : 'alert alert-warning')}">
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Durumu</label>
                                                 <h5 class="mb-0">
-                                                    <span th:text="${mailForm.status ? 'Onaylandı' : 'Beklemede'}"
-                                                          th:class="${mailForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                                    <span
+                                                        th:text="${mailForm.status ? 'Onaylandı' : (mailForm.rejected ? 'Reddedildi' : 'Beklemede')}"
+                                                        th:classappend="${mailForm.status ? 'badge bg-success' : (mailForm.rejected ? 'badge bg-danger' : 'badge bg-warning')}">
                                                     </span>
                                                 </h5>
+                                                <span th:if="${mailForm.rejected}">
+                                                    <br>
+                                                    <strong>Red Sebebi : </strong><span
+                                                        th:text="${mailForm.rejectionReason}"></span>
+                                                </span>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Tarihi</label>
-                                                <h5 class="mb-0" th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                                <h5 class="mb-0"
+                                                    th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}">
+                                                </h5>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Mail Adresi</label>
@@ -51,18 +60,16 @@
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="mailUsername">Kullanıcı Adı</label>
-                                        <input type="text" class="form-control" 
-                                               id="mailUsername"
-                                               th:field="*{username}" readonly>
+                                        <input type="text" class="form-control" id="mailUsername" th:field="*{username}"
+                                            readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="mailEmailInput">Mail Adresi</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" 
-                                                   id="mailEmailInput"
-                                                   th:field="*{email}">
+                                            <input type="text" class="form-control" id="mailEmailInput"
+                                                th:field="*{email}">
                                             <span class="input-group-text">@gantep.edu.tr</span>
                                         </div>
                                     </div>
@@ -70,30 +77,28 @@
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="mailPassword">Şifre</label>
-                                        <input type="password" class="form-control"
-                                               id="mailPassword"
-                                               th:field="*{password}"
-                                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                                               title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
+                                        <input type="password" class="form-control" id="mailPassword"
+                                            th:field="*{password}" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                                            title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="info-group">
                                         <label class="form-label" for="mailConfirmPassword">Şifre Tekrar</label>
-                                        <input type="password" class="form-control"
-                                               id="mailConfirmPassword"
-                                               th:field="*{confirmPassword}">
+                                        <input type="password" class="form-control" id="mailConfirmPassword"
+                                            th:field="*{confirmPassword}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <input type="hidden" id="mailStatus" th:field="*{status}" value="false">
-                            
+
                             <div class="alert alert-info mt-3">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.</small>
+                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam
+                                    içermelidir.</small>
                             </div>
-                            
+
                             <div class="text-end mt-4">
                                 <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">
                                     <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
@@ -122,17 +127,20 @@
                                 <li>Daire Başkanlığımızın Bilgi Güvenliği Politikasını</li>
                             </ul>
                             <p>peşinen kabul etmiş sayılır.</p>
-                            
-                            <p>Bu politikalara aykırı davranışta bulunmayacağını, verilerinin çeşitli akademik ve idari işlemlerin yapılması, raporlanması, analiz ve değerlendirmelerin yapılması, istatistiki ve bilimsel verileri üretilmesi gibi amaçlarla kullanılabileceğini kabul ve taahhüt eder.</p>
-                            
+
+                            <p>Bu politikalara aykırı davranışta bulunmayacağını, verilerinin çeşitli akademik ve idari
+                                işlemlerin yapılması, raporlanması, analiz ve değerlendirmelerin yapılması, istatistiki
+                                ve bilimsel verileri üretilmesi gibi amaçlarla kullanılabileceğini kabul ve taahhüt
+                                eder.</p>
+
                             <p class="mt-2">
-                                <small class="text-muted">Ayrıntılı bilgi için 
-                                    <a href="https://bidb.gantep.edu.tr" target="_blank">bidb.gantep.edu.tr</a> 
+                                <small class="text-muted">Ayrıntılı bilgi için
+                                    <a href="https://bidb.gantep.edu.tr" target="_blank">bidb.gantep.edu.tr</a>
                                     adresini ziyaret ediniz.
                                 </small>
                             </p>
                         </div>
-                        
+
                         <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" id="mailConfirmCheckbox">
                             <label class="form-check-label" for="mailConfirmCheckbox">
@@ -142,7 +150,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                        <button type="button" class="btn btn-primary" id="mailSubmitButton" disabled>Onayla ve Gönder</button>
+                        <button type="button" class="btn btn-primary" id="mailSubmitButton" disabled>Onayla ve
+                            Gönder</button>
                     </div>
                 </div>
             </div>
@@ -171,7 +180,7 @@
 
         <!-- Mail form için JavaScript -->
         <script th:inline="javascript">
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const mailForm = document.getElementById('mailForm');
                 const mailModal = new bootstrap.Modal(document.getElementById('mailConfirmationModal'));
                 const mailExistingModal = new bootstrap.Modal(document.getElementById('mailExistingModal'));
@@ -180,7 +189,7 @@
                 const mailApplyButton = document.getElementById('mailApplyButton');
 
                 // Popup'ı göster
-                window.showMailConfirmationPopup = async function() {
+                window.showMailConfirmationPopup = async function () {
                     if (!mailForm.checkValidity()) {
                         mailForm.reportValidity();
                         return;
@@ -230,12 +239,12 @@
                 };
 
                 // Checkbox durumuna göre submit butonunu aktif/pasif yap
-                mailConfirmCheckbox.addEventListener('change', function() {
+                mailConfirmCheckbox.addEventListener('change', function () {
                     mailSubmitButton.disabled = !this.checked;
                 });
 
                 // Onayla ve Gönder butonuna tıklandığında
-                mailSubmitButton.addEventListener('click', function() {
+                mailSubmitButton.addEventListener('click', function () {
                     mailModal.hide();
                     mailForm.submit();
                 });
@@ -249,44 +258,54 @@
                 border-radius: 8px;
                 height: 100%;
             }
+
             .info-group label {
                 font-size: 0.9rem;
                 margin-bottom: 5px;
                 display: block;
             }
+
             .info-group h5 {
                 color: #2c3e50;
                 font-weight: 600;
             }
+
             .card {
                 border: none;
-                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
                 border-radius: 12px;
             }
+
             .card-header {
                 border-radius: 12px 12px 0 0 !important;
                 padding: 1rem 1.5rem;
             }
+
             .card-body {
                 padding: 1.5rem;
             }
+
             .badge {
                 font-size: 0.9rem;
                 padding: 0.5em 1em;
             }
+
             .form-control {
                 border-radius: 6px;
                 border: 1px solid #ced4da;
                 padding: 0.5rem 1rem;
             }
+
             .form-control:focus {
                 border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
             }
+
             .input-group-text {
                 background-color: #e9ecef;
                 border: 1px solid #ced4da;
             }
+
             .btn-primary {
                 padding: 0.5rem 1.5rem;
                 font-weight: 500;
@@ -294,4 +313,5 @@
         </style>
     </div>
 </body>
-</html> 
+
+</html>

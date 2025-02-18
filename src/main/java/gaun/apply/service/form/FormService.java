@@ -68,41 +68,43 @@ public class FormService {
     }
 
     public void rejectForm(Long id, Class<? extends BaseFormData> formClass, String reason) {
-        BaseFormData form;
-        
+        BaseFormData form = null; // form değişkenini burada tanımlayın
+
         if (formClass.equals(MailFormData.class)) {
             form = mailFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
             form.setRejected(true);
             form.setRejectionReason(reason);
             form.setRejectionDate(LocalDateTime.now());
             mailFormService.saveMailFormData((MailFormData) form);
         } else if (formClass.equals(EduroamFormData.class)) {
             form = eduroamFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
+            form.setRejected(true);
+            form.setRejectionReason(reason);
+            form.setRejectionDate(LocalDateTime.now());
             eduroamFormService.saveEduroamFormData((EduroamFormData) form);
         } else if (formClass.equals(IpMacFormData.class)) {
             form = ipMacFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
+            form.setRejected(true);
+            form.setRejectionReason(reason);
+            form.setRejectionDate(LocalDateTime.now());
             ipMacFormService.saveIpMacFormData((IpMacFormData) form);
         } else if (formClass.equals(CloudAccountFormData.class)) {
             form = cloudAccountFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cloud başvurusu bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Cloud başvurusu bulunamadı"));
+            form.setRejected(true);
+            form.setRejectionReason(reason);
+            form.setRejectionDate(LocalDateTime.now());
             cloudAccountFormService.saveCloudAccountFormData((CloudAccountFormData) form);
         } else if (formClass.equals(VpnFormData.class)) {
             form = vpnFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
+            form.setRejected(true);
+            form.setRejectionReason(reason);
+            form.setRejectionDate(LocalDateTime.now());
             vpnFormService.saveVpnFormData((VpnFormData) form);
-        } else if (formClass.equals(WebAcademicFormData.class)) {
-            form = webAcademicFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Web Akademik başvurusu bulunamadı"));
-            webAcademicFormService.saveWebAcademicFormData((WebAcademicFormData) form);
-        } else if (formClass.equals(ServerSetupFormData.class)) {
-            form = serverSetupFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sunucu Kurulum başvurusu bulunamadı"));
-            serverSetupFormService.saveServerSetupFormData((ServerSetupFormData) form);
-        } else {
-            throw new RuntimeException("Geçersiz form tipi");
         }
     }
 

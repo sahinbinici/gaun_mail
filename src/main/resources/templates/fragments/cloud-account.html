@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <div th:fragment="content">
         <div class="card">
@@ -15,20 +16,23 @@
                     <div class="col-12">
                         <div class="info-group">
                             <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                            <div th:if="${cloudForm != null}" 
-                                 th:class="${cloudForm.status ? 'alert alert-success' : 'alert alert-warning'}">
+                            <div th:if="${cloudForm != null}"
+                                th:class="${cloudForm.status ? 'alert alert-success' : (cloudForm.rejected ? 'alert alert-danger' : 'alert alert-warning')}">
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label class="text-muted">Başvuru Durumu</label>
                                         <h5 class="mb-0">
-                                            <span th:text="${cloudForm.status ? 'Onaylandı' : 'Beklemede'}"
-                                                  th:class="${cloudForm.status ? 'badge bg-success' : 'badge bg-warning'}">
+                                            <span
+                                                th:text="${cloudForm.status ? 'Onaylandı' : (cloudForm.rejected ? 'Reddedildi' : 'Beklemede')}"
+                                                th:class="${cloudForm.status ? 'badge bg-success' : (cloudForm.rejected ? 'badge bg-danger' : 'badge bg-warning')}">
                                             </span>
                                         </h5>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="text-muted">Başvuru Tarihi</label>
-                                        <h5 class="mb-0" th:text="${#temporals.format(cloudForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                        <h5 class="mb-0"
+                                            th:text="${#temporals.format(cloudForm.applyDate, 'dd/MM/yyyy HH:mm')}">
+                                        </h5>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="text-muted">Kapasite</label>
@@ -38,6 +42,11 @@
                                         <label class="text-muted">Kullanım Amacı</label>
                                         <h5 class="mb-0" th:text="${cloudForm.purpose}"></h5>
                                     </div>
+                                    <span th:if="${cloudForm.rejected}">
+                                        <br>
+                                        <strong>Red Sebebi : </strong><span
+                                            th:text="${cloudForm.rejectionReason}"></span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +56,8 @@
                 <!-- Başvuru formu -->
                 <div th:if="${hasCloudApplication == false}">
                     <!-- Mevcut form içeriği -->
-                    <form id="cloudForm" th:action="@{/staff/cloud-account/apply}" method="post" th:object="${cloudAccountFormDto}">
+                    <form id="cloudForm" th:action="@{/staff/cloud-account/apply}" method="post"
+                        th:object="${cloudAccountFormDto}">
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <div class="info-group">
@@ -84,4 +94,5 @@
         </div>
     </div>
 </body>
-</html> 
+
+</html>

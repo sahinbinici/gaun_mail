@@ -23,7 +23,6 @@ import gaun.apply.entity.user.User;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
 import static gaun.apply.util.ConvertUtil.convertEntityToDto;
-import gaun.apply.entity.Student;
 import gaun.apply.repository.StudentRepository;
 
 @Service

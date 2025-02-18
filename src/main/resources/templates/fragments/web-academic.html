@@ -1,74 +1,108 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <div th:fragment="content">
         <div class="card">
-            <div class="card-header">
-                <h4>Web Akademik Başvuru Formu</h4>
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Web Akademik Başvurusu
+                </h3>
             </div>
             <div class="card-body">
                 <!-- Başvuru durumu -->
-                <div th:if="${webAcademicForm != null}" class="alert"
-                     th:classappend="${webAcademicForm.status ? 'alert-success' : (webAcademicForm.rejected ? 'alert-danger' : 'alert-warning')}">
-                    <strong>Başvuru Durumu:</strong>
-                    <span th:if="${webAcademicForm.status}">Onaylandı</span>
-                    <span th:if="${!webAcademicForm.status and !webAcademicForm.rejected}">Beklemede</span>
-                    <span th:if="${webAcademicForm.rejected}">
-                        Reddedildi
-                        <br>
-                        <strong>Red Sebebi:</strong> <span th:text="${webAcademicForm.rejectionReason}"></span>
-                    </span>
+                <div th:if="${webAcademicForm != null}" class="row">
+                    <div class="col-12">
+                        <div class="info-group">
+                            <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
+                            <div
+                                th:classappend="${webAcademicForm.status ? 'alert-success' : (webAcademicForm.rejected ? 'alert-danger' : 'alert-warning')}">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Başvuru Durumu</label>
+                                        <h5 class="mb-0">
+                                            <span
+                                                th:text="${webAcademicForm.status ? 'Onaylandı' : (webAcademicForm.rejected ? 'Reddedildi' : 'Beklemede')}"
+                                                th:class="${webAcademicForm.status ? 'badge bg-success' : (webAcademicForm.rejected ? 'badge bg-danger' : 'badge bg-warning')}">
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Başvuru Tarihi</label>
+                                        <h5 class="mb-0"
+                                            th:text="${#temporals.format(webAcademicForm.applyDate, 'dd/MM/yyyy HH:mm')}"></h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Domain</label>
+                                        <h5 class="mb-0" th:text="${webAcademicForm.domainName}"></h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">MySql Kullanıcı Adı</label>
+                                        <h5 class="mb-0" th:text="${webAcademicForm.mysqlUsername}"></h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Ftp Kullanıcı Adı</label>
+                                        <h5 class="mb-0" th:text="${webAcademicForm.ftpUsername}"></h5>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="text-muted">Hosting Tipi</label>
+                                        <h5 class="mb-0" th:text="${webAcademicForm.hostingType}"></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Başvuru formu -->
+                    <form th:if="${webAcademicForm == null}" th:action="@{/staff/web-academic/apply}"
+                        th:object="${webAcademicFormDto}" method="post" class="needs-validation" novalidate>
+
+                        <input type="hidden" th:field="*{tcKimlikNo}">
+
+                        <div class="mb-3">
+                            <label for="domainName" class="form-label">Domain Adı</label>
+                            <input type="text" class="form-control" id="domainName" th:field="*{domainName}" required>
+                            <div class="invalid-feedback">Domain adı gereklidir</div>
+                            <small class="form-text text-muted">Örnek: akademik.gantep.edu.tr</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ftpUsername" class="form-label">FTP Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="ftpUsername" th:field="*{ftpUsername}" required>
+                            <div class="invalid-feedback">FTP kullanıcı adı gereklidir</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mysqlUsername" class="form-label">MySQL Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="mysqlUsername" th:field="*{mysqlUsername}"
+                                required>
+                            <div class="invalid-feedback">MySQL kullanıcı adı gereklidir</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="purpose" class="form-label">Kullanım Amacı</label>
+                            <textarea class="form-control" id="purpose" th:field="*{purpose}" rows="4"
+                                required></textarea>
+                            <div class="invalid-feedback">Kullanım amacı gereklidir</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hostingType" class="form-label">Hosting Tipi</label>
+                            <select class="form-select" id="hostingType" th:field="*{hostingType}" required>
+                                <option value="">Seçiniz...</option>
+                                <option value="SHARED">Paylaşımlı (Shared)</option>
+                                <option value="DEDICATED">Özel (Dedicated)</option>
+                            </select>
+                            <div class="invalid-feedback">Hosting tipi seçilmelidir</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Başvuru Yap</button>
+                    </form>
                 </div>
-
-                <!-- Başvuru formu -->
-                <form th:if="${webAcademicForm == null}" 
-                      th:action="@{/staff/web-academic/apply}" 
-                      th:object="${webAcademicFormDto}" 
-                      method="post" 
-                      class="needs-validation" 
-                      novalidate>
-                    
-                    <input type="hidden" th:field="*{tcKimlikNo}">
-
-                    <div class="mb-3">
-                        <label for="domainName" class="form-label">Domain Adı</label>
-                        <input type="text" class="form-control" id="domainName" th:field="*{domainName}" required>
-                        <div class="invalid-feedback">Domain adı gereklidir</div>
-                        <small class="form-text text-muted">Örnek: akademik.gantep.edu.tr</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="ftpUsername" class="form-label">FTP Kullanıcı Adı</label>
-                        <input type="text" class="form-control" id="ftpUsername" th:field="*{ftpUsername}" required>
-                        <div class="invalid-feedback">FTP kullanıcı adı gereklidir</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="mysqlUsername" class="form-label">MySQL Kullanıcı Adı</label>
-                        <input type="text" class="form-control" id="mysqlUsername" th:field="*{mysqlUsername}" required>
-                        <div class="invalid-feedback">MySQL kullanıcı adı gereklidir</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="purpose" class="form-label">Kullanım Amacı</label>
-                        <textarea class="form-control" id="purpose" th:field="*{purpose}" rows="4" required></textarea>
-                        <div class="invalid-feedback">Kullanım amacı gereklidir</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="hostingType" class="form-label">Hosting Tipi</label>
-                        <select class="form-select" id="hostingType" th:field="*{hostingType}" required>
-                            <option value="">Seçiniz...</option>
-                            <option value="SHARED">Paylaşımlı (Shared)</option>
-                            <option value="DEDICATED">Özel (Dedicated)</option>
-                        </select>
-                        <div class="invalid-feedback">Hosting tipi seçilmelidir</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Başvuru Yap</button>
-                </form>
             </div>
         </div>
-    </div>
+        </div>
 </body>
-</html> 
+
+</html>
