@@ -73,12 +73,6 @@ public class ConvertUtil {
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             StudentDto studentFromService = ConvertUtil.convertJsonToStudentDto(response.getBody());
-            
-            // Doğum tarihi kontrolü
-            if (!compareBirthDates(studentDto.getDogumTarihi(), studentFromService.getDogumTarihi())) {
-                throw new RuntimeException("Doğum tarihini hatalı girdiniz. Kaydınız başarısız oldu!");
-            }
-            
             return studentFromService;
         } else {
             return null;

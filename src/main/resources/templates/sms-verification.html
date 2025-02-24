@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Doğrulama</title>
+    <link rel="stylesheet" href="/static/css/styles.css"> <!-- CSS dosyanızı buraya ekleyin -->
+</head>
+<body>
+<div class="container">
+    <h1>SMS Doğrulama</h1>
+    <form action="#" th:action="@{/register/verify-sms}" method="post" th:object="${smsVerificationDto}">
+        <div class="form-group">
+            <label for="code">Doğrulama Kodunu Girin:</label>
+            <input type="text" id="code" name="code" required th:field="*{code}">
+        </div>
+        <button type="submit" class="btn">Doğrula</button>
+    </form>
+    <div class="error-message">
+        <!-- Hata mesajları burada gösterilebilir -->
+        <p th:if="${error}" th:text="${error}"></p>
+    </div>
+</div>
+</body>
+</html>

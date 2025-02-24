@@ -1,13 +1,16 @@
 package gaun.apply.controller;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import gaun.apply.util.ConvertUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
+import gaun.apply.dto.SmsVerificationDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.Staff;
@@ -33,11 +37,13 @@ import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
 import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
+import gaun.apply.service.SmsService;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.MailFormService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 
@@ -54,6 +60,7 @@ public class BaseController {
     private final UserRepository userRepository;
     private final MailFormService mailFormService;
     private final EduroamFormService eduroamFormService;
+    private final SmsService smsService;
 
     public BaseController(UserService userService,
                           StudentService studentService,
@@ -62,7 +69,7 @@ public class BaseController {
                           StaffService staffService,
                           PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository,
-                          UserRepository userRepository, MailFormService mailFormService, EduroamFormService eduroamFormService) {
+                          UserRepository userRepository, MailFormService mailFormService, EduroamFormService eduroamFormService, SmsService smsService) {
         this.userService = userService;
         this.studentService = studentService;
         this.mailFormRepository = mailFormRepository;
@@ -73,7 +80,10 @@ public class BaseController {
         this.userRepository = userRepository;
         this.mailFormService = mailFormService;
         this.eduroamFormService = eduroamFormService;
+        this.smsService = smsService;
     }
+
+    String verificationCode = String.valueOf(new Random().nextInt(999999)); 
 
     @GetMapping("/")
     public String root() {
@@ -99,7 +109,7 @@ public class BaseController {
 
         // Check roles in priority order: ADMIN > STAFF > USER
         if (roles.contains("ROLE_ADMIN")) {
-            return "redirect:/admin";
+            return "redirect:/staff/index";
         } else if (roles.contains("ROLE_STAFF")) {
             return "redirect:/staff/index";
         } else if (roles.contains("ROLE_USER")) {
@@ -119,12 +129,14 @@ public class BaseController {
     public String showRegistrationForm(Model model) {
         model.addAttribute("studentDto", new StudentDto());
         model.addAttribute("userDto", new UserDto());
+        model.addAttribute("smsVerificationDto", new SmsVerificationDto());
         return "register";
     }
 
     @PostMapping("/register/save/student")
     public String registrationStudent(@Valid @ModelAttribute("studentDto") StudentDto studentDto,
                                     BindingResult result,
+                                    HttpSession session,
                                     Model model) {
         try {
             User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
@@ -137,17 +149,46 @@ public class BaseController {
                 model.addAttribute("userDto", new UserDto());
                 return "register";
             }
-            if(existingUser==null){
-                studentService.saveStudent(studentDto);
-            }
-            userService.saveUserStudent(studentDto);
-            return "redirect:/register?success";
+            studentDto = ConvertUtil.getStudentFromObs(studentDto);
+            // Öğrenci bilgilerini oturumda saklayın
+            session.setAttribute("studentDto", studentDto);
+
+            // SMS gönderimi ve diğer işlemler
+            String verificationCode = String.valueOf(new Random().nextInt(999999));
+            smsService.sendSms(new String[]{studentDto.getGsm1()}, "Your verification code is: " + verificationCode);
+
+            model.addAttribute("verificationCode", verificationCode);
+            model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+            return "sms-verification"; // Redirect to SMS verification page
         } catch (Exception e) {
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu");
             model.addAttribute("userDto", new UserDto());
+            model.addAttribute("smsVerificationDto", new SmsVerificationDto());
             return "register";
         }
     }
+
+    @PostMapping("/register/verify-sms")
+    public String verifySms(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto, 
+                            BindingResult result, Model model, HttpSession session) throws NoSuchAlgorithmException {
+        String code = smsVerificationDto.getCode();
+        System.out.println("Verification code: " + code);
+        
+        // Kod kontrolü
+        if (!verificationCode.equals(code)) {
+            model.addAttribute("error", "Geçersiz doğrulama kodu");
+            return "sms-verification"; // Hata durumunda tekrar form sayfasına dön
+        }
+
+        // Öğrenci bilgilerini oturumdan al
+        StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+
+        // Öğrenci kaydını yap
+        studentService.saveStudent(studentDto);
+
+        return "redirect:/register?success"; // Başarılı kayıt sonrası yönlendirme
+    }
+
 
     @PostMapping("/register/save/staff")
     public String registrationStaff(@Valid @ModelAttribute("userDto") UserDto userDto,
@@ -365,5 +406,10 @@ public class BaseController {
                 System.err.println("Error checking applications: " + e.getMessage());
             }
         }
+    }
+
+    @GetMapping("/error")
+    public String errorPage() {
+        return "error"; // error.html sayfasına yönlendirin
     }
 } 
