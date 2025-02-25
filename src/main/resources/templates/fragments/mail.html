@@ -31,7 +31,6 @@
                                                     </span>
                                                 </h5>
                                                 <span th:if="${mailForm.rejected}">
-                                                    <br>
                                                     <strong>Red Sebebi : </strong><span
                                                         th:text="${mailForm.rejectionReason}"></span>
                                                 </span>
@@ -45,6 +44,14 @@
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Mail Adresi</label>
                                                 <h5 class="mb-0" th:text="${mailForm.email + '@gantep.edu.tr'}"></h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Şifre</label>
+                                                <h5 class="mb-0">
+                                                    <span class="password-toggle" style="cursor: pointer;" 
+                                                          onclick="togglePassword(this)" 
+                                                          th:text="'********'" 
+                                                          th:data-password="${mailForm.password}">********</span>
                                             </div>
                                         </div>
                                     </div>
@@ -251,6 +258,17 @@
             });
         </script>
 
+        <script>
+        function togglePassword(element) {
+            const password = element.getAttribute('data-password');
+            if (element.textContent === '********') {
+                element.textContent = password;
+            } else {
+                element.textContent = '********';
+            }
+        }
+        </script>
+
         <style>
             .info-group {
                 padding: 15px;
@@ -309,6 +327,11 @@
             .btn-primary {
                 padding: 0.5rem 1.5rem;
                 font-weight: 500;
+            }
+
+            .password-toggle:hover {
+                color: #007bff;
+                text-decoration: underline;
             }
         </style>
     </div>

@@ -25,19 +25,13 @@ import gaun.apply.service.UserService;
 public class StudentUserController {
     private final UserService userService;
     private final StudentService studentService;
-    private final MailFormRepository mailFormRepository;
-    private final EduroamFormRepository eduroamFormRepository;
     private final MailFormService mailFormService;
     private final EduroamFormService eduroamFormService;
 
     public StudentUserController(UserService userService,
-                                 StudentService studentService,
-                                 MailFormRepository mailFormRepository,
-                                 EduroamFormRepository eduroamFormRepository, MailFormService mailFormService, EduroamFormService eduroamFormService) {
+                                 StudentService studentService, MailFormService mailFormService, EduroamFormService eduroamFormService) {
         this.userService = userService;
         this.studentService = studentService;
-        this.mailFormRepository = mailFormRepository;
-        this.eduroamFormRepository = eduroamFormRepository;
         this.mailFormService = mailFormService;
         this.eduroamFormService = eduroamFormService;
     }

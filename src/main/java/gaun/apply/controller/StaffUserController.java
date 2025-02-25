@@ -44,31 +44,25 @@ import jakarta.validation.Valid;
 public class StaffUserController {
     private final UserService userService;
     private final StaffService staffService;
-    private final MailFormRepository mailFormRepository;
-    private final EduroamFormRepository eduroamFormRepository;
-    @Autowired
-    private CloudAccountFormRepository cloudAccountFormRepository;
-    @Autowired
-    private VpnFormRepository vpnFormRepository;
-    @Autowired
-    private IpMacFormRepository ipMacFormRepository;
-    @Autowired
-    private MailFormService mailFormService;
-    @Autowired
-    private EduroamFormService eduroamFormService;
-    @Autowired
-    private VpnFormService vpnFormService;
-    @Autowired
-    private WebAcademicFormService webAcademicFormService;
+    private final CloudAccountFormRepository cloudAccountFormRepository;
+    private final VpnFormRepository vpnFormRepository;
+    private final IpMacFormRepository ipMacFormRepository;
+    private final MailFormService mailFormService;
+    private final EduroamFormService eduroamFormService;
+    private final VpnFormService vpnFormService;
+    private final WebAcademicFormService webAcademicFormService;
 
-    public StaffUserController(UserService userService, 
-                             StaffService staffService,
-                             MailFormRepository mailFormRepository,
-                             EduroamFormRepository eduroamFormRepository) {
+    public StaffUserController(UserService userService,
+                               StaffService staffService, CloudAccountFormRepository cloudAccountFormRepository, VpnFormRepository vpnFormRepository, IpMacFormRepository ipMacFormRepository, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, WebAcademicFormService webAcademicFormService) {
         this.userService = userService;
         this.staffService = staffService;
-        this.mailFormRepository = mailFormRepository;
-        this.eduroamFormRepository = eduroamFormRepository;
+        this.cloudAccountFormRepository = cloudAccountFormRepository;
+        this.vpnFormRepository = vpnFormRepository;
+        this.ipMacFormRepository = ipMacFormRepository;
+        this.mailFormService = mailFormService;
+        this.eduroamFormService = eduroamFormService;
+        this.vpnFormService = vpnFormService;
+        this.webAcademicFormService = webAcademicFormService;
     }
 
     @GetMapping("/ip-mac")

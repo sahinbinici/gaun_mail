@@ -24,9 +24,8 @@ public class StudentService {
             .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
     }
 
-    public void saveStudent(StudentDto studentDto) throws NoSuchAlgorithmException {
-        StudentDto studentDtoData = ConvertUtil.getStudentFromObs(studentDto);
-        Student student = modelMapper.map(studentDtoData, Student.class);
+    public void saveStudent(StudentDto studentDto) {
+        Student student = modelMapper.map(studentDto, Student.class);
         studentRepository.save(student);
     }
 

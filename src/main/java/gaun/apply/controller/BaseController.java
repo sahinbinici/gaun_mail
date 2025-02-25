@@ -1,6 +1,5 @@
 package gaun.apply.controller;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +9,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import gaun.apply.util.ConvertUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,14 +33,13 @@ import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
-import gaun.apply.repository.form.EduroamFormRepository;
-import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.service.SmsService;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.MailFormService;
+import gaun.apply.util.ConvertUtil;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -52,8 +49,6 @@ import jakarta.validation.Valid;
 public class BaseController {
     private final UserService userService;
     private final StudentService studentService;
-    private final MailFormRepository mailFormRepository;
-    private final EduroamFormRepository eduroamFormRepository;
     private final StaffService staffService;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
@@ -64,16 +59,12 @@ public class BaseController {
 
     public BaseController(UserService userService,
                           StudentService studentService,
-                          MailFormRepository mailFormRepository,
-                          EduroamFormRepository eduroamFormRepository,
                           StaffService staffService,
                           PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository,
                           UserRepository userRepository, MailFormService mailFormService, EduroamFormService eduroamFormService, SmsService smsService) {
         this.userService = userService;
         this.studentService = studentService;
-        this.mailFormRepository = mailFormRepository;
-        this.eduroamFormRepository = eduroamFormRepository;
         this.staffService = staffService;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -82,8 +73,6 @@ public class BaseController {
         this.eduroamFormService = eduroamFormService;
         this.smsService = smsService;
     }
-
-    String verificationCode = String.valueOf(new Random().nextInt(999999)); 
 
     @GetMapping("/")
     public String root() {
@@ -138,23 +127,30 @@ public class BaseController {
                                     BindingResult result,
                                     HttpSession session,
                                     Model model) {
+        String pass = studentDto.getPassword();
         try {
             User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
             if (existingUser != null) {
                 result.rejectValue("ogrenciNo", null, "Bu öğrenci numarası ile daha önce kayıt yapılmış");
-                return "register";
-            }
-
-            if (result.hasErrors()) {
                 model.addAttribute("userDto", new UserDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
                 return "register";
             }
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
+            studentDto.setPassword(pass);
+            studentDto.setConfirmPassword(pass);
+
+            if (result.hasErrors()) {
+                model.addAttribute("userDto", new UserDto());
+                result.rejectValue("ogrenciNo", null, "OBS'den öğrenci bilgileri alınamadı");
+                return "register";
+            }
             // Öğrenci bilgilerini oturumda saklayın
+            String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("studentDto", studentDto);
+            session.setAttribute("verificationCode", verificationCode);
 
             // SMS gönderimi ve diğer işlemler
-            String verificationCode = String.valueOf(new Random().nextInt(999999));
             smsService.sendSms(new String[]{studentDto.getGsm1()}, "Your verification code is: " + verificationCode);
 
             model.addAttribute("verificationCode", verificationCode);
@@ -170,13 +166,15 @@ public class BaseController {
 
     @PostMapping("/register/verify-sms")
     public String verifySms(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto, 
-                            BindingResult result, Model model, HttpSession session) throws NoSuchAlgorithmException {
+                            BindingResult result, Model model, HttpSession session){
         String code = smsVerificationDto.getCode();
         System.out.println("Verification code: " + code);
         
         // Kod kontrolü
-        if (!verificationCode.equals(code)) {
+        if (!session.getAttribute("verificationCode").equals(code)) {
             model.addAttribute("error", "Geçersiz doğrulama kodu");
+            model.addAttribute("studentDto", new StudentDto());
+            model.addAttribute("userDto", new UserDto());
             return "sms-verification"; // Hata durumunda tekrar form sayfasına dön
         }
 
@@ -185,6 +183,7 @@ public class BaseController {
 
         // Öğrenci kaydını yap
         studentService.saveStudent(studentDto);
+        userService.saveUserStudent(studentDto);
 
         return "redirect:/register?success"; // Başarılı kayıt sonrası yönlendirme
     }
@@ -199,6 +198,7 @@ public class BaseController {
             if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
                 result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
                 model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("userDto", new UserDto());
                 return "register";
             }
 
@@ -207,12 +207,15 @@ public class BaseController {
             if (existingUser != null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("userDto", new UserDto());
+                model.addAttribute("error", "Bu TC kimlik numarası ile daha önce kayıt yapılmış. Lütfen farklı bir TC kimlik numarası kullanın.");
                 return "register";
             }
 
             // Form validasyon kontrolü
             if (result.hasErrors()) {
                 model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("userDto", new UserDto());
                 return "register";
             }
 
@@ -221,6 +224,7 @@ public class BaseController {
             if (staff == null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile personel kaydı bulunamadı");
                 model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("userDto", new UserDto());
                 return "register";
             }
 
@@ -232,6 +236,7 @@ public class BaseController {
             e.printStackTrace();
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
             model.addAttribute("studentDto", new StudentDto());
+            model.addAttribute("userDto", new UserDto());
             return "register";
         }
     }
@@ -255,7 +260,7 @@ public class BaseController {
                 return "fragments/index";
             }
 
-            MailFormData existingMailForm = mailFormService.mailFormData(mailFormDto.getUsername());//mailFormRepository.findByUsername(mailFormDto.getUsername());
+            MailFormData existingMailForm = mailFormService.mailFormData(mailFormDto.getUsername());
             if (existingMailForm != null) {
                 return "redirect:/index?mailExists=true";
             }

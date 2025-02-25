@@ -45,6 +45,15 @@
                                                 <label class="text-muted">Kullanıcı Adı</label>
                                                 <h5 class="mb-0" th:text="${eduroamForm.username}"></h5>
                                             </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Şifre</label>
+                                                <h5 class="mb-0">
+                                                    <span class="password-toggle" style="cursor: pointer;" 
+                                                          onclick="toggleEduroamPassword(this)" 
+                                                          th:text="'********'" 
+                                                          th:data-password="${eduroamForm.password}">********</span>
+                                                </h5>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -212,6 +221,17 @@
             });
         </script>
 
+        <script>
+        function toggleEduroamPassword(element) {
+            const password = element.getAttribute('data-password');
+            if (element.textContent === '********') {
+                element.textContent = password;
+            } else {
+                element.textContent = '********';
+            }
+        }
+        </script>
+
         <style>
             .info-group {
                 padding: 15px;
@@ -265,6 +285,11 @@
             .btn-primary {
                 padding: 0.5rem 1.5rem;
                 font-weight: 500;
+            }
+
+            .password-toggle:hover {
+                color: #007bff;
+                text-decoration: underline;
             }
         </style>
     </div>

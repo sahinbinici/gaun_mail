@@ -46,7 +46,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
-    private final MailFormRepository mailFormRepository;
     private final FormService formService;
     private final StudentService studentService;
     private final StaffService staffService;
@@ -58,9 +57,8 @@ public class AdminController {
     private final WebAcademicFormService webAcademicFormService;
     private final ServerSetupFormService serverSetupFormService;
 
-    public AdminController(UserService userService, MailFormRepository mailFormRepository, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, WebAcademicFormService webAcademicFormService, ServerSetupFormService serverSetupFormService) {
+    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, WebAcademicFormService webAcademicFormService, ServerSetupFormService serverSetupFormService) {
         this.userService = userService;
-        this.mailFormRepository = mailFormRepository;
         this.formService = formService;
         this.studentService = studentService;
         this.staffService = staffService;

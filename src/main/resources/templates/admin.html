@@ -131,10 +131,12 @@
                                         <thead>
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
+                                                <th>Şifre</th>
                                                 <th>Email</th>
                                                 <th>Başvuru Tarihi</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
+                                                <th>Açıklama</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -147,6 +149,7 @@
                                                     </a>
                                                 </td>
                                                 <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                                <td th:text="${form.password}"></td>
                                                 <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
                                                     <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
@@ -165,6 +168,8 @@
                                                             Reddet
                                                         </button>
                                                     </div>
+                                                </td>
+                                                <td>
                                                     <div th:if="${form.rejected}">
                                                         <small class="text-danger" th:text="${form.rejectionReason}"></small>
                                                     </div>
@@ -220,6 +225,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
+                                                <th>Şifre</th>
                                                 <th>Başvuru Tarihi</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
@@ -229,11 +235,12 @@
                                             <tr th:each="form : ${eduroamForms}">
                                                 <td>
                                                     <a href="#" onclick="showUserDetails(this)" 
-                                                       th:data-username="${form.username}" 
+                                                       th:data-username="${form.username}"
                                                        style="text-decoration: underline;">
                                                         <span th:text="${form.username}"></span>
                                                     </a>
                                                 </td>
+                                                <td th:text="${form.password}"></td>
                                                 <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
                                                     <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
