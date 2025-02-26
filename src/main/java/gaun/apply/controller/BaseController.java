@@ -50,7 +50,6 @@ public class BaseController {
     private final UserService userService;
     private final StudentService studentService;
     private final StaffService staffService;
-    private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final MailFormService mailFormService;
@@ -60,13 +59,11 @@ public class BaseController {
     public BaseController(UserService userService,
                           StudentService studentService,
                           StaffService staffService,
-                          PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository,
                           UserRepository userRepository, MailFormService mailFormService, EduroamFormService eduroamFormService, SmsService smsService) {
         this.userService = userService;
         this.studentService = studentService;
         this.staffService = staffService;
-        this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.mailFormService = mailFormService;

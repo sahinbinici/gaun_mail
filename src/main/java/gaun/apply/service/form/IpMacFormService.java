@@ -39,4 +39,8 @@ public class IpMacFormService {
     public List<IpMacFormData> getAllIpMacForms() {
         return ipMacFormRepository.findAll();
     }
+
+    public void deleteIpMacForm(Long id) {
+        ipMacFormRepository.deleteById(id);
+    }
 }

@@ -23,9 +23,6 @@ public class MailFormService {
     public MailFormData mailFormData(String username){
         return mailFormRepository.findByUsername(username);
     }
-    public long countByStatus(boolean status){
-        return mailFormRepository.countByStatus(status);
-    }
 
     public List<MailFormData> findTop10ByOrderByApplyDateDesc(){
         return mailFormRepository.findTop10ByOrderByApplyDateDesc();
@@ -37,5 +34,9 @@ public class MailFormService {
 
     public List<MailFormData> getAllMailForms() {
         return mailFormRepository.findAll();
+    }
+
+    public void deleteMailForm(Long id) {
+        mailFormRepository.deleteById(id);
     }
 }

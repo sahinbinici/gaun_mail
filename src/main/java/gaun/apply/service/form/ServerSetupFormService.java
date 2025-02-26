@@ -39,4 +39,8 @@ public class ServerSetupFormService {
     public List<ServerSetupFormData> getAllServerSetupForms() {
         return serverSetupFormRepository.findAll();
     }
+
+    public void deleteServerSetupForm(Long id) {
+        serverSetupFormRepository.deleteById(id);
+    }
 } 

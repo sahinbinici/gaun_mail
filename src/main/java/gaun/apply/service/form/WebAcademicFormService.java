@@ -39,4 +39,8 @@ public class WebAcademicFormService {
     public List<WebAcademicFormData> getAllWebAcademicForms() {
         return webAcademicFormRepository.findAll();
     }
+
+    public void deleteWebAcademicForm(Long id) {
+        webAcademicFormRepository.deleteById(id);
+    }
 } 

@@ -180,4 +180,36 @@ $(document).ready(function() {
             alert('Başvuru reddedilemedi: ' + error.message);
         });
     });
-}); 
+});
+
+function deleteForm(formType, formId) {
+    if (!confirm('Bu başvuruyu silmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    const { token, header } = getCsrfToken();
+    const headers = {};
+    if (token && header) {
+        headers[header] = token;
+    }
+
+    fetch(`/bim-basvuru/admin/${formType}/delete/${formId}`, {
+        method: 'POST',
+        headers: headers,
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            return response.text().then(text => {
+                console.error('Error response:', text);
+                throw new Error('Silme işlemi başarısız');
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Silme işlemi sırasında bir hata oluştu: ' + error.message);
+    });
+} 

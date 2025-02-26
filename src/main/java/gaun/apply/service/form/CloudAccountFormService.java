@@ -39,4 +39,8 @@ public class CloudAccountFormService {
     public List<CloudAccountFormData> getAllCloudAccountForms() {
         return cloudAccountFormRepository.findAll();
     }
+
+    public void deleteCloudAccountForm(Long id) {
+        cloudAccountFormRepository.deleteById(id);
+    }
 }

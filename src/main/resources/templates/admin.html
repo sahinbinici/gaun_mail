@@ -168,6 +168,12 @@
                                                             Reddet
                                                         </button>
                                                     </div>
+                                                    <div th:if="${form.status or form.rejected}">
+                                                        <button class="btn btn-sm btn-danger delete-btn"
+                                                                th:onclick="|deleteForm('mail', ${form.id})|">
+                                                            Sil
+                                                        </button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <div th:if="${form.rejected}">
@@ -224,11 +230,11 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Kullanıcı Adı</th>
-                                                <th>Şifre</th>
+                                                <th>Kullanıcı</th>
                                                 <th>Başvuru Tarihi</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
+                                                <th>Açıklama</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -240,17 +246,22 @@
                                                         <span th:text="${form.username}"></span>
                                                     </a>
                                                 </td>
-                                                <td th:text="${form.password}"></td>
                                                 <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
-                                                    <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                                    <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
-                                                    <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
+                                                    <div th:if="${form.rejected}">
+                                                        <small class="text-danger">Reddedildi</small>
+                                                    </div>
+                                                    <div th:if="${form.status}">
+                                                        <small class="text-success">Onaylandı</small>
+                                                    </div>
+                                                    <div th:if="${!form.status and !form.rejected}">
+                                                        <small class="text-warning">Beklemede</small>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <div th:if="${!form.status and !form.rejected}">
                                                         <button class="btn btn-sm btn-success" 
-                                                                th:onclick="|activateForm('eduroam', '${form.id}')|">
+                                                                th:onclick="|activateForm('eduroam', ${form.id})|">
                                                             Onayla
                                                         </button>
                                                         <button class="btn btn-sm btn-danger reject-btn"
@@ -259,6 +270,14 @@
                                                             Reddet
                                                         </button>
                                                     </div>
+                                                    <div th:if="${form.status or form.rejected}">
+                                                        <button class="btn btn-sm btn-danger delete-btn"
+                                                                th:onclick="|deleteForm('eduroam', ${form.id})|">
+                                                            Sil
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>
                                                     <div th:if="${form.rejected}">
                                                         <small class="text-danger" th:text="${form.rejectionReason}"></small>
                                                     </div>
@@ -343,17 +362,20 @@
                                                     <td>
                                                         <div th:if="${!form.status and !form.rejected}">
                                                             <button class="btn btn-sm btn-success" 
-                                                                    th:onclick="|activateForm('ipmac', '${form.id}')|">
+                                                                    th:onclick="|activateForm('ip-mac', ${form.id})|">
                                                                 Onayla
                                                             </button>
                                                             <button class="btn btn-sm btn-danger reject-btn"
                                                                     th:data-form-id="${form.id}"
-                                                                    th:data-form-type="ipmac">
+                                                                    th:data-form-type="ip-mac">
                                                                 Reddet
                                                             </button>
                                                         </div>
-                                                        <div th:if="${form.rejected}">
-                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        <div th:if="${form.status or form.rejected}">
+                                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                                    th:onclick="|deleteForm('ip-mac', ${form.id})|">
+                                                                Sil
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -451,8 +473,11 @@
                                                                 Reddet
                                                             </button>
                                                         </div>
-                                                        <div th:if="${form.rejected}">
-                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        <div th:if="${form.status or form.rejected}">
+                                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                                    th:onclick="|deleteForm('cloud', ${form.id})|">
+                                                                Sil
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -550,8 +575,11 @@
                                                                 Reddet
                                                             </button>
                                                         </div>
-                                                        <div th:if="${form.rejected}">
-                                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                                        <div th:if="${form.status or form.rejected}">
+                                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                                    th:onclick="|deleteForm('vpn', ${form.id})|">
+                                                                Sil
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -660,8 +688,11 @@
                                                     Reddet
                                                 </button>
                                             </div>
-                                            <div th:if="${form.rejected}">
-                                                <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                            <div th:if="${form.status or form.rejected}">
+                                                <button class="btn btn-sm btn-danger delete-btn"
+                                                        th:onclick="|deleteForm('webacademic', ${form.id})|">
+                                                    Sil
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

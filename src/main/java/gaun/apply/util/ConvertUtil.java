@@ -20,7 +20,6 @@ import gaun.apply.entity.user.User;
 public class ConvertUtil {
 
     private static final RestTemplate restTemplate = new RestTemplate();
-    private PasswordEncoder passwordEncoder;
     private static String baseUrl="https://www.gantep.edu.tr/mobil/usercheck_o_json.php/";
 
     public static UserDto convertEntityToDto(User user) {
@@ -45,10 +44,6 @@ public class ConvertUtil {
         BigInteger no = new BigInteger(1, messageDigest);
         String password = no.toString(16).toUpperCase();
         return password;
-    }
-
-    public static String convertMD5ToPassword(String param) {
-        return param;
     }
 
     public static boolean compareBirthDates(String inputBirthDate, String obsBirthDate) {

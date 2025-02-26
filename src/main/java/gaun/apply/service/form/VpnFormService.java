@@ -39,4 +39,8 @@ public class VpnFormService {
     public List<VpnFormData> getAllVpnForms() {
         return vpnFormRepository.findAll();
     }
+
+    public void deleteVpnForm(Long id) {
+        vpnFormRepository.deleteById(id);
+    }
 }

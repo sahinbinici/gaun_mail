@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.Staff;
-import gaun.apply.entity.user.User;
 import gaun.apply.entity.form.BaseFormData;
 import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.EduroamFormData;
@@ -28,7 +27,7 @@ import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.ServerSetupFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.form.WebAcademicFormData;
-import gaun.apply.repository.form.MailFormRepository;
+import gaun.apply.entity.user.User;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
@@ -183,6 +182,18 @@ public class AdminController {
         eduroamForm.setApprovalDate(LocalDateTime.now());
         eduroamFormService.saveEduroamFormData(eduroamForm);//eduroamFormRepository.save(eduroamForm);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/eduroam/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteEduroamForm(@PathVariable Long id) {
+        try {
+            eduroamFormService.deleteEduroamForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Eduroam başvurusu silinemedi: " + e.getMessage());
+        }
     }
 
     @GetMapping("/user-details/{username}")
@@ -356,6 +367,78 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body("Form reddi başarısız: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/mail/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteMailForm(@PathVariable Long id) {
+        try {
+            mailFormService.deleteMailForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Mail başvurusu silinemedi: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/ip-mac/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteIpMacForm(@PathVariable Long id) {
+        try {
+            ipMacFormService.deleteIpMacForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("IP-MAC başvurusu silinemedi: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/cloud/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteCloudAccountForm(@PathVariable Long id) {
+        try {
+            cloudAccountFormService.deleteCloudAccountForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Cloud hesap başvurusu silinemedi: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/vpn/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteVpnForm(@PathVariable Long id) {
+        try {
+            vpnFormService.deleteVpnForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("VPN başvurusu silinemedi: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/web-academic/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteWebAcademicForm(@PathVariable Long id) {
+        try {
+            webAcademicFormService.deleteWebAcademicForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Web Akademik başvurusu silinemedi: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/server-setup/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteServerSetupForm(@PathVariable Long id) {
+        try {
+            serverSetupFormService.deleteServerSetupForm(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Sunucu Kurulum başvurusu silinemedi: " + e.getMessage());
         }
     }
 } 

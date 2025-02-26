@@ -20,9 +20,6 @@ public class EduroamFormService {
         return eduroamFormRepository.findByUsername(username);
     }
 
-    public long countByStatus(boolean status){
-        return eduroamFormRepository.countByStatus(status);
-    }
     public List<EduroamFormData> findTop10ByOrderByApplyDateDesc(){
         return eduroamFormRepository.findTop10ByOrderByApplyDateDesc();
     }
@@ -37,5 +34,9 @@ public class EduroamFormService {
 
     public List<EduroamFormData> getAllEduroamForms() {
         return eduroamFormRepository.findAll();
+    }
+
+    public void deleteEduroamForm(Long id) {
+        eduroamFormRepository.deleteById(id);
     }
 }
