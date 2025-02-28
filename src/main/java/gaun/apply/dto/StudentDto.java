@@ -43,4 +43,5 @@ public class StudentDto{
     private String gsm1;
     @JsonProperty("DOGUM_TARIHI")
     private String dogumTarihi;
+    private String smsCode;
 }

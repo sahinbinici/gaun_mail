@@ -1,25 +1,147 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMS Doğrulama</title>
-    <link rel="stylesheet" href="/static/css/styles.css"> <!-- CSS dosyanızı buraya ekleyin -->
+    <title>SMS Doğrulama - GAÜN BİM</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .verification-card {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+            background-color: white;
+        }
+        .verification-title {
+            color: #0d6efd;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .verification-info {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .code-input {
+            letter-spacing: 0.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>SMS Doğrulama</h1>
-    <form action="#" th:action="@{/register/verify-sms}" method="post" th:object="${smsVerificationDto}">
-        <div class="form-group">
-            <label for="code">Doğrulama Kodunu Girin:</label>
-            <input type="text" id="code" name="code" required th:field="*{code}">
+    <div class="container">
+        <div class="verification-card">
+            <h2 class="verification-title">SMS Doğrulama</h2>
+            
+            <p class="verification-info">
+                Cep telefonunuza gönderilen 6 haneli doğrulama kodunu giriniz.
+            </p>
+
+            <form th:action="@{/register/verify-sms}" method="post" th:object="${smsVerificationDto}">
+                <div class="mb-4">
+                    <input type="text" 
+                           class="form-control code-input" 
+                           id="code" 
+                           name="code" 
+                           th:field="*{code}"
+                           maxlength="6"
+                           placeholder="------"
+                           required
+                           autocomplete="off">
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Doğrula</button>
+                    <a th:href="@{/register}" class="btn btn-outline-secondary">İptal</a>
+                </div>
+            </form>
+
+            <div th:if="${error}" class="error-message">
+                <div class="alert alert-danger" role="alert" th:text="${error}"></div>
+            </div>
+
+            <div class="verification-info mt-4">
+                <p>Kod gelmedi mi? 
+                    <a href="#" onclick="resendSms()" class="text-primary">Tekrar Gönder</a>
+                </p>
+            </div>
         </div>
-        <button type="submit" class="btn">Doğrula</button>
-    </form>
-    <div class="error-message">
-        <!-- Hata mesajları burada gösterilebilir -->
-        <p th:if="${error}" th:text="${error}"></p>
     </div>
-</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sadece sayı girişine izin ver
+        document.getElementById('code').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // SMS tekrar gönderme fonksiyonu
+        function resendSms() {
+            const resendLink = document.querySelector('.verification-info a');
+            resendLink.style.pointerEvents = 'none';
+            resendLink.textContent = 'Gönderiliyor...';
+
+            fetch('/bim-basvuru/register/resend-sms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // CSRF token'ı ekle
+                    [document.querySelector("meta[name='_csrf_header']").content]: 
+                    document.querySelector("meta[name='_csrf']").content
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('SMS gönderilemedi');
+                }
+                // Başarılı mesajı göster
+                alert('Doğrulama kodu tekrar gönderildi');
+            })
+            .catch(error => {
+                alert('Hata: ' + error.message);
+            })
+            .finally(() => {
+                // 60 saniye beklet
+                let seconds = 60;
+                const interval = setInterval(() => {
+                    if (seconds <= 0) {
+                        resendLink.style.pointerEvents = 'auto';
+                        resendLink.textContent = 'Tekrar Gönder';
+                        clearInterval(interval);
+                    } else {
+                        resendLink.textContent = `${seconds} saniye sonra tekrar deneyin`;
+                        seconds--;
+                    }
+                }, 1000);
+            });
+        }
+    </script>
+
+    <!-- CSRF token meta etiketlerini ekle -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </body>
 </html>

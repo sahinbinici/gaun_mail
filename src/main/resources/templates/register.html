@@ -92,19 +92,19 @@
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label for="confirmPassword">Şifre Tekrarı</label>
+                                        <label for="studentConfirmPassword">Şifre Tekrarı</label>
                                         <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="fas fa-lock"></i>
                                             </span>
-                                            <input type="password"
-                                                   class="form-control"
-                                                   id="confirmPassword"
-                                                   th:field="*{confirmPassword}"
+                                            <input type="password" 
+                                                   class="form-control" 
+                                                   id="studentConfirmPassword" 
+                                                   th:field="*{confirmPassword}" 
                                                    placeholder="Şifreyi tekrar giriniz">
                                         </div>
-                                        <span th:if="${#fields.hasErrors('confirmPassword')}"
-                                              th:errors="*{confirmPassword}"
+                                        <span th:if="${#fields.hasErrors('confirmPassword')}" 
+                                              th:errors="*{confirmPassword}" 
                                               class="text-danger"></span>
                                     </div>
 
@@ -159,14 +159,14 @@
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label for="confirmPassword">Şifre Tekrarı</label>
+                                        <label for="staffConfirmPassword">Şifre Tekrarı</label>
                                         <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="fas fa-lock"></i>
                                             </span>
                                             <input type="password" 
                                                    class="form-control" 
-                                                   id="confirmPassword" 
+                                                   id="staffConfirmPassword" 
                                                    th:field="*{confirmPassword}" 
                                                    placeholder="Şifreyi tekrar giriniz">
                                         </div>

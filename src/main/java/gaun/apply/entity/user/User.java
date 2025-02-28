@@ -1,5 +1,6 @@
 package gaun.apply.entity.user;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class User {
     private String identityNumber;
 
     private String password;
+    private LocalDate registerDate = LocalDate.now();
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(

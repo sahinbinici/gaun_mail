@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -101,7 +101,6 @@ public class BaseController {
         } else if (roles.contains("ROLE_USER")) {
             return "redirect:/student/index";
         }
-
         // Fallback to login if no valid role found
         return "redirect:/login";
     }
@@ -146,7 +145,6 @@ public class BaseController {
             String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("studentDto", studentDto);
             session.setAttribute("verificationCode", verificationCode);
-
             // SMS gönderimi ve diğer işlemler
             smsService.sendSms(new String[]{studentDto.getGsm1()}, "Your verification code is: " + verificationCode);
 
@@ -165,8 +163,6 @@ public class BaseController {
     public String verifySms(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto, 
                             BindingResult result, Model model, HttpSession session){
         String code = smsVerificationDto.getCode();
-        System.out.println("Verification code: " + code);
-        
         // Kod kontrolü
         if (!session.getAttribute("verificationCode").equals(code)) {
             model.addAttribute("error", "Geçersiz doğrulama kodu");
@@ -174,17 +170,14 @@ public class BaseController {
             model.addAttribute("userDto", new UserDto());
             return "sms-verification"; // Hata durumunda tekrar form sayfasına dön
         }
-
         // Öğrenci bilgilerini oturumdan al
         StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
-
         // Öğrenci kaydını yap
         studentService.saveStudent(studentDto);
         userService.saveUserStudent(studentDto);
 
         return "redirect:/register?success"; // Başarılı kayıt sonrası yönlendirme
     }
-
 
     @PostMapping("/register/save/staff")
     public String registrationStaff(@Valid @ModelAttribute("userDto") UserDto userDto,
@@ -413,5 +406,30 @@ public class BaseController {
     @GetMapping("/error")
     public String errorPage() {
         return "error"; // error.html sayfasına yönlendirin
+    }
+
+    @PostMapping("/register/resend-sms")
+    @ResponseBody
+    public ResponseEntity<?> resendSms(HttpSession session) {
+        try {
+            StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+            if (studentDto == null) {
+                return ResponseEntity.badRequest().body("Öğrenci bilgileri bulunamadı");
+            }
+
+            // Yeni doğrulama kodu oluştur
+            String verificationCode = String.valueOf(new Random().nextInt(999999));
+            // Kodu session'a kaydet
+            session.setAttribute("verificationCode", verificationCode);
+            
+            // SMS gönder
+            smsService.sendSms(new String[]{studentDto.getGsm1()}, 
+                "Doğrulama kodunuz: " + verificationCode);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("SMS gönderilemedi: " + e.getMessage());
+        }
     }
 } 

@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,7 +19,7 @@ import gaun.apply.entity.user.User;
 public class ConvertUtil {
 
     private static final RestTemplate restTemplate = new RestTemplate();
-    private static String baseUrl="https://www.gantep.edu.tr/mobil/usercheck_o_json.php/";
+    private static final String baseUrl="https://www.gantep.edu.tr/mobil/usercheck_o_json.php/";
 
     public static UserDto convertEntityToDto(User user) {
         UserDto userDto = new UserDto();
