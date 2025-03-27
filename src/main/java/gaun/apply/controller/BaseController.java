@@ -134,7 +134,6 @@ public class BaseController {
             }
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
             studentDto.setPassword(pass);
-            studentDto.setConfirmPassword(pass);
 
             if (result.hasErrors()) {
                 model.addAttribute("userDto", new UserDto());

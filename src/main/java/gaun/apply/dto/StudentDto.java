@@ -13,8 +13,6 @@ public class StudentDto{
     private String ogrenciNo;
     @NotEmpty(message = "Şifre boş olamaz")
     private String password;
-    @NotEmpty(message = "Şifre tekrarı boş olamaz")
-    private String confirmPassword;
     @JsonProperty("AD")
     private String ad;
     @JsonProperty("SOYAD")
