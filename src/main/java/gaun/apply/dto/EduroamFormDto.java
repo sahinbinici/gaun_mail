@@ -9,12 +9,10 @@ public class EduroamFormDto {
 
     @NotEmpty(message = "Kullanıcı adı boş olamaz")
     private String username;
-    
+    private String tcKimlikNo;
     @NotEmpty(message = "Şifre boş olamaz")
     @Size(min = 8, message = "Şifre en az 8 karakter olmalıdır")
     private String password;
-
     private String confirmPassword;
-    
     private boolean status;
 }

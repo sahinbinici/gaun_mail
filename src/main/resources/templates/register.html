@@ -27,7 +27,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/index}">GAÜN - BİM Başvuru Sayfam</a>
+            <a class="navbar-brand" th:href="@{/index}">GAÜN - Bilgi İşlem Daire Başkanlığı Başvuru Formları</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -86,7 +86,7 @@
                                                    id="password" 
                                                    name="password" 
                                                    class="form-control" 
-                                                   placeholder="OBS Şifrenizi Girin" />
+                                                   placeholder="OBS Şifrenizi Girin (E-Devlet Şifresi ile Kayıt Yapılmamaktadır!)" />
                                         </div>
                                         <p class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
                                     </div>
@@ -95,7 +95,7 @@
                                         <button class="btn btn-primary" type="submit">
                                             <i class="fas fa-user-plus me-2"></i>Kayıt Ol
                                         </button>
-                                        <span class="ms-3">Zaten hesabınız var mı? 
+                                        <span class="ms-3">
                                             <a th:href="@{/login}">Giriş Yap</a>
                                         </span>
                                     </div>

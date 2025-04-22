@@ -214,6 +214,7 @@ public class AdminController {
                 if (student != null) {
                     response.put("type", "STUDENT");
                     response.put("ogrenciNo", student.getOgrenciNo());
+                    response.put("tcKimlikNo", student.getTcKimlikNo());
                     response.put("ad", student.getAd());
                     response.put("soyad", student.getSoyad());
                     response.put("fakKod", student.getFakKod());

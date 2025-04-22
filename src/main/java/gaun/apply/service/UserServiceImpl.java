@@ -6,10 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import gaun.apply.entity.Student;
 import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.MailFormData;
 import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
+import gaun.apply.util.ConvertUtil;
+import gaun.apply.util.RandomPasswordGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +25,6 @@ import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
-import static gaun.apply.util.ConvertUtil.convertEntityToDto;
 import gaun.apply.repository.StudentRepository;
 
 @Service
@@ -34,14 +36,15 @@ public class UserServiceImpl implements UserService {
     private final MailFormRepository mailFormRepository;
     private final EduroamFormRepository eduroamFormRepository;
     private final StudentRepository studentRepository;
+    private final StudentService studentService;
 
     public UserServiceImpl(UserRepository userRepository,
-                         RoleRepository roleRepository,
-                         PasswordEncoder passwordEncoder,
-                         StaffService staffService,
-                         MailFormRepository mailFormRepository,
-                         EduroamFormRepository eduroamFormRepository,
-                         StudentRepository studentRepository) {
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder,
+                           StaffService staffService,
+                           MailFormRepository mailFormRepository,
+                           EduroamFormRepository eduroamFormRepository,
+                           StudentRepository studentRepository, StudentService studentService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -49,6 +52,7 @@ public class UserServiceImpl implements UserService {
         this.mailFormRepository = mailFormRepository;
         this.eduroamFormRepository = eduroamFormRepository;
         this.studentRepository = studentRepository;
+        this.studentService = studentService;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
-
+        user.setTcKimlikNo(studentDto.getTcKimlikNo());
         Role role = roleRepository.findByName("ROLE_USER");
         if (role == null) {
             role = new Role("ROLE_USER");
@@ -111,7 +115,6 @@ public class UserServiceImpl implements UserService {
             }
             user.setRoles(Arrays.asList(userRole));
         }
-        
         userRepository.save(user);
     }
 
@@ -123,7 +126,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map((user) -> convertEntityToDto(user))
+        return users.stream().map(ConvertUtil::convertEntityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -131,8 +134,9 @@ public class UserServiceImpl implements UserService {
     public void saveMailApply(MailFormDto mailFormDto) {
         MailFormData mailFormData = new MailFormData();
         mailFormData.setUsername(mailFormDto.getUsername());
-        mailFormData.setEmail(mailFormDto.getEmail());
-        mailFormData.setPassword(mailFormDto.getPassword());
+        mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
+        mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
+        mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
         mailFormData.setStatus(mailFormDto.isStatus());
         mailFormData.setApplyDate(LocalDateTime.now());
         mailFormRepository.save(mailFormData);
@@ -142,6 +146,7 @@ public class UserServiceImpl implements UserService {
     public void saveEduroamApply(EduroamFormDto eduroamFormDto) {
         EduroamFormData eduroamFormData = new EduroamFormData();
         eduroamFormData.setUsername(eduroamFormDto.getUsername());
+        eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
         eduroamFormData.setPassword(eduroamFormDto.getPassword());
         eduroamFormData.setApplyDate(LocalDateTime.now());
         eduroamFormData.setStatus(eduroamFormDto.isStatus());

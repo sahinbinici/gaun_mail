@@ -130,9 +130,9 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Kullanıcı Adı</th>
-                                                <th>Şifre</th>
+                                                <th>Öğrenci No / TC Kimlik No</th>
                                                 <th>Email</th>
+                                                <th>Şifre</th>
                                                 <th>Başvuru Tarihi</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
@@ -143,7 +143,7 @@
                                             <tr th:each="form : ${mailForms}">
                                                 <td>
                                                     <a href="#" onclick="showUserDetails(this)" 
-                                                       th:data-username="${form.username}" 
+                                                       th:data-username="${form.username}"
                                                        style="text-decoration: underline;">
                                                         <span th:text="${form.username}"></span>
                                                     </a>
@@ -231,6 +231,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Kullanıcı</th>
+                                                <th>Şifre</th>
                                                 <th>Başvuru Tarihi</th>
                                                 <th>Durum</th>
                                                 <th>İşlemler</th>
@@ -243,8 +244,11 @@
                                                     <a href="#" onclick="showUserDetails(this)" 
                                                        th:data-username="${form.username}"
                                                        style="text-decoration: underline;">
-                                                        <span th:text="${form.username}"></span>
+                                                        <span th:text="${form.tcKimlikNo}"></span>
                                                     </a>
+                                                </td>
+                                                <td>
+                                                        <span th:text="${form.password}"></span>
                                                 </td>
                                                 <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                                 <td>
@@ -730,6 +734,7 @@
                         <h6>Öğrenci Bilgileri</h6>
                         <table class="table">
                             <tr><td>Öğrenci No:</td><td id="student_ogrenciNo"></td></tr>
+                            <tr><td>TC Kimlik No:</td><td id="tcKimlikNo"></td></tr>
                             <tr><td>Ad:</td><td id="student_ad"></td></tr>
                             <tr><td>Soyad:</td><td id="student_soyad"></td></tr>
                             <tr><td>Fakülte:</td><td id="student_fakulte"></td></tr>

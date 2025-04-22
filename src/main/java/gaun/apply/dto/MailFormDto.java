@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class MailFormDto {
     private String username;
+    private String tcKimlikNo;
     private String email;
     private String password;
     private String confirmPassword;

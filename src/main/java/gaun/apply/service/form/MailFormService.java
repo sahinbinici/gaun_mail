@@ -24,6 +24,10 @@ public class MailFormService {
         return mailFormRepository.findByUsername(username);
     }
 
+    public MailFormData findByTcKimlikNo(String tcKimlikNo){
+        return mailFormRepository.findByTcKimlikNo(tcKimlikNo);
+    }
+
     public List<MailFormData> findTop10ByOrderByApplyDateDesc(){
         return mailFormRepository.findTop10ByOrderByApplyDateDesc();
     }

@@ -43,15 +43,11 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Kullanıcı Adı</label>
-                                                <h5 class="mb-0" th:text="${eduroamForm.username}"></h5>
+                                                <h5 class="mb-0" th:text="${eduroamForm.tcKimlikNo}"></h5>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Şifre</label>
-                                                <h5 class="mb-0">
-                                                    <span class="password-toggle" style="cursor: pointer;" 
-                                                          onclick="toggleEduroamPassword(this)" 
-                                                          th:text="'********'" 
-                                                          th:data-password="${eduroamForm.password}">********</span>
+                                                <h5 class="mb-0" th:text="${eduroamForm.password}">
                                                 </h5>
                                             </div>
                                         </div>
@@ -66,11 +62,18 @@
                         <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post"
                             th:object="${eduroamFormDto}">
                             <div class="row">
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-6 mb-4" style="display: none">
                                     <div class="info-group">
-                                        <label class="form-label" for="eduroamUsername">Kullanıcı Adı</label>
+                                        <label class="form-label" for="eduroamUsername">Öğrenci No</label>
                                         <input type="text" class="form-control" id="eduroamUsername"
                                             th:field="*{username}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="eduroamUsername">Kullanıcı Adı - TC Kimlik No</label>
+                                        <input type="text" class="form-control" id="tcKimlikNo"
+                                               th:field="*{tcKimlikNo}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
@@ -160,6 +163,22 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="row">
+                <div class="col-12">
+                    <div class="info-group">
+                        <h5 class="card-title mb-3"> Eduroam Hesap Yönetimi</h5>
+                        <label class="text-muted">Ad Soyad
+                            <h5 class="card-info mb-3">Derya KURTOĞLU</h5></label>
+                        <label class="text-muted">Tel
+                            <h5 class="card-info mb-3">0 342 317 19 52</h5></label>
+                        <label class="text-muted">E-Posta
+                            <h5 class="card-info mb-3">deryakurtoglu@gantep.edu.tr</h5></label>
                     </div>
                 </div>
             </div>

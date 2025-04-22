@@ -30,9 +30,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String identityNumber;
-
+    private String tcKimlikNo;
     private String password;
     private LocalDate registerDate = LocalDate.now();
 

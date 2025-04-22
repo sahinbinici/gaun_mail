@@ -5,9 +5,8 @@
     <div th:fragment="content">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h3 class="card-title mb-0">
-                    <i class="fas fa-envelope me-2"></i>
-                    Mail Başvuru
+                <h3 class="card-title mb-0"> <i class="fas fa-envelope me-2"></i>
+                    E-Posta Başvuru
                 </h3>
             </div>
             <div class="card-body">
@@ -30,10 +29,11 @@
                                                         th:classappend="${mailForm.status ? 'badge bg-success' : (mailForm.rejected ? 'badge bg-danger' : 'badge bg-warning')}">
                                                     </span>
                                                 </h5>
-                                                <span th:if="${mailForm.rejected}">
-                                                    <strong>Red Sebebi : </strong><span
-                                                        th:text="${mailForm.rejectionReason}"></span>
-                                                </span>
+                                                <br>
+                                                <div class="col-md-8 mb-3" th:if="${mailForm.rejected}">
+                                                    <label class="text-muted">Red Sebebi</label>
+                                                        <h5 class="mb-0" th:text="${mailForm.rejectionReason}"></h5>
+                                                </div>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Tarihi</label>
@@ -47,64 +47,53 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Şifre</label>
-                                                <h5 class="mb-0">
-                                                    <span class="password-toggle" style="cursor: pointer;" 
-                                                          onclick="togglePassword(this)" 
-                                                          th:text="'********'" 
-                                                          th:data-password="${mailForm.password}">********</span>
+                                                <h5 class="mb-0" th:text="${mailForm.password}"></h5>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <span th:if="${mailForm.status}">
+                                            <a href="https://mail1.gantep.edu.tr/">Oturum açmak ve şifrenizi değiştirmek için tıklayın..</a>
+                                            <br>
+                                            <a href="https://mail1.gaziantep.edu.tr/sss/">Yardım klavuzu için tıklayın..</a>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Başvuru yoksa başvuru formunu göster -->
                     <div th:if="${hasMailApplication == false}">
                         <form id="mailForm" th:action="@{/mail/apply}" method="post" th:object="${mailFormDto}">
                             <div class="row">
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-6 mb-4" style="display: none;">
                                     <div class="info-group">
-                                        <label class="form-label" for="mailUsername">Kullanıcı Adı</label>
+                                        <label class="form-label" for="mailUsername">Öğrenci No</label>
                                         <input type="text" class="form-control" id="mailUsername" th:field="*{username}"
                                             readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-6 mb-4" style="display: none;">
                                     <div class="info-group">
-                                        <label class="form-label" for="mailEmailInput">Mail Adresi</label>
-                                        <div class="input-group">
+                                        <label class="form-label" for="mailUsername">TC Kimlik No</label>
+                                        <input type="text" class="form-control" id="tcKimlikNo" th:field="*{tcKimlikNo}"
+                                               readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 mb-2">
+                                    <div class="info-group">
+                                        <label class="form-label" for="mailEmailInput">E-Posta Adresi</label>
+                                        <div class="input-group mb-1">
                                             <input type="text" class="form-control" id="mailEmailInput"
-                                                th:field="*{email}">
+                                                th:field="*{email}" readonly>
                                             <span class="input-group-text">@gantep.edu.tr</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <div class="info-group">
-                                        <label class="form-label" for="mailPassword">Şifre</label>
-                                        <input type="password" class="form-control" id="mailPassword"
-                                            th:field="*{password}" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                                            title="En az 8 karakter, en az bir harf ve bir rakam içermelidir">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <div class="info-group">
-                                        <label class="form-label" for="mailConfirmPassword">Şifre Tekrar</label>
-                                        <input type="password" class="form-control" id="mailConfirmPassword"
-                                            th:field="*{confirmPassword}">
-                                    </div>
+                                        <label class="form-label">**E-Posta adresiniz adınızın ilk harfi, soyadınızın ilk harfi ve öğrenci numaranızın son 6 hanesini alınarak belirlenmektedir.</label>
                                 </div>
                             </div>
 
                             <input type="hidden" id="mailStatus" th:field="*{status}" value="false">
-
-                            <div class="alert alert-info mt-3">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <small>Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam
-                                    içermelidir.</small>
-                            </div>
 
                             <div class="text-end mt-4">
                                 <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">
@@ -112,6 +101,22 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="row">
+                <div class="col-12">
+                    <div class="info-group">
+                        <h5 class="card-title mb-3"> E-POSTA Kullanıcı Hesap Yönetimi</h5>
+                        <label class="text-muted">Ad Soyad
+                            <h5 class="card-info mb-3">Pınar BAKKALLAR</h5></label>
+                        <label class="text-muted">Tel
+                            <h5 class="card-info mb-3">0 342 317 19 79</h5></label>
+                        <label class="text-muted">E-Posta
+                            <h5 class="card-info mb-3">pbakkallar@gantep.edu.tr</h5></label>
                     </div>
                 </div>
             </div>
@@ -202,23 +207,8 @@
                         return;
                     }
 
-                    const password = document.getElementById('mailPassword');
-                    const confirmPassword = document.getElementById('mailConfirmPassword');
                     const username = document.getElementById('mailUsername').value;
                     const email = document.getElementById('mailEmailInput').value;
-
-                    // Şifre kontrolü
-                    if (password.value !== confirmPassword.value) {
-                        alert('Şifreler eşleşmiyor!');
-                        return;
-                    }
-
-                    // Şifre pattern kontrolü
-                    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-                    if (!passwordPattern.test(password.value)) {
-                        alert('Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf ile bir rakam içermelidir.');
-                        return;
-                    }
 
                     // Email kontrolü
                     if (!email) {
@@ -256,17 +246,6 @@
                     mailForm.submit();
                 });
             });
-        </script>
-
-        <script>
-        function togglePassword(element) {
-            const password = element.getAttribute('data-password');
-            if (element.textContent === '********') {
-                element.textContent = password;
-            } else {
-                element.textContent = '********';
-            }
-        }
         </script>
 
         <style>

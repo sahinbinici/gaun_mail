@@ -19,7 +19,7 @@ import gaun.apply.entity.user.User;
 public class ConvertUtil {
 
     private static final RestTemplate restTemplate = new RestTemplate();
-    private static final String baseUrl="https://www.gaziantep.edu.tr/mobil/usercheck_o_json.php/";
+    private static final String baseUrl="https://wwweski.gantep.edu.tr/mobil/usercheck_o_json.php/";
 
     public static UserDto convertEntityToDto(User user) {
         UserDto userDto = new UserDto();

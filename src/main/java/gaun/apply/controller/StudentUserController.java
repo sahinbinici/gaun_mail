@@ -41,7 +41,6 @@ public class StudentUserController {
         if (principal == null) {
             return "redirect:/login";
         }
-        
         String identityNumber = principal.getName();
         User user = userService.findByidentityNumber(identityNumber);
         StudentDto student = studentService.findByOgrenciNo(identityNumber);
@@ -64,7 +63,10 @@ public class StudentUserController {
             MailFormDto mailFormDto = new MailFormDto();
             EduroamFormDto eduroamFormDto = new EduroamFormDto();
             mailFormDto.setUsername(user.getIdentityNumber());
+            mailFormDto.setTcKimlikNo(user.getTcKimlikNo());
+            mailFormDto.setEmail(studentService.createEmailAddress(identityNumber).toLowerCase());
             eduroamFormDto.setUsername(user.getIdentityNumber());
+            eduroamFormDto.setTcKimlikNo(user.getTcKimlikNo());
             model.addAttribute("mailFormDto", mailFormDto);
             model.addAttribute("eduroamFormDto", eduroamFormDto);
         }

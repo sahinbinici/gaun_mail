@@ -231,9 +231,10 @@ public class BaseController {
     }
 
     @GetMapping("/mail/apply")
-    public String showMailApplyResult(@RequestParam(required = false) String success, 
+    public String showMailApplyResult(@RequestParam(required = false) String success,
                                     @RequestParam(required = false) String error,
-                                    Model model) {
+                                    Model model,MailFormDto mailFormDto) {
+        model.addAttribute("mailFormDto", mailFormDto);
         if (error != null) {
             model.addAttribute("error", "Başvuru sırasında bir hata oluştu.");
         }
@@ -248,15 +249,12 @@ public class BaseController {
             if (result.hasErrors()) {
                 return "fragments/index";
             }
-
             MailFormData existingMailForm = mailFormService.mailFormData(mailFormDto.getUsername());
             if (existingMailForm != null) {
                 return "redirect:/index?mailExists=true";
             }
-
             userService.saveMailApply(mailFormDto);
             return "redirect:/mail/apply?success";
-            
         } catch (Exception e) {
             return "redirect:/index?error=true";
         }
@@ -310,7 +308,7 @@ public class BaseController {
     public Map<String, Object> checkMailExists(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
         MailFormData existingMail = mailFormService.mailFormData(username);//mailFormRepository.findByUsername(username);
-        
+
         if (existingMail != null) {
             response.put("exists", true);
             response.put("email", existingMail.getEmail());
