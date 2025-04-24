@@ -91,12 +91,15 @@ function showUserDetails(element) {
         return response.json();
     })
     .then(data => {
+        console.log(data.type);
+        document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo;
         if (data.type === 'STUDENT') {
             document.getElementById('studentDetails').style.display = 'block';
             document.getElementById('staffDetails').style.display = 'none';
             
             // Öğrenci bilgilerini güncelle
             document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo;
+            document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo;
             document.getElementById('student_ad').textContent = data.ad;
             document.getElementById('student_soyad').textContent = data.soyad;
             document.getElementById('student_fakulte').textContent = data.fakKod;
@@ -114,7 +117,6 @@ function showUserDetails(element) {
             document.getElementById('staff_birim').textContent = data.birim;
             document.getElementById('staff_unvan').textContent = data.unvan;
         }
-        
         new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
     })
     .catch(error => {
