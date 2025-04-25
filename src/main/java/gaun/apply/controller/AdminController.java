@@ -24,10 +24,9 @@ import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.MailFormData;
-import gaun.apply.entity.form.ServerSetupFormData;
 import gaun.apply.entity.form.VpnFormData;
-import gaun.apply.entity.form.WebAcademicFormData;
 import gaun.apply.entity.user.User;
+import gaun.apply.service.AdminTabPermissionService;
 import gaun.apply.service.StaffService;
 import gaun.apply.service.StudentService;
 import gaun.apply.service.UserService;
@@ -36,10 +35,11 @@ import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.FormService;
 import gaun.apply.service.form.IpMacFormService;
 import gaun.apply.service.form.MailFormService;
-import gaun.apply.service.form.ServerSetupFormService;
 import gaun.apply.service.form.VpnFormService;
-import gaun.apply.service.form.WebAcademicFormService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,10 +53,9 @@ public class AdminController {
     private final VpnFormService vpnFormService;
     private final CloudAccountFormService cloudAccountFormService;
     private final IpMacFormService ipMacFormService;
-    private final WebAcademicFormService webAcademicFormService;
-    private final ServerSetupFormService serverSetupFormService;
+    private final AdminTabPermissionService adminTabPermissionService;
 
-    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, WebAcademicFormService webAcademicFormService, ServerSetupFormService serverSetupFormService) {
+    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, AdminTabPermissionService adminTabPermissionService) {
         this.userService = userService;
         this.formService = formService;
         this.studentService = studentService;
@@ -66,70 +65,80 @@ public class AdminController {
         this.vpnFormService = vpnFormService;
         this.cloudAccountFormService = cloudAccountFormService;
         this.ipMacFormService = ipMacFormService;
-        this.webAcademicFormService = webAcademicFormService;
-        this.serverSetupFormService = serverSetupFormService;
+        this.adminTabPermissionService = adminTabPermissionService;
     }
 
-    @GetMapping
-    public String showAdminPage(Model model, HttpServletRequest request) {
-        // Kullanıcı istatistikleri
-        long totalUsers = userService.findAllUsers().size();
-        long activeUsers = userService.findAllUsers().stream()
-                .filter(UserDto::isEnabled)
-                .count();
+    @GetMapping({"", "/"})
+    public String showAdminDashboard(Model model, HttpServletRequest request, HttpSession session) {
+        // Get current user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findByidentityNumber(auth.getName());
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // Get tab permissions
+        Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
+        model.addAttribute("tabPermissions", tabPermissions);
+
+        // Add user statistics
         Map<String, Long> userStats = new HashMap<>();
-        userStats.put("total", totalUsers);
-        userStats.put("active", activeUsers);
+        userStats.put("total", userService.countUsers());
+        userStats.put("active", userService.countActiveUsers());
         model.addAttribute("userStats", userStats);
 
-        // Mail başvuruları
-        List<MailFormData> mailForms = mailFormService.getAllMailForms();
-        model.addAttribute("mailForms", mailForms);
-        model.addAttribute("hasMailForms", !mailForms.isEmpty());
-        model.addAttribute("mailStats", getFormStats(mailForms));
-        model.addAttribute("mailFormType", "mail");
+        // Session'dan aktif sekme bilgisini al
+        String activeTab = (String) session.getAttribute("activeTab");
+        if (activeTab == null || !tabPermissions.getOrDefault(activeTab, false)) {
+            // Eğer aktif sekmeye erişim yoksa, erişimi olan ilk sekmeyi seç
+            activeTab = tabPermissions.entrySet().stream()
+                    .filter(Map.Entry::getValue)
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse("mail");
+        }
+        model.addAttribute("activeTab", activeTab);
 
-        // Eduroam başvuruları
-        List<EduroamFormData> eduroamForms = eduroamFormService.getAllEduroamForms();
-        model.addAttribute("eduroamForms", eduroamForms);
-        model.addAttribute("hasEduroamForms", !eduroamForms.isEmpty());
-        model.addAttribute("eduroamStats", getFormStats(eduroamForms));
-        model.addAttribute("eduroamFormType", "eduroam");
+        // Load data only for permitted tabs
+        if (tabPermissions.getOrDefault("mail", false)) {
+            List<MailFormData> mailForms = mailFormService.getAllMailForms();
+            model.addAttribute("mailForms", mailForms);
+            model.addAttribute("hasMailForms", !mailForms.isEmpty());
+            model.addAttribute("mailStats", getFormStats(mailForms));
+            model.addAttribute("mailFormType", "mail");
+        }
 
-        // IP-MAC başvuruları
-        List<IpMacFormData> ipMacForms = ipMacFormService.getAllIpMacForms();
-        model.addAttribute("ipMacForms", ipMacForms);
-        model.addAttribute("hasIpMacForms", !ipMacForms.isEmpty());
-        model.addAttribute("ipMacStats", getFormStats(ipMacForms));
-        model.addAttribute("ipMacFormType", "ipmac");
+        if (tabPermissions.getOrDefault("eduroam", false)) {
+            List<EduroamFormData> eduroamForms = eduroamFormService.getAllEduroamForms();
+            model.addAttribute("eduroamForms", eduroamForms);
+            model.addAttribute("hasEduroamForms", !eduroamForms.isEmpty());
+            model.addAttribute("eduroamStats", getFormStats(eduroamForms));
+            model.addAttribute("eduroamFormType", "eduroam");
+        }
 
-        // Cloud başvuruları
-        List<CloudAccountFormData> cloudForms = cloudAccountFormService.getAllCloudAccountForms();
-        model.addAttribute("cloudForms", cloudForms);
-        model.addAttribute("hasCloudForms", !cloudForms.isEmpty());
-        model.addAttribute("cloudStats", getFormStats(cloudForms));
-        model.addAttribute("cloudFormType", "cloud");
+        if (tabPermissions.getOrDefault("ip-mac", false)) {
+            List<IpMacFormData> ipMacForms = ipMacFormService.getAllIpMacForms();
+            model.addAttribute("ipMacForms", ipMacForms);
+            model.addAttribute("hasIpMacForms", !ipMacForms.isEmpty());
+            model.addAttribute("ipMacStats", getFormStats(ipMacForms));
+            model.addAttribute("ipMacFormType", "ipmac");
+        }
 
-        // VPN başvuruları
-        List<VpnFormData> vpnForms = vpnFormService.getAllVpnForms();
-        model.addAttribute("vpnForms", vpnForms);
-        model.addAttribute("hasVpnForms", !vpnForms.isEmpty());
-        model.addAttribute("vpnStats", getFormStats(vpnForms));
-        model.addAttribute("vpnFormType", "vpn");
+        if (tabPermissions.getOrDefault("cloud", false)) {
+            List<CloudAccountFormData> cloudForms = cloudAccountFormService.getAllCloudAccountForms();
+            model.addAttribute("cloudForms", cloudForms);
+            model.addAttribute("hasCloudForms", !cloudForms.isEmpty());
+            model.addAttribute("cloudStats", getFormStats(cloudForms));
+            model.addAttribute("cloudFormType", "cloud");
+        }
 
-        // Web Akademik başvuruları
-        List<WebAcademicFormData> webAcademicForms = webAcademicFormService.getAllWebAcademicForms();
-        model.addAttribute("webAcademicForms", webAcademicForms);
-        model.addAttribute("hasWebAcademicForms", !webAcademicForms.isEmpty());
-        model.addAttribute("webAcademicStats", getFormStats(webAcademicForms));
-        model.addAttribute("webAcademicFormType", "webacademic");
-
-        // Sunucu Kurulum başvuruları
-        List<ServerSetupFormData> serverSetupForms = serverSetupFormService.getAllServerSetupForms();
-        model.addAttribute("serverSetupForms", serverSetupForms);
-        model.addAttribute("hasServerSetupForms", !serverSetupForms.isEmpty());
-        model.addAttribute("serverSetupStats", getFormStats(serverSetupForms));
-        model.addAttribute("serverSetupFormType", "serversetup");
+        if (tabPermissions.getOrDefault("vpn", false)) {
+            List<VpnFormData> vpnForms = vpnFormService.getAllVpnForms();
+            model.addAttribute("vpnForms", vpnForms);
+            model.addAttribute("hasVpnForms", !vpnForms.isEmpty());
+            model.addAttribute("vpnStats", getFormStats(vpnForms));
+            model.addAttribute("vpnFormType", "vpn");
+        }
 
         // CSRF token'ı ekle
         CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -247,82 +256,61 @@ public class AdminController {
 
     @PostMapping("/{formType}/activate/{id}")
     @ResponseBody
-    public ResponseEntity<?> activateForm(@PathVariable String formType, 
-                                        @PathVariable Long id) {
+    public ResponseEntity<?> activateForm(@PathVariable String formType, @PathVariable Long id, HttpSession session) {
         try {
-            String className = formType.substring(0, 1).toUpperCase() + 
-                              formType.substring(1) + "FormData";
-            @SuppressWarnings("unchecked")
-            Class<? extends BaseFormData> formClass = 
-                (Class<? extends BaseFormData>) Class.forName("gaun.apply.entity.form." + className);
-            formService.activateForm(id, formClass);
+            // Get current user and check permission
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = userService.findByidentityNumber(auth.getName());
+            if (currentUser == null || !adminTabPermissionService.hasTabPermission(currentUser.getId(), formType)) {
+                return ResponseEntity.status(403).body("Bu işlem için yetkiniz yok");
+            }
+
+            // Aktif sekme bilgisini session'a kaydet
+            session.setAttribute("activeTab", formType);
+
+            switch (formType) {
+                case "mail":
+                    MailFormData mailForm = mailFormService.findById(id)
+                            .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
+                    mailForm.setStatus(true);
+                    mailForm.setApprovalDate(LocalDateTime.now());
+                    mailFormService.saveMailFormData(mailForm);
+                    break;
+                case "eduroam":
+                    EduroamFormData eduroamForm = eduroamFormService.findById(id)
+                            .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
+                    eduroamForm.setStatus(true);
+                    eduroamForm.setApprovalDate(LocalDateTime.now());
+                    eduroamFormService.saveEduroamFormData(eduroamForm);
+                    break;
+                case "vpn":
+                    VpnFormData vpnForm = vpnFormService.findById(id)
+                            .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
+                    vpnForm.setStatus(true);
+                    vpnForm.setApprovalDate(LocalDateTime.now());
+                    vpnFormService.saveVpnFormData(vpnForm);
+                    break;
+                case "ip-mac":
+                    IpMacFormData ipMacForm = ipMacFormService.findById(id)
+                            .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
+                    ipMacForm.setStatus(true);
+                    ipMacForm.setApprovalDate(LocalDateTime.now());
+                    ipMacFormService.saveIpMacFormData(ipMacForm);
+                    break;
+                case "cloud":
+                    CloudAccountFormData cloudForm = cloudAccountFormService.findById(id)
+                            .orElseThrow(() -> new RuntimeException("Cloud başvurusu bulunamadı"));
+                    cloudForm.setStatus(true);
+                    cloudForm.setApprovalDate(LocalDateTime.now());
+                    cloudAccountFormService.saveCloudAccountFormData(cloudForm);
+                    break;
+                default:
+                    throw new RuntimeException("Geçersiz form tipi: " + formType);
+            }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body("Form aktivasyonu başarısız: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Form aktivasyonu başarısız: " + e.getMessage());
         }
-    }
-
-    @PostMapping("/ip-mac/activate/{id}")
-    @ResponseBody
-    public ResponseEntity<?> activateIpMacForm(@PathVariable Long id) {
-        IpMacFormData ipMacForm = ipMacFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
-        ipMacForm.setStatus(true);
-        ipMacForm.setApprovalDate(LocalDateTime.now());
-        ipMacFormService.saveIpMacFormData(ipMacForm);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/cloud/activate/{id}")
-    @ResponseBody
-    public ResponseEntity<?> activateCloudForm(@PathVariable Long id) {
-        CloudAccountFormData cloudForm = cloudAccountFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("GAUN Bulut başvurusu bulunamadı"));
-        cloudForm.setStatus(true);
-        cloudForm.setApprovalDate(LocalDateTime.now());
-        cloudAccountFormService.saveCloudAccountFormData(cloudForm);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/vpn/activate/{id}")
-    @ResponseBody
-    public ResponseEntity<?> activateVpnForm(@PathVariable Long id) {
-        try {
-            VpnFormData vpnForm = vpnFormService.findById(id)
-                    .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
-            vpnForm.setStatus(true);
-            vpnForm.setApprovalDate(LocalDateTime.now());
-            vpnFormService.saveVpnFormData(vpnForm);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            // Hata detaylarını loglayalım
-            e.printStackTrace();
-            return ResponseEntity.badRequest()
-                    .body("Başvuru aktifleştirilemedi: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/web-academic/activate/{id}")
-    @ResponseBody
-    public ResponseEntity<?> activateWebAcademicForm(@PathVariable Long id) {
-        WebAcademicFormData form = webAcademicFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Web Akademik başvurusu bulunamadı"));
-        form.setStatus(true);
-        form.setApprovalDate(LocalDateTime.now());
-        webAcademicFormService.saveWebAcademicFormData(form);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/server-setup/activate/{id}")
-    @ResponseBody
-    public ResponseEntity<?> activateServerSetupForm(@PathVariable Long id) {
-        ServerSetupFormData form = serverSetupFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sunucu Kurulum başvurusu bulunamadı"));
-        form.setStatus(true);
-        form.setApprovalDate(LocalDateTime.now());
-        serverSetupFormService.saveServerSetupFormData(form);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{formType}/reject/{id}")
@@ -348,12 +336,6 @@ public class AdminController {
                     break;
                 case "vpn":
                     className = "VpnFormData";
-                    break;
-                case "webacademic":
-                    className = "WebAcademicFormData";
-                    break;
-                case "serversetup":
-                    className = "ServerSetupFormData";
                     break;
                 default:
                     throw new IllegalArgumentException("Geçersiz form tipi: " + formType);
@@ -416,30 +398,6 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body("VPN başvurusu silinemedi: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/web-academic/delete/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteWebAcademicForm(@PathVariable Long id) {
-        try {
-            webAcademicFormService.deleteWebAcademicForm(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body("Web Akademik başvurusu silinemedi: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/server-setup/delete/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteServerSetupForm(@PathVariable Long id) {
-        try {
-            serverSetupFormService.deleteServerSetupForm(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body("Sunucu Kurulum başvurusu silinemedi: " + e.getMessage());
         }
     }
 } 

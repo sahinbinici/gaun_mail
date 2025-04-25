@@ -41,33 +41,27 @@
     <div class="container mt-5">
         <!-- Sekmeler -->
         <ul class="nav nav-tabs mb-4">
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
+            <li class="nav-item" th:if="${tabPermissions.getOrDefault('mail', false)}">
+                <a class="nav-link" th:classappend="${activeTab == 'mail' ? 'active' : ''}" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
+            <li class="nav-item" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
+                <a class="nav-link" th:classappend="${activeTab == 'eduroam' ? 'active' : ''}" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
+            <li class="nav-item" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
+                <a class="nav-link" th:classappend="${activeTab == 'ip-mac' ? 'active' : ''}" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
+            <li class="nav-item" th:if="${tabPermissions.getOrDefault('cloud', false)}">
+                <a class="nav-link" th:classappend="${activeTab == 'cloud' ? 'active' : ''}" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#web-academic">Web Akademik Başvuruları</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#server-setup">Sunucu Kurulum Başvuruları</a>
+            <li class="nav-item" th:if="${tabPermissions.getOrDefault('vpn', false)}">
+                <a class="nav-link" th:classappend="${activeTab == 'vpn' ? 'active' : ''}" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
             </li>
         </ul>
 
         <!-- Sekme İçerikleri -->
         <div class="tab-content">
             <!-- Mail Sekmesi -->
-            <div class="tab-pane fade show active" id="mail">
+            <div class="tab-pane fade" th:classappend="${activeTab == 'mail' ? 'show active' : ''}" id="mail" th:if="${tabPermissions.getOrDefault('mail', false)}">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -191,7 +185,7 @@
             </div>
 
             <!-- Eduroam Sekmesi -->
-            <div class="tab-pane fade" id="eduroam">
+            <div class="tab-pane fade" th:classappend="${activeTab == 'eduroam' ? 'show active' : ''}" id="eduroam" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -296,7 +290,7 @@
                 </div>
             </div>
             <!-- IP-MAC Sekmesi -->
-            <div class="tab-pane fade" id="ip-mac">
+            <div class="tab-pane fade" th:classappend="${activeTab == 'ip-mac' ? 'show active' : ''}" id="ip-mac" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
                 <!-- Başvuru varsa -->
                 <div th:if="${hasIpMacForms}">
                     <div class="row">
@@ -400,7 +394,7 @@
             </div>
 
             <!-- GAUN Bulut Sekmesi -->
-            <div class="tab-pane fade" id="cloud">
+            <div class="tab-pane fade" th:classappend="${activeTab == 'cloud' ? 'show active' : ''}" id="cloud" th:if="${tabPermissions.getOrDefault('cloud', false)}">
                 <!-- Başvuru varsa -->
                 <div th:if="${hasCloudForms}">
                     <div class="row">
@@ -502,7 +496,7 @@
             </div>
 
             <!-- VPN Sekmesi -->
-            <div class="tab-pane fade" id="vpn">
+            <div class="tab-pane fade" th:classappend="${activeTab == 'vpn' ? 'show active' : ''}" id="vpn" th:if="${tabPermissions.getOrDefault('vpn', false)}">
                 <!-- Başvuru varsa -->
                 <div th:if="${hasVpnForms}">
                     <div class="row">
@@ -601,121 +595,6 @@
                     <i class="fas fa-info-circle me-2"></i>
                     Henüz VPN başvurusu bulunmamaktadır.
                 </div>
-            </div>
-
-            <!-- Web Akademik Sekmesi -->
-            <div class="tab-pane fade" id="web-academic">
-                <!-- İstatistikler -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Web Akademik Başvuru İstatistikleri</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="alert alert-info">
-                                            <h5>Toplam Başvuru</h5>
-                                            <h3 th:text="${webAcademicStats.total}">0</h3>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="alert alert-warning">
-                                            <h5>Bekleyen</h5>
-                                            <h3 th:text="${webAcademicStats.pending}">0</h3>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="alert alert-success">
-                                            <h5>Onaylanan</h5>
-                                            <h3 th:text="${webAcademicStats.approved}">0</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Başvuru Tablosu -->
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Web Akademik Başvuruları</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>TC Kimlik No</th>
-                                        <th>Domain Adı</th>
-                                        <th>FTP Kullanıcı</th>
-                                        <th>MySQL Kullanıcı</th>
-                                        <th>Hosting Tipi</th>
-                                        <th>Başvuru Tarihi</th>
-                                        <th>Durum</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="form : ${webAcademicForms}">
-                                        <td>
-                                            <a href="#" onclick="showUserDetails(this)" 
-                                               th:data-username="${form.tcKimlikNo}" 
-                                               style="text-decoration: underline;">
-                                                <span th:text="${form.tcKimlikNo}"></span>
-                                            </a>
-                                        </td>
-                                        <td th:text="${form.domainName}"></td>
-                                        <td th:text="${form.ftpUsername}"></td>
-                                        <td th:text="${form.mysqlUsername}"></td>
-                                        <td>
-                                            <span th:if="${form.hostingType == 'SHARED'}" class="badge bg-info">Paylaşımlı</span>
-                                            <span th:if="${form.hostingType == 'DEDICATED'}" class="badge bg-primary">Özel</span>
-                                        </td>
-                                        <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
-                                        <td>
-                                            <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                            <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
-                                            <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
-                                        </td>
-                                        <td>
-                                            <div th:if="${!form.status and !form.rejected}">
-                                                <button class="btn btn-sm btn-success" 
-                                                        th:onclick="|activateForm('webacademic', '${form.id}')|">
-                                                    Onayla
-                                                </button>
-                                                <button class="btn btn-sm btn-danger reject-btn"
-                                                        th:data-form-id="${form.id}"
-                                                        th:data-form-type="webacademic">
-                                                    Reddet
-                                                </button>
-                                            </div>
-                                            <div th:if="${form.status or form.rejected}">
-                                                <button class="btn btn-sm btn-danger delete-btn"
-                                                        th:onclick="|deleteForm('webacademic', ${form.id})|">
-                                                    Sil
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Başvuru yoksa -->
-                <div th:unless="${hasWebAcademicForms}" class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Henüz Web Akademik başvurusu bulunmamaktadır.
-                </div>
-            </div>
-
-            <!-- Sunucu Kurulum Sekmesi -->
-            <div class="tab-pane fade" id="server-setup">
-                <!-- Sunucu Kurulum başvuruları için benzer yapı -->
             </div>
         </div>
     </div>

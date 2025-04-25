@@ -34,6 +34,7 @@ public class User {
     private String tcKimlikNo;
     private String password;
     private LocalDate registerDate = LocalDate.now();
+    private boolean active = true;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(

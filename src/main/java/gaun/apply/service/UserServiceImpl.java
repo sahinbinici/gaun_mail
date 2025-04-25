@@ -1,5 +1,6 @@
 package gaun.apply.service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,9 @@ import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.util.ConvertUtil;
 import gaun.apply.util.RandomPasswordGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,49 +29,47 @@ import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
-import gaun.apply.repository.StudentRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final StaffService staffService;
     private final MailFormRepository mailFormRepository;
     private final EduroamFormRepository eduroamFormRepository;
-    private final StudentRepository studentRepository;
     private final StudentService studentService;
+    private final Clock clock;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            StaffService staffService,
                            MailFormRepository mailFormRepository,
                            EduroamFormRepository eduroamFormRepository,
-                           StudentRepository studentRepository, StudentService studentService) {
+                           StudentService studentService,
+                           Clock clock) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.staffService = staffService;
         this.mailFormRepository = mailFormRepository;
         this.eduroamFormRepository = eduroamFormRepository;
-        this.studentRepository = studentRepository;
         this.studentService = studentService;
+        this.clock = clock;
     }
 
     @Override
     public void saveUserStudent(StudentDto studentDto) {
-        // User kaydı
         User user = new User();
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
         user.setTcKimlikNo(studentDto.getTcKimlikNo());
-        Role role = roleRepository.findByName("ROLE_USER");
-        if (role == null) {
-            role = new Role("ROLE_USER");
-            roleRepository.save(role);
-        }
-        user.setRoles(Arrays.asList(role));
+        user.setRoles(getOrCreateRole("ROLE_USER"));
+        user.setActive(true);
         userRepository.save(user);
     }
 
@@ -77,45 +79,32 @@ public class UserServiceImpl implements UserService {
         user.setIdentityNumber(userDto.getTcKimlikNo());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        // Personel kontrolü
         Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
         if (staff != null) {
             List<Role> roles = new ArrayList<>();
+            roles.addAll(getOrCreateRole("ROLE_STAFF"));
             
-            // ROLE_STAFF rolünü ekle
-            Role staffRole = roleRepository.findByName("ROLE_STAFF");
-            if (staffRole == null) {
-                staffRole = new Role();
-                staffRole.setName("ROLE_STAFF");
-                roleRepository.save(staffRole);
-            }
-            roles.add(staffRole);
-            
-            // Eğer personel admin ise ROLE_ADMIN rolünü de ekle
             if (staff.isAdmin()) {
-                Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-                if (adminRole == null) {
-                    adminRole = new Role();
-                    adminRole.setName("ROLE_ADMIN");
-                    roleRepository.save(adminRole);
-                }
-                roles.add(adminRole);
-                System.out.println("Admin rolü eklendi: " + staff.getTcKimlikNo()); // Debug için log
+                roles.addAll(getOrCreateRole("ROLE_ADMIN"));
+                logger.debug("Admin role added for staff: {}", staff.getTcKimlikNo());
             }
             
             user.setRoles(roles);
-            System.out.println("Kullanıcı rolleri: " + roles); // Debug için log
+            logger.debug("User roles set: {}", roles);
         } else {
-            // ROLE_USER rolünü ata
-            Role userRole = roleRepository.findByName("ROLE_USER");
-            if (userRole == null) {
-                userRole = new Role();
-                userRole.setName("ROLE_USER");
-                roleRepository.save(userRole);
-            }
-            user.setRoles(Arrays.asList(userRole));
+            user.setRoles(getOrCreateRole("ROLE_USER"));
         }
+        user.setActive(true);
         userRepository.save(user);
+    }
+
+    private List<Role> getOrCreateRole(String roleName) {
+        Role role = roleRepository.findByName(roleName);
+        if (role == null) {
+            role = new Role(roleName);
+            roleRepository.save(role);
+        }
+        return Arrays.asList(role);
     }
 
     @Override
@@ -138,7 +127,7 @@ public class UserServiceImpl implements UserService {
         mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
         mailFormData.setStatus(mailFormDto.isStatus());
-        mailFormData.setApplyDate(LocalDateTime.now());
+        mailFormData.setApplyDate(LocalDateTime.now(clock));
         mailFormRepository.save(mailFormData);
     }
 
@@ -148,7 +137,7 @@ public class UserServiceImpl implements UserService {
         eduroamFormData.setUsername(eduroamFormDto.getUsername());
         eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
         eduroamFormData.setPassword(eduroamFormDto.getPassword());
-        eduroamFormData.setApplyDate(LocalDateTime.now());
+        eduroamFormData.setApplyDate(LocalDateTime.now(clock));
         eduroamFormData.setStatus(eduroamFormDto.isStatus());
         eduroamFormRepository.save(eduroamFormData);
     }
@@ -160,7 +149,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long countActiveUsers() {
-        return userRepository.count();  // Şimdilik tüm kullanıcıları aktif sayıyoruz
+        return userRepository.countByActive(true);
     }
-
 }

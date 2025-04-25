@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import gaun.apply.entity.form.MailFormData;
 
 @Repository
-public interface MailFormRepository extends JpaRepository<MailFormData, Long> {
+public interface MailFormRepository extends BaseFormRepository<MailFormData> {
     MailFormData findByUsername(String username);
     MailFormData findByTcKimlikNo(String tcKimlikNo);
     List<MailFormData> findTop10ByOrderByApplyDateDesc();

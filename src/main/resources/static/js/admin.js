@@ -20,6 +20,11 @@ function activateForm(formType, id) {
         }
         headers['Content-Type'] = 'application/json';
         
+        // Aktif sekmeyi URL'ye ekle
+        const activeTab = document.querySelector('.nav-link.active');
+        const activeTabId = activeTab ? activeTab.getAttribute('href') : '#mail';
+        window.location.hash = activeTabId;
+        
         const url = `/bim-basvuru/admin/${formType}/activate/${id}`;
         console.log('Request URL:', url);
         console.log('Headers:', headers);
@@ -214,4 +219,18 @@ function deleteForm(formType, formId) {
         console.error('Error:', error);
         alert('Silme işlemi sırasında bir hata oluştu: ' + error.message);
     });
-} 
+}
+
+// Sayfa yüklendiğinde aktif sekmeyi ayarla
+document.addEventListener('DOMContentLoaded', function() {
+    // URL'den hash değerini al
+    const hash = window.location.hash;
+    if (hash) {
+        // Hash değerine göre sekmeyi aktif et
+        const tabToActivate = document.querySelector(`a[href="${hash}"]`);
+        if (tabToActivate) {
+            const tab = new bootstrap.Tab(tabToActivate);
+            tab.show();
+        }
+    }
+}); 

@@ -12,9 +12,7 @@ import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.MailFormData;
-import gaun.apply.entity.form.ServerSetupFormData;
 import gaun.apply.entity.form.VpnFormData;
-import gaun.apply.entity.form.WebAcademicFormData;
 import gaun.apply.repository.form.BaseFormRepository;
 
 @Service
@@ -25,17 +23,13 @@ public class FormService {
     private final VpnFormService vpnFormService;
     private final CloudAccountFormService cloudAccountFormService;
     private final IpMacFormService ipMacFormService;
-    private final WebAcademicFormService webAcademicFormService;
-    private final ServerSetupFormService serverSetupFormService;
     
     public FormService(List<BaseFormRepository<? extends BaseFormData>> repos,
                       MailFormService mailFormService,
                       EduroamFormService eduroamFormService,
                       VpnFormService vpnFormService,
                       CloudAccountFormService cloudAccountFormService,
-                      IpMacFormService ipMacFormService,
-                      WebAcademicFormService webAcademicFormService,
-                      ServerSetupFormService serverSetupFormService) {
+                      IpMacFormService ipMacFormService) {
         repositories = repos.stream()
             .collect(Collectors.toMap(
                 r -> r.getClass().getInterfaces()[0].getSimpleName(),
@@ -46,8 +40,6 @@ public class FormService {
         this.vpnFormService = vpnFormService;
         this.cloudAccountFormService = cloudAccountFormService;
         this.ipMacFormService = ipMacFormService;
-        this.webAcademicFormService = webAcademicFormService;
-        this.serverSetupFormService = serverSetupFormService;
     }
     
     public void activateForm(Long id, Class<? extends BaseFormData> formClass) {
