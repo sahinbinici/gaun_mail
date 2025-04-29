@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Başvuru varsa -->
+    <div th:if="${hasIpMacForms}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>IP-MAC Başvuru İstatistikleri</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-warning">
+                                    <h5>Bekleyen Başvuru</h5>
+                                    <h3 th:text="${ipMacStats.pending}">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h5>Onaylanan Başvuru</h5>
+                                    <h3 th:text="${ipMacStats.approved}">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Son IP-MAC Başvuruları</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>TC Kimlik No</th>
+                                        <th>MAC Adresi</th>
+                                        <th>IP Adresi</th>
+                                        <th>Lokasyon</th>
+                                        <th>Başvuru Tarihi</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="form : ${ipMacForms}">
+                                        <td>
+                                            <a href="#" onclick="showUserDetails(this)" 
+                                               th:data-username="${form.tcKimlikNo}" 
+                                               style="text-decoration: underline;">
+                                                <span th:text="${form.tcKimlikNo}"></span>
+                                            </a>
+                                        </td>
+                                        <td th:text="${form.macAddress}"></td>
+                                        <td th:text="${form.ipAddress}"></td>
+                                        <td th:text="${form.location}"></td>
+                                        <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td>
+                                            <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                            <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                            <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
+                                        </td>
+                                        <td>
+                                            <div th:if="${!form.status and !form.rejected}">
+                                                <button class="btn btn-sm btn-success" 
+                                                        th:onclick="|activateForm('ip-mac', ${form.id})|">
+                                                    Onayla
+                                                </button>
+                                                <button class="btn btn-sm btn-danger reject-btn"
+                                                        th:data-form-id="${form.id}"
+                                                        th:data-form-type="ip-mac">
+                                                    Reddet
+                                                </button>
+                                            </div>
+                                            <div th:if="${form.status or form.rejected}">
+                                                <button class="btn btn-sm btn-danger delete-btn"
+                                                        th:onclick="|deleteForm('ip-mac', ${form.id})|">
+                                                    Sil
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Başvuru yoksa -->
+    <div th:unless="${hasIpMacForms}" class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Henüz IP-MAC başvurusu bulunmamaktadır.
+    </div>
+</body>
+</html> 

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Mail Başvuru İstatistikleri</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h5>Toplam Başvuru</h5>
+                                <h3 th:text="${mailStats.total}">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-warning">
+                                <h5>Bekleyen Başvuru</h5>
+                                <h3 th:text="${mailStats.pending}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Kullanıcı İstatistikleri</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-success">
+                                <h5>Toplam Kullanıcı</h5>
+                                <h3 th:text="${userStats.total}">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-primary">
+                                <h5>Aktif Kullanıcı</h5>
+                                <h3 th:text="${userStats.active}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mail Başvuru Tablosu -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Son Mail Başvuruları</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Öğrenci No / TC Kimlik No</th>
+                                    <th>Email</th>
+                                    <th>Şifre</th>
+                                    <th>Başvuru Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                    <th>Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="form : ${mailForms}">
+                                    <td>
+                                        <a href="#" onclick="showUserDetails(this)" 
+                                           th:data-username="${form.username}"
+                                           style="text-decoration: underline;">
+                                            <span th:text="${form.username}"></span>
+                                        </a>
+                                    </td>
+                                    <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                    <td th:text="${form.password}"></td>
+                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td>
+                                        <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
+                                        <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
+                                        <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
+                                    </td>
+                                    <td>
+                                        <div th:if="${!form.status and !form.rejected}">
+                                            <button class="btn btn-sm btn-success" 
+                                                    th:onclick="|activateForm('mail', '${form.id}')|">
+                                                Onayla
+                                            </button>
+                                            <button class="btn btn-sm btn-danger reject-btn"
+                                                    th:data-form-id="${form.id}"
+                                                    th:data-form-type="mail">
+                                                Reddet
+                                            </button>
+                                        </div>
+                                        <div th:if="${form.status or form.rejected}">
+                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                    th:onclick="|deleteForm('mail', ${form.id})|">
+                                                Sil
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:if="${form.rejected}">
+                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
