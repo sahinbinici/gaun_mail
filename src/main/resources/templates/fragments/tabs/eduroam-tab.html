@@ -1,0 +1,14 @@
+<!-- Eduroam Tab Fragment -->
+<div class="tab-pane fade" id="eduroam" role="tabpanel" aria-labelledby="eduroam-tab">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Eduroam Başvuru</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/eduroam/apply}" method="post" th:object="${eduroamFormDto}">
+                <div th:replace="fragments/forms/eduroam :: eduroam-form"></div>
+                <button type="submit" class="btn btn-primary">Başvur</button>
+            </form>
+        </div>
+    </div>
+</div> 

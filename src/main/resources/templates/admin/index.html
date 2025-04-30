@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <!-- Additional head content -->
+</head>
+<body>
+    <!-- Template content based on your model attributes -->
+    <h1>Admin Dashboard</h1>
+    
+    <!-- Display active tab and tab permissions -->
+    <div th:if="${tabPermissions != null}">
+        <!-- Tab navigation -->
+        <ul>
+            <li th:if="${tabPermissions.mail}" th:class="${activeTab == 'mail' ? 'active' : ''}">
+                <a href="#mail">Mail Forms</a>
+            </li>
+            <li th:if="${tabPermissions.eduroam}" th:class="${activeTab == 'eduroam' ? 'active' : ''}">
+                <a href="#eduroam">Eduroam Forms</a>
+            </li>
+            <!-- Add other tabs similarly -->
+        </ul>
+        
+        <!-- Tab content sections -->
+        <!-- For each tab type, show related forms and statistics -->
+    </div>
+    
+    <!-- Add the rest of your admin dashboard content -->
+</body>
+</html>

@@ -70,14 +70,6 @@ function activateVpnForm(id) {
     activateForm('vpn', id);
 }
 
-function activateWebAcademicForm(id) {
-    activateForm('webacademic', id);
-}
-
-function activateServerSetupForm(id) {
-    activateForm('serversetup', id);
-}
-
 // Kullanıcı detayları modalı için fonksiyonlar
 function showUserDetails(element) {
     const username = element.getAttribute('data-username');

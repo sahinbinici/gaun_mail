@@ -1,0 +1,14 @@
+<!-- VPN Tab Fragment -->
+<div class="tab-pane fade" id="vpn" role="tabpanel" aria-labelledby="vpn-tab">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">VPN Başvuru</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/vpn/apply}" method="post" th:object="${vpnFormDto}">
+                <div th:replace="fragments/forms/vpn :: vpn-form"></div>
+                <button type="submit" class="btn btn-primary">Başvur</button>
+            </form>
+        </div>
+    </div>
+</div> 

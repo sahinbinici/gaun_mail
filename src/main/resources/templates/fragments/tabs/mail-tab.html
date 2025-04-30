@@ -1,0 +1,14 @@
+<!-- Mail Tab Fragment -->
+<div class="tab-pane fade" id="mail" role="tabpanel" aria-labelledby="mail-tab">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Mail Başvuru</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/mail/apply}" method="post" th:object="${mailFormDto}">
+                <div th:replace="fragments/forms/mail :: mail-form"></div>
+                <button type="submit" class="btn btn-primary">Başvur</button>
+            </form>
+        </div>
+    </div>
+</div> 

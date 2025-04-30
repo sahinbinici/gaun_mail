@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaun.apply.service.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
@@ -26,10 +27,6 @@ import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.user.User;
-import gaun.apply.service.AdminTabPermissionService;
-import gaun.apply.service.StaffService;
-import gaun.apply.service.StudentService;
-import gaun.apply.service.UserService;
 import gaun.apply.service.form.CloudAccountFormService;
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.FormService;
@@ -54,8 +51,9 @@ public class AdminController {
     private final CloudAccountFormService cloudAccountFormService;
     private final IpMacFormService ipMacFormService;
     private final AdminTabPermissionService adminTabPermissionService;
+    private final SmsService smsService;
 
-    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, AdminTabPermissionService adminTabPermissionService) {
+    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, AdminTabPermissionService adminTabPermissionService, SmsService smsService) {
         this.userService = userService;
         this.formService = formService;
         this.studentService = studentService;
@@ -66,6 +64,7 @@ public class AdminController {
         this.cloudAccountFormService = cloudAccountFormService;
         this.ipMacFormService = ipMacFormService;
         this.adminTabPermissionService = adminTabPermissionService;
+        this.smsService = smsService;
     }
 
     @GetMapping({"", "/"})
@@ -179,6 +178,8 @@ public class AdminController {
         mailForm.setStatus(true);
         mailForm.setApprovalDate(LocalDateTime.now());
         mailFormService.saveMailFormData(mailForm);//mailFormRepository.save(mailForm);
+        StudentDto student = studentService.findByOgrenciNo(mailForm.getUsername());
+        smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz onaylandı.https://mail2.gantep.edu.tr adresinden oturum açıp şifrenizi değiştirin.");
         return ResponseEntity.ok().build();
     }
 
@@ -190,6 +191,8 @@ public class AdminController {
         eduroamForm.setStatus(true);
         eduroamForm.setApprovalDate(LocalDateTime.now());
         eduroamFormService.saveEduroamFormData(eduroamForm);//eduroamFormRepository.save(eduroamForm);
+        StudentDto student = studentService.findByOgrenciNo(eduroamForm.getUsername());
+        smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
         return ResponseEntity.ok().build();
     }
 
@@ -344,7 +347,6 @@ public class AdminController {
             @SuppressWarnings("unchecked")
             Class<? extends BaseFormData> formClass = 
                 (Class<? extends BaseFormData>) Class.forName("gaun.apply.entity.form." + className);
-            
             formService.rejectForm(id, formClass, reason);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

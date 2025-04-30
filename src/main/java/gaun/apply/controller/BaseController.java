@@ -145,7 +145,7 @@ public class BaseController {
             session.setAttribute("studentDto", studentDto);
             session.setAttribute("verificationCode", verificationCode);
             // SMS gönderimi ve diğer işlemler
-            smsService.sendSms(new String[]{studentDto.getGsm1()}, verificationCode);
+            smsService.sendSms(new String[]{studentDto.getGsm1()}, "Doğrulama Kodu : "+verificationCode);
 
             model.addAttribute("verificationCode", verificationCode);
             model.addAttribute("smsVerificationDto", new SmsVerificationDto());

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Öğrenci Bilgilerim</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Öğrenci Bilgilerim</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Öğrenci No:</strong> <span th:text="${student.ogrenciNo}"></span></p>
+                                <p><strong>TC Kimlik No:</strong> <span th:text="${student.tcKimlikNo}"></span></p>
+                                <p><strong>Ad:</strong> <span th:text="${student.ad}"></span></p>
+                                <p><strong>Soyad:</strong> <span th:text="${student.soyad}"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Fakülte:</strong> <span th:text="${student.fakKod}"></span></p>
+                                <p><strong>Bölüm:</strong> <span th:text="${student.bolumAd}"></span></p>
+                                <p><strong>Program:</strong> <span th:text="${student.programAd}"></span></p>
+                                <p><strong>Sınıf:</strong> <span th:text="${student.sinif}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
