@@ -1,13 +1,16 @@
 package gaun.apply.repository.form;
 
-import java.util.List;
+import gaun.apply.entity.form.BaseFormData;
+import gaun.apply.enums.ApplicationStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import gaun.apply.entity.form.BaseFormData;
+
+import java.util.List;
 
 @NoRepositoryBean
 public interface BaseFormRepository<T extends BaseFormData> extends JpaRepository<T, Long> {
-    T findByTcKimlikNo(String tcKimlikNo);
+    List<T> findByApplicationStatus(ApplicationStatusEnum status);
     long countByStatus(boolean status);
     List<T> findTop10ByOrderByApplyDateDesc();
-} 
+    T findByTcKimlikNo(String tcKimlikNo);
+}

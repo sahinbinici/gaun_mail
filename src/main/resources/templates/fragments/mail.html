@@ -17,20 +17,20 @@
                         <div class="col-12">
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                                <div th:with="mailForm=${@mailFormService.mailFormData(user.identityNumber)}">
+                                <div th:with="mailForm=${@mailFormService.findByUsername(user.identityNumber)}">
                                     <div th:if="${mailForm != null}"
-                                        th:classappend="${mailForm.status ? 'alert alert-success' : (mailForm.rejected ? 'alert alert-danger' : 'alert alert-warning')}">
+                                        th:classappend="${mailForm.isStatus() ? 'alert alert-success' : (mailForm.isRejected() ? 'alert alert-danger' : 'alert alert-warning')}">
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
                                                 <label class="text-muted">Başvuru Durumu</label>
                                                 <h5 class="mb-0">
                                                     <span
-                                                        th:text="${mailForm.status ? 'Onaylandı' : (mailForm.rejected ? 'Reddedildi' : 'Beklemede')}"
-                                                        th:classappend="${mailForm.status ? 'badge bg-success' : (mailForm.rejected ? 'badge bg-danger' : 'badge bg-warning')}">
+                                                        th:text="${mailForm.isStatus() ? 'Onaylandı' : (mailForm.isRejected() ? 'Reddedildi' : 'Beklemede')}"
+                                                        th:classappend="${mailForm.isStatus() ? 'badge bg-success' : (mailForm.isRejected() ? 'badge bg-danger' : 'badge bg-warning')}">
                                                     </span>
                                                 </h5>
                                                 <br>
-                                                <div class="col-md-8 mb-3" th:if="${mailForm.rejected}">
+                                                <div class="col-md-8 mb-3" th:if="${mailForm.isRejected()}">
                                                     <label class="text-muted">Red Sebebi</label>
                                                         <h5 class="mb-0" th:text="${mailForm.rejectionReason}"></h5>
                                                 </div>
@@ -41,18 +41,18 @@
                                                     th:text="${#temporals.format(mailForm.applyDate, 'dd/MM/yyyy HH:mm')}">
                                                 </h5>
                                             </div>
-                                            <div class="col-md-4 mb-3" th:if="${!mailForm.rejected}">
+                                            <div class="col-md-4 mb-3" th:if="${!mailForm.isRejected()}">
                                                 <label class="text-muted">E-posta Adresi</label>
                                                 <h5 class="mb-0" th:text="${mailForm.email + '@gantep.edu.tr'}"></h5>
                                             </div>
-                                            <div class="col-md-4 mb-3" th:if="${!mailForm.rejected}">
+                                            <div class="col-md-4 mb-3" th:if="${!mailForm.isRejected()}">
                                                 <label class="text-muted">Şifre</label>
                                                 <h5 class="mb-0" th:text="${mailForm.password}"></h5>
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <span th:if="${mailForm.status}">
+                                        <span th:if="${mailForm.isStatus()}">
                                             <a href="https://mail1.gantep.edu.tr/">Oturum açmak ve şifrenizi değiştirmek için tıklayın..</a>
                                             <br>
                                             <a href="https://mail1.gaziantep.edu.tr/sss/">Yardım klavuzu için tıklayın..</a>

@@ -4,21 +4,18 @@ import java.security.Principal;
 
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.MailFormService;
+import gaun.apply.service.StudentService;
+import gaun.apply.service.UserService;
+import gaun.apply.dto.StudentDto;
+import gaun.apply.dto.EduroamFormDto;
+import gaun.apply.dto.MailFormDto;
+import gaun.apply.entity.user.User;
+import gaun.apply.entity.form.EduroamFormData;
+import gaun.apply.entity.form.MailFormData;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import gaun.apply.dto.EduroamFormDto;
-import gaun.apply.dto.MailFormDto;
-import gaun.apply.dto.StudentDto;
-import gaun.apply.entity.form.EduroamFormData;
-import gaun.apply.entity.form.MailFormData;
-import gaun.apply.entity.user.User;
-import gaun.apply.repository.form.EduroamFormRepository;
-import gaun.apply.repository.form.MailFormRepository;
-import gaun.apply.service.StudentService;
-import gaun.apply.service.UserService;
 
 @Controller
 @RequestMapping("/student")
@@ -52,7 +49,7 @@ public class StudentUserController {
         if (user != null) {
             model.addAttribute("user", user);
             // Mail başvurusu kontrolü
-            MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
+            MailFormData mailForm = mailFormService.findByUsername(user.getIdentityNumber());
             hasMailApp = (mailForm != null);
             
             // Eduroam başvurusu kontrolü

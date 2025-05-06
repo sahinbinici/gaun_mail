@@ -45,17 +45,31 @@
             <div class="col-md-9">
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="bilgilerim">
-                        <div th:replace="fragments/bilgilerim :: content"></div>
+                        <div th:replace="~{fragments/bilgilerim :: content}"></div>
                     </div>
                     <div class="tab-pane fade" id="mail">
-                        <div th:replace="fragments/mail :: content"></div>
-                        <!-- Update form status display -->
+                        <!-- Başvuru sonuç mesajları -->
+                        <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            Başvurunuz başarıyla alınmıştır.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:if="${param.error[0] == 'validation'}">Lütfen tüm alanları doğru şekilde doldurunuz.</span>
+                            <span th:if="${param.error[0] == 'true'}">Başvuru sırasında bir hata oluştu. Lütfen tekrar deneyiniz.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${param.mailExists}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Bu hesap için daha önce başvuru yapılmıştır.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:replace="~{fragments/mail :: content}"></div>
+                        <!-- Form durumu gösterimi -->
                         <div th:if="${mailForm != null}" class="alert" 
-                             th:classappend="${mailForm.status ? 'alert-success' : (mailForm.rejected ? 'alert-danger' : 'alert-warning')}">
+                             th:classappend="${mailForm.isStatus() ? 'alert-success' : (mailForm.isRejected() ? 'alert-danger' : 'alert-warning')}">
                             <strong>Mail Başvurusu Durumu:</strong>
-                            <span th:if="${mailForm.status}">Onaylandı</span>
-                            <span th:if="${!mailForm.status and !mailForm.rejected}">Beklemede</span>
-                            <span th:if="${mailForm.rejected}">
+                            <span th:if="${mailForm.isStatus()}">Onaylandı</span>
+                            <span th:if="${!mailForm.isStatus() and !mailForm.isRejected()}">Beklemede</span>
+                            <span th:if="${mailForm.isRejected()}">
                                 Reddedildi
                                 <br>
                                 <strong>Red Sebebi:</strong> <span th:text="${mailForm.rejectionReason}"></span>
@@ -63,14 +77,28 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="eduroam">
-                        <div th:replace="fragments/eduroam :: content"></div>
-                        <!-- Repeat similar blocks for other form types -->
+                        <!-- Başvuru sonuç mesajları -->
+                        <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            Başvurunuz başarıyla alınmıştır.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:if="${param.error[0] == 'validation'}">Lütfen tüm alanları doğru şekilde doldurunuz.</span>
+                            <span th:if="${param.error[0] == 'true'}">Başvuru sırasında bir hata oluştu. Lütfen tekrar deneyiniz.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${param.eduroamExists}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Bu hesap için daha önce başvuru yapılmıştır.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:replace="~{fragments/eduroam :: content}"></div>
+                        <!-- Form durumu gösterimi -->
                         <div th:if="${eduroamForm != null}" class="alert"
-                             th:classappend="${eduroamForm.status ? 'alert-success' : (eduroamForm.rejected ? 'alert-danger' : 'alert-warning')}">
+                             th:classappend="${eduroamForm.isStatus() ? 'alert-success' : (eduroamForm.isRejected() ? 'alert-danger' : 'alert-warning')}">
                             <strong>Eduroam Başvurusu Durumu:</strong>
-                            <span th:if="${eduroamForm.status}">Onaylandı</span>
-                            <span th:if="${!eduroamForm.status and !eduroamForm.rejected}">Beklemede</span>
-                            <span th:if="${eduroamForm.rejected}">
+                            <span th:if="${eduroamForm.isStatus()}">Onaylandı</span>
+                            <span th:if="${!eduroamForm.isStatus() and !eduroamForm.isRejected()}">Beklemede</span>
+                            <span th:if="${eduroamForm.isRejected()}">
                                 Reddedildi
                                 <br>
                                 <strong>Red Sebebi:</strong> <span th:text="${eduroamForm.rejectionReason}"></span>
@@ -106,9 +134,16 @@
                     // Show corresponding pane
                     const target = this.id.replace('-tab', '');
                     document.getElementById(target).classList.add('show', 'active');
+                    
+                    // Hide all success alerts when switching tabs
+                    document.querySelectorAll('.alert-success.alert-dismissible').forEach(alert => {
+                        // Create a Bootstrap alert instance and hide it
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    });
                 });
             });
         });
     </script>
 </body>
-</html> 
+</html>

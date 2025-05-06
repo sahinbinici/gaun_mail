@@ -43,6 +43,19 @@ public class CustomUserDetailsService implements UserDetailsService{
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
         
+        // Check if user is a staff member with admin privileges
+        boolean hasStaffRole = authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF"));
+                
+        if (hasStaffRole) {
+            // Check if the staff has admin privileges in the Staff entity
+            var staff = staffService.findByTcKimlikNo(user.getTcKimlikNo());
+            if (staff != null && staff.isAdmin()) {
+                // Add ROLE_STAFF_ADMIN authority
+                authorities.add(new SimpleGrantedAuthority("ROLE_STAFF_ADMIN"));
+            }
+        }
+        
         return new org.springframework.security.core.userdetails.User(
                 user.getIdentityNumber(),
                 user.getPassword(),

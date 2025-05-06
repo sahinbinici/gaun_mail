@@ -2,11 +2,6 @@
 function getCsrfToken() {
     const token = $("meta[name='_csrf']").attr("content");
     const header = $("meta[name='_csrf_header']").attr("content");
-    
-    // Debug için token bilgilerini konsola yazdır
-    console.log('CSRF Token:', token);
-    console.log('CSRF Header:', header);
-    
     return { token, header };
 }
 
@@ -26,15 +21,12 @@ function activateForm(formType, id) {
         window.location.hash = activeTabId;
         
         const url = `/bim-basvuru/admin/${formType}/activate/${id}`;
-        console.log('Request URL:', url);
-        console.log('Headers:', headers);
         
         fetch(url, {
             method: 'POST',
             headers: headers,
             credentials: 'include'
         }).then(response => {
-            console.log('Response status:', response.status);
             if (!response.ok) {
                 return response.text().then(text => {
                     console.error('Error response:', text);
@@ -88,33 +80,33 @@ function showUserDetails(element) {
         return response.json();
     })
     .then(data => {
-        console.log(data.type);
-        document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo;
         if (data.type === 'STUDENT') {
             document.getElementById('studentDetails').style.display = 'block';
             document.getElementById('staffDetails').style.display = 'none';
             
             // Öğrenci bilgilerini güncelle
-            document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo;
-            document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo;
-            document.getElementById('student_ad').textContent = data.ad;
-            document.getElementById('student_soyad').textContent = data.soyad;
-            document.getElementById('student_fakulte').textContent = data.fakKod;
-            document.getElementById('student_bolum').textContent = data.bolumAd;
-            document.getElementById('student_program').textContent = data.programAd;
-            document.getElementById('student_sinif').textContent = data.sinif;
+            document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo || '';
+            document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo || '';
+            document.getElementById('student_ad').textContent = data.ad || '';
+            document.getElementById('student_soyad').textContent = data.soyad || '';
+            document.getElementById('student_fakulte').textContent = data.fakKod || '';
+            document.getElementById('student_bolum').textContent = data.bolumAd || '';
+            document.getElementById('student_program').textContent = data.programAd || '';
+            document.getElementById('student_sinif').textContent = data.sinif || '';
         } else {
             document.getElementById('studentDetails').style.display = 'none';
             document.getElementById('staffDetails').style.display = 'block';
             
             // Personel bilgilerini güncelle
-            document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo;
-            document.getElementById('staff_ad').textContent = data.ad;
-            document.getElementById('staff_soyad').textContent = data.soyad;
-            document.getElementById('staff_birim').textContent = data.birim;
-            document.getElementById('staff_unvan').textContent = data.unvan;
+            document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo || '';
+            document.getElementById('staff_ad').textContent = data.ad || '';
+            document.getElementById('staff_soyad').textContent = data.soyad || '';
+            document.getElementById('staff_birim').textContent = data.birim || '';
+            document.getElementById('staff_unvan').textContent = data.unvan || '';
         }
-        new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+        
+        const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+        userDetailsModal.show();
     })
     .catch(error => {
         console.error('Hata:', error);
@@ -122,65 +114,7 @@ function showUserDetails(element) {
     });
 }
 
-// Reddetme işlemleri için modal ve form yönetimi
-$(document).ready(function() {
-    const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
-
-    // Red butonu tıklandığında
-    $('.reject-btn').click(function() {
-        const formId = $(this).data('form-id');
-        const formType = $(this).data('form-type');
-        
-        // Form verilerini modal'a aktar
-        $('#formId').val(formId);
-        $('#formType').val(formType);
-        
-        // Modal'ı göster
-        rejectModal.show();
-    });
-
-    // Reddet butonuna tıklandığında
-    $('#confirmReject').click(function() {
-        const formId = $('#formId').val();
-        const formType = $('#formType').val();
-        const reason = $('#rejectionReason').val();
-
-        if (!reason) {
-            alert('Lütfen red sebebi giriniz');
-            return;
-        }
-
-        // CSRF token ve headers
-        const { token, header } = getCsrfToken();
-        const headers = {};
-        if (token && header) {
-            headers[header] = token;
-        }
-        headers['Content-Type'] = 'application/x-www-form-urlencoded';
-
-        // Reddetme isteği gönder
-        fetch(`/bim-basvuru/admin/${formType}/reject/${formId}`, {
-            method: 'POST',
-            headers: headers,
-            body: `reason=${encodeURIComponent(reason)}`
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('İşlem başarısız oldu');
-            }
-            return response.text();
-        })
-        .then(() => {
-            rejectModal.hide();
-            location.reload();
-        })
-        .catch(error => {
-            console.error('Hata:', error);
-            alert('Başvuru reddedilemedi: ' + error.message);
-        });
-    });
-});
-
+// Form silme fonksiyonu
 function deleteForm(formType, formId) {
     if (!confirm('Bu başvuruyu silmek istediğinizden emin misiniz?')) {
         return;
@@ -213,16 +147,78 @@ function deleteForm(formType, formId) {
     });
 }
 
-// Sayfa yüklendiğinde aktif sekmeyi ayarla
+// Event listener'ları bağlama fonksiyonu
+function attachEventListeners() {
+    // Reddetme butonları için event listener
+    document.querySelectorAll('.reject-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const formId = this.getAttribute('data-form-id');
+            const formType = this.getAttribute('data-form-type');
+            
+            if (document.getElementById('formId')) {
+                document.getElementById('formId').value = formId;
+            }
+            
+            if (document.getElementById('formType')) {
+                document.getElementById('formType').value = formType;
+            }
+            
+            const rejectModal = document.getElementById('rejectModal');
+            if (rejectModal) {
+                const bsModal = new bootstrap.Modal(rejectModal);
+                bsModal.show();
+            }
+        });
+    });
+}
+
+// Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', function() {
-    // URL'den hash değerini al
-    const hash = window.location.hash;
-    if (hash) {
-        // Hash değerine göre sekmeyi aktif et
-        const tabToActivate = document.querySelector(`a[href="${hash}"]`);
-        if (tabToActivate) {
-            const tab = new bootstrap.Tab(tabToActivate);
-            tab.show();
-        }
+    // Event listener'ları bağla
+    attachEventListeners();
+    
+    // Reddetme modalı için onay butonu event listener'ı
+    const confirmRejectBtn = document.getElementById('confirmReject');
+    if (confirmRejectBtn) {
+        confirmRejectBtn.addEventListener('click', function() {
+            const formId = document.getElementById('formId').value;
+            const formType = document.getElementById('formType').value;
+            const reason = document.getElementById('rejectionReason').value;
+            
+            if (!reason) {
+                alert('Lütfen red sebebi giriniz');
+                return;
+            }
+            
+            const { token, header } = getCsrfToken();
+            const headers = {};
+            if (token && header) {
+                headers[header] = token;
+            }
+            headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            
+            fetch(`/bim-basvuru/admin/${formType}/reject/${formId}`, {
+                method: 'POST',
+                headers: headers,
+                body: `reason=${encodeURIComponent(reason)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('İşlem başarısız oldu');
+                }
+                return response.text();
+            })
+            .then(() => {
+                const rejectModal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+                if (rejectModal) {
+                    rejectModal.hide();
+                }
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert('Başvuru reddedilemedi: ' + error.message);
+            });
+        });
     }
-}); 
+});

@@ -49,10 +49,11 @@
                                         <th>Başvuru Tarihi</th>
                                         <th>Durum</th>
                                         <th>İşlemler</th>
+                                        <th>Red Nedeni</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="form : ${cloudForms}">
+                                    <tr th:each="form : ${cloudForms}" th:data-status="${form.isStatus() ? 'approved' : (form.isRejected() ? 'rejected' : 'pending')}">
                                         <td>
                                             <a href="#" onclick="showUserDetails(this)" 
                                                th:data-username="${form.tcKimlikNo}" 
@@ -64,27 +65,31 @@
                                         <td th:text="${form.purpose}"></td>
                                         <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                         <td>
-                                            <span th:if="${form.status}" class="badge bg-success">Onaylandı</span>
-                                            <span th:if="${form.rejected}" class="badge bg-danger">Reddedildi</span>
-                                            <span th:if="${!form.status and !form.rejected}" class="badge bg-warning">Beklemede</span>
+                                            <span th:if="${form.isStatus()}" class="badge bg-success">Onaylandı</span>
+                                            <span th:if="${form.isRejected()}" class="badge bg-danger">Reddedildi</span>
+                                            <span th:if="${!form.isStatus() and !form.isRejected()}" class="badge bg-warning">Beklemede</span>
                                         </td>
                                         <td>
-                                            <div th:if="${!form.status and !form.rejected}">
+                                            <div th:if="${!form.isStatus() and !form.isRejected()}">
                                                 <button class="btn btn-sm btn-success" 
                                                         th:onclick="|activateForm('cloud', '${form.id}')|">
                                                     Onayla
                                                 </button>
                                                 <button class="btn btn-sm btn-danger reject-btn"
-                                                        th:data-form-id="${form.id}"
-                                                        th:data-form-type="cloud">
+                                                        th:onclick="|showRejectModal('cloud', ${form.id})|">
                                                     Reddet
                                                 </button>
                                             </div>
-                                            <div th:if="${form.status or form.rejected}">
+                                            <div th:if="${form.isStatus() or form.isRejected()}">
                                                 <button class="btn btn-sm btn-danger delete-btn"
                                                         th:onclick="|deleteForm('cloud', ${form.id})|">
                                                     Sil
                                                 </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:if="${form.isRejected()}">
+                                                <small class="text-danger" th:text="${form.rejectionReason}"></small>
                                             </div>
                                         </td>
                                     </tr>

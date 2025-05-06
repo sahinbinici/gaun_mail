@@ -43,7 +43,9 @@ import gaun.apply.util.ConvertUtil;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-
+/**
+ * BaseController
+ */
 @Controller
 @RequestMapping("/")
 public class BaseController {
@@ -243,20 +245,20 @@ public class BaseController {
 
     @PostMapping("/mail/apply")
     public String mailApply(@Valid @ModelAttribute("mailFormDto") MailFormDto mailFormDto, 
-                            BindingResult result, 
-                            Model model) {
+                        BindingResult result, 
+                        Model model) {
         try {
             if (result.hasErrors()) {
-                return "fragments/index";
+                return "redirect:/student/index?error=validation";
             }
-            MailFormData existingMailForm = mailFormService.mailFormData(mailFormDto.getUsername());
+            MailFormData existingMailForm = mailFormService.findByUsername(mailFormDto.getUsername());
             if (existingMailForm != null) {
-                return "redirect:/index?mailExists=true";
+                return "redirect:/student/index?mailExists=true";
             }
             userService.saveMailApply(mailFormDto);
-            return "redirect:/mail/apply?success";
+            return "redirect:/student/index?success=true";
         } catch (Exception e) {
-            return "redirect:/index?error=true";
+            return "redirect:/student/index?error=true";
         }
     }
 
@@ -274,27 +276,22 @@ public class BaseController {
 
     @PostMapping("/eduroam/apply")
     public String eduroamApply(@Valid @ModelAttribute("eduroamFormDto") EduroamFormDto eduroamFormDto,
-                            BindingResult result,
-                            Model model) {
+                        BindingResult result,
+                        Model model) {
         try {
-            // Validasyon hataları varsa
             if (result.hasErrors()) {
-                return "eduroam-apply";
+                return "redirect:/student/index?error=validation";
             }
 
-            // Kullanıcı adı kontrolü
-            EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getUsername());//eduroamFormRepository.findByUsername(eduroamFormDto.getUsername());
+            EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getUsername());
             if (existingEduroam != null) {
-                model.addAttribute("error", "Bu kullanıcı adı ile daha önce başvuru yapılmış");
-                return "eduroam-apply";
+                return "redirect:/student/index?eduroamExists=true";
             }
 
             userService.saveEduroamApply(eduroamFormDto);
-            return "redirect:/eduroam/success";
-            
+            return "redirect:/student/index?success=true";
         } catch (Exception e) {
-            model.addAttribute("error", "Başvuru sırasında bir hata oluştu.");
-            return "eduroam-apply";
+            return "redirect:/student/index?error=true";
         }
     }
 
@@ -307,7 +304,7 @@ public class BaseController {
     @ResponseBody
     public Map<String, Object> checkMailExists(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        MailFormData existingMail = mailFormService.mailFormData(username);//mailFormRepository.findByUsername(username);
+        MailFormData existingMail = mailFormService.findByUsername(username);
 
         if (existingMail != null) {
             response.put("exists", true);
@@ -324,7 +321,7 @@ public class BaseController {
     @ResponseBody
     public Map<String, Object> checkEduroamExists(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(username);//eduroamFormRepository.findByUsername(username);
+        EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(username);
         
         if (existingEduroam != null) {
             response.put("exists", true);
@@ -387,11 +384,11 @@ public class BaseController {
                     model.addAttribute("user", user);
                     
                     // Mail başvurusu kontrolü
-                    MailFormData mailForm = mailFormService.mailFormData(user.getIdentityNumber());//mailFormRepository.findByUsername(user.getIdentityNumber());
+                    MailFormData mailForm = mailFormService.findByUsername(user.getIdentityNumber());
                     model.addAttribute("hasMailApplication", mailForm != null);
                     
                     // Eduroam başvurusu kontrolü
-                    EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());//eduroamFormRepository.findByUsername(user.getIdentityNumber());
+                    EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());
                     model.addAttribute("hasEduroamApplication", eduroamForm != null);
                 }
             } catch (Exception e) {

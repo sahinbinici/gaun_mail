@@ -13,6 +13,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" th:src="@{/js/admin.js}"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -38,51 +39,56 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <!-- Sekmeler -->
-        <ul class="nav nav-tabs mb-4">
-            <li class="nav-item" th:if="${tabPermissions.getOrDefault('mail', false)}">
-                <a class="nav-link" th:classappend="${activeTab == 'mail' ? 'active' : ''}" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
-            </li>
-            <li class="nav-item" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
-                <a class="nav-link" th:classappend="${activeTab == 'eduroam' ? 'active' : ''}" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
-            </li>
-            <li class="nav-item" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
-                <a class="nav-link" th:classappend="${activeTab == 'ip-mac' ? 'active' : ''}" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
-            </li>
-            <li class="nav-item" th:if="${tabPermissions.getOrDefault('cloud', false)}">
-                <a class="nav-link" th:classappend="${activeTab == 'cloud' ? 'active' : ''}" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
-            </li>
-            <li class="nav-item" th:if="${tabPermissions.getOrDefault('vpn', false)}">
-                <a class="nav-link" th:classappend="${activeTab == 'vpn' ? 'active' : ''}" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
-            </li>
-        </ul>
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <!-- Ana İçerik -->
+            <div class="col-md-12">
+                <!-- Sekmeler -->
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('mail', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'mail' ? 'active' : ''}" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
+                    </li>
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'eduroam' ? 'active' : ''}" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
+                    </li>
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'ip-mac' ? 'active' : ''}" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
+                    </li>
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('cloud', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'cloud' ? 'active' : ''}" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
+                    </li>
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('vpn', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'vpn' ? 'active' : ''}" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
+                    </li>
+                </ul>
 
-        <!-- Sekme İçerikleri -->
-        <div class="tab-content">
-            <!-- Mail Sekmesi -->
-            <div class="tab-pane fade" th:classappend="${activeTab == 'mail' ? 'show active' : ''}" id="mail" th:if="${tabPermissions.getOrDefault('mail', false)}">
-                <div th:replace="fragments/mail-tab :: body"></div>
-            </div>
+                <!-- Sekme İçerikleri -->
+                <div class="tab-content">
+                    <!-- Mail Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'mail' ? 'show active' : ''}" id="mail" th:if="${tabPermissions.getOrDefault('mail', false)}">
+                        <div th:replace="fragments/mail-tab :: body"></div>
+                    </div>
 
-            <!-- Eduroam Sekmesi -->
-            <div class="tab-pane fade" th:classappend="${activeTab == 'eduroam' ? 'show active' : ''}" id="eduroam" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
-                <div th:replace="fragments/eduroam-tab :: body"></div>
-            </div>
+                    <!-- Eduroam Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'eduroam' ? 'show active' : ''}" id="eduroam" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
+                        <div th:replace="fragments/eduroam-tab :: body"></div>
+                    </div>
 
-            <!-- IP-MAC Sekmesi -->
-            <div class="tab-pane fade" th:classappend="${activeTab == 'ip-mac' ? 'show active' : ''}" id="ip-mac" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
-                <div th:replace="fragments/ip-mac-tab :: body"></div>
-            </div>
+                    <!-- IP-MAC Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'ip-mac' ? 'show active' : ''}" id="ip-mac" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
+                        <div th:replace="fragments/ip-mac-tab :: body"></div>
+                    </div>
 
-            <!-- GAUN Bulut Sekmesi -->
-            <div class="tab-pane fade" th:classappend="${activeTab == 'cloud' ? 'show active' : ''}" id="cloud" th:if="${tabPermissions.getOrDefault('cloud', false)}">
-                <div th:replace="fragments/cloud-tab :: body"></div>
-            </div>
+                    <!-- GAUN Bulut Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'cloud' ? 'show active' : ''}" id="cloud" th:if="${tabPermissions.getOrDefault('cloud', false)}">
+                        <div th:replace="fragments/cloud-tab :: body"></div>
+                    </div>
 
-            <!-- VPN Sekmesi -->
-            <div class="tab-pane fade" th:classappend="${activeTab == 'vpn' ? 'show active' : ''}" id="vpn" th:if="${tabPermissions.getOrDefault('vpn', false)}">
-                <div th:replace="fragments/vpn-tab :: body"></div>
+                    <!-- VPN Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'vpn' ? 'show active' : ''}" id="vpn" th:if="${tabPermissions.getOrDefault('vpn', false)}">
+                        <div th:replace="fragments/vpn-tab :: body"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -126,23 +132,21 @@
         </div>
     </div>
 
-    <!-- Update the reject modal -->
-    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <!-- Reddetme Modalı -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="rejectModalLabel">Başvuruyu Reddet</h5>
+                    <h5 class="modal-title">Başvuruyu Reddet</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="rejectForm">
-                        <input type="hidden" id="formId">
-                        <input type="hidden" id="formType">
-                        <div class="mb-3">
-                            <label for="rejectionReason" class="form-label">Red Sebebi</label>
-                            <textarea class="form-control" id="rejectionReason" required></textarea>
-                        </div>
-                    </form>
+                    <input type="hidden" id="formId">
+                    <input type="hidden" id="formType">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Red Sebebi</label>
+                        <textarea class="form-control" id="rejectionReason" rows="3" required></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
@@ -152,4 +156,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

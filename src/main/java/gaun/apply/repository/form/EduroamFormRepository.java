@@ -1,20 +1,18 @@
 package gaun.apply.repository.form;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
+import java.time.LocalDateTime;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import gaun.apply.entity.form.EduroamFormData;
 
 @Repository
-public interface EduroamFormRepository extends JpaRepository<EduroamFormData, Long> {
+public interface EduroamFormRepository extends BaseFormRepository<EduroamFormData> {
     EduroamFormData findByUsername(String username);
-
+    EduroamFormData findByTcKimlikNo(String tcKimlikNo);
+    List<EduroamFormData> findTop100ByOrderByApplyDateDesc();
+    List<EduroamFormData> findByApplyDateAfter(LocalDateTime date);
     Optional<EduroamFormData> findById(Long id);
-
-    List<EduroamFormData> findTop10ByOrderByApplyDateDesc();
-
-    void deleteById(Long id);
-} 
+}

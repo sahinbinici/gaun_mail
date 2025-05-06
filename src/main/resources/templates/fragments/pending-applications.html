@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Bekleyen Başvurular
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Başvuru Türü</th>
+                                <th>Öğrenci No / TC Kimlik No</th>
+                                <th>Email/Kullanıcı Adı</th>
+                                <th>Başvuru Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Mail Başvuruları -->
+                            <tr th:each="form : ${pendingMailForms}">
+                                <td>Mail</td>
+                                <td>
+                                    <a href="#" onclick="showUserDetails(this)" 
+                                       th:data-username="${form.username}"
+                                       style="text-decoration: underline;">
+                                        <span th:text="${form.username}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" 
+                                            th:onclick="|activateForm('mail', '${form.id}')|">
+                                        Onayla
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn"
+                                            th:data-form-type="mail"
+                                            th:data-form-id="${form.id}">
+                                        Reddet
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Eduroam Başvuruları -->
+                            <tr th:each="form : ${pendingEduroamForms}">
+                                <td>Eduroam</td>
+                                <td>
+                                    <a href="#" onclick="showUserDetails(this)" 
+                                       th:data-username="${form.username}"
+                                       style="text-decoration: underline;">
+                                        <span th:text="${form.username}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${form.username}"></td>
+                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" 
+                                            th:onclick="|activateForm('eduroam', '${form.id}')|">
+                                        Onayla
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn"
+                                            th:data-form-type="eduroam"
+                                            th:data-form-id="${form.id}">
+                                        Reddet
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- IP-MAC Başvuruları -->
+                            <tr th:each="form : ${pendingIpMacForms}">
+                                <td>IP-MAC</td>
+                                <td>
+                                    <a href="#" onclick="showUserDetails(this)" 
+                                       th:data-username="${form.tcKimlikNo}"
+                                       style="text-decoration: underline;">
+                                        <span th:text="${form.tcKimlikNo}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${form.username}"></td>
+                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" 
+                                            th:onclick="|activateForm('ipmac', '${form.id}')|">
+                                        Onayla
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn"
+                                            th:data-form-type="ipmac"
+                                            th:data-form-id="${form.id}">
+                                        Reddet
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Cloud Başvuruları -->
+                            <tr th:each="form : ${pendingCloudForms}">
+                                <td>GAUN BULUT</td>
+                                <td>
+                                    <a href="#" onclick="showUserDetails(this)" 
+                                       th:data-username="${form.tcKimlikNo}"
+                                       style="text-decoration: underline;">
+                                        <span th:text="${form.tcKimlikNo}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${form.username}"></td>
+                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" 
+                                            th:onclick="|activateForm('cloud', '${form.id}')|">
+                                        Onayla
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn"
+                                            th:data-form-type="cloud"
+                                            th:data-form-id="${form.id}">
+                                        Reddet
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- VPN Başvuruları -->
+                            <tr th:each="form : ${pendingVpnForms}">
+                                <td>VPN</td>
+                                <td>
+                                    <a href="#" onclick="showUserDetails(this)" 
+                                       th:data-username="${form.tcKimlikNo}"
+                                       style="text-decoration: underline;">
+                                        <span th:text="${form.tcKimlikNo}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${form.username}"></td>
+                                <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" 
+                                            th:onclick="|activateForm('vpn', '${form.id}')|">
+                                        Onayla
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-btn"
+                                            th:data-form-type="vpn"
+                                            th:data-form-id="${form.id}">
+                                        Reddet
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

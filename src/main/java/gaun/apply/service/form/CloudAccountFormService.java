@@ -1,5 +1,6 @@
 package gaun.apply.service.form;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import gaun.apply.entity.form.CloudAccountFormData;
 import gaun.apply.repository.form.CloudAccountFormRepository;
+import gaun.apply.enums.ApplicationStatusEnum;
 
 @Service
 public class CloudAccountFormService {
@@ -42,5 +44,23 @@ public class CloudAccountFormService {
 
     public void deleteCloudAccountForm(Long id) {
         cloudAccountFormRepository.deleteById(id);
+    }
+
+    public List<CloudAccountFormData> findLastMonthApplications() {
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+        return cloudAccountFormRepository.findByApplyDateAfter(oneMonthAgo);
+    }
+
+    public List<CloudAccountFormData> findLast100Applications() {
+        return cloudAccountFormRepository.findTop100ByOrderByApplyDateDesc();
+    }
+
+    public List<CloudAccountFormData> findByDurum(String durum) {
+        try {
+            ApplicationStatusEnum status = ApplicationStatusEnum.valueOf(durum);
+            return cloudAccountFormRepository.findByApplicationStatus(status);
+        } catch (IllegalArgumentException e) {
+            return List.of(); // Return empty list if status is invalid
+        }
     }
 }

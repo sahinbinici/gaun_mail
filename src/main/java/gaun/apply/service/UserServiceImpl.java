@@ -7,21 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import gaun.apply.entity.Student;
 import gaun.apply.entity.form.EduroamFormData;
 import gaun.apply.entity.form.MailFormData;
+import gaun.apply.enums.ApplicationStatusEnum;
 import gaun.apply.repository.form.EduroamFormRepository;
 import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.util.ConvertUtil;
 import gaun.apply.util.RandomPasswordGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.MailFormDto;
+import gaun.apply.dto.EduroamFormDto;
 import gaun.apply.dto.StudentDto;
 import gaun.apply.dto.UserDto;
 import gaun.apply.entity.Staff;
@@ -29,6 +23,11 @@ import gaun.apply.entity.user.Role;
 import gaun.apply.entity.user.User;
 import gaun.apply.repository.RoleRepository;
 import gaun.apply.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -126,8 +125,11 @@ public class UserServiceImpl implements UserService {
         mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
         mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
-        mailFormData.setStatus(mailFormDto.isStatus());
-        mailFormData.setApplyDate(LocalDateTime.now(clock));
+        mailFormData.setStatus(false); // Başlangıçta onaylanmamış
+        mailFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede
+        LocalDateTime now = LocalDateTime.now(clock);
+        mailFormData.setApplyDate(now);
+        mailFormData.setCreatedAt(now);
         mailFormRepository.save(mailFormData);
     }
 
@@ -137,8 +139,11 @@ public class UserServiceImpl implements UserService {
         eduroamFormData.setUsername(eduroamFormDto.getUsername());
         eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
         eduroamFormData.setPassword(eduroamFormDto.getPassword());
-        eduroamFormData.setApplyDate(LocalDateTime.now(clock));
-        eduroamFormData.setStatus(eduroamFormDto.isStatus());
+        eduroamFormData.setStatus(false); // Başlangıçta onaylanmamış
+        eduroamFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede
+        LocalDateTime now = LocalDateTime.now(clock);
+        eduroamFormData.setApplyDate(now);
+        eduroamFormData.setCreatedAt(now);
         eduroamFormRepository.save(eduroamFormData);
     }
 

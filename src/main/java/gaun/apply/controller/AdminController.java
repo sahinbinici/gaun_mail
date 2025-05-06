@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import gaun.apply.service.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,11 @@ import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.entity.form.MailFormData;
 import gaun.apply.entity.form.VpnFormData;
 import gaun.apply.entity.user.User;
+import gaun.apply.service.AdminTabPermissionService;
+import gaun.apply.service.SmsService;
+import gaun.apply.service.StaffService;
+import gaun.apply.service.StudentService;
+import gaun.apply.service.UserService;
 import gaun.apply.service.form.CloudAccountFormService;
 import gaun.apply.service.form.EduroamFormService;
 import gaun.apply.service.form.FormService;
@@ -35,8 +41,6 @@ import gaun.apply.service.form.MailFormService;
 import gaun.apply.service.form.VpnFormService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,7 +57,17 @@ public class AdminController {
     private final AdminTabPermissionService adminTabPermissionService;
     private final SmsService smsService;
 
-    public AdminController(UserService userService, FormService formService, StudentService studentService, StaffService staffService, MailFormService mailFormService, EduroamFormService eduroamFormService, VpnFormService vpnFormService, CloudAccountFormService cloudAccountFormService, IpMacFormService ipMacFormService, AdminTabPermissionService adminTabPermissionService, SmsService smsService) {
+    public AdminController(UserService userService,
+                         FormService formService,
+                         StudentService studentService,
+                         StaffService staffService,
+                         MailFormService mailFormService,
+                         EduroamFormService eduroamFormService,
+                         VpnFormService vpnFormService,
+                         CloudAccountFormService cloudAccountFormService,
+                         IpMacFormService ipMacFormService,
+                         AdminTabPermissionService adminTabPermissionService,
+                         SmsService smsService) {
         this.userService = userService;
         this.formService = formService;
         this.studentService = studentService;
@@ -68,7 +82,10 @@ public class AdminController {
     }
 
     @GetMapping({"", "/"})
-    public String showAdminDashboard(Model model, HttpServletRequest request, HttpSession session) {
+    public String showAdminDashboard(Model model, HttpServletRequest request, HttpSession session,
+                                    @RequestParam(required = false) String filter,
+                                    @RequestParam(required = false) String tcKimlikNo,
+                                    @RequestParam(required = false) String status) {
         // Get current user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findByidentityNumber(auth.getName());
@@ -97,10 +114,27 @@ public class AdminController {
                     .orElse("mail");
         }
         model.addAttribute("activeTab", activeTab);
+        
+        // Add filter values to model
+        model.addAttribute("currentFilter", filter);
+        model.addAttribute("currentTcKimlikNo", tcKimlikNo);
+        model.addAttribute("currentStatus", status);
 
         // Load data only for permitted tabs
         if (tabPermissions.getOrDefault("mail", false)) {
-            List<MailFormData> mailForms = mailFormService.getAllMailForms();
+            List<MailFormData> mailForms;
+            if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                MailFormData mailForm = mailFormService.findByTcKimlikNo(tcKimlikNo);
+                mailForms = mailForm != null ? List.of(mailForm) : List.of();
+            } else if (status != null && !status.isEmpty()) {
+                mailForms = mailFormService.findByDurum(status);
+            } else if ("month".equals(filter)) {
+                mailForms = mailFormService.findLastMonthApplications();
+            } else if ("last100".equals(filter)) {
+                mailForms = mailFormService.findLast100Applications();
+            } else {
+                mailForms = mailFormService.getAllMailForms();
+            }
             model.addAttribute("mailForms", mailForms);
             model.addAttribute("hasMailForms", !mailForms.isEmpty());
             model.addAttribute("mailStats", getFormStats(mailForms));
@@ -108,7 +142,19 @@ public class AdminController {
         }
 
         if (tabPermissions.getOrDefault("eduroam", false)) {
-            List<EduroamFormData> eduroamForms = eduroamFormService.getAllEduroamForms();
+            List<EduroamFormData> eduroamForms;
+            if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                EduroamFormData eduroamForm = eduroamFormService.findByTcKimlikNo(tcKimlikNo);
+                eduroamForms = eduroamForm != null ? List.of(eduroamForm) : List.of();
+            } else if (status != null && !status.isEmpty()) {
+                eduroamForms = eduroamFormService.findByDurum(status);
+            } else if ("month".equals(filter)) {
+                eduroamForms = eduroamFormService.findLastMonthApplications();
+            } else if ("last100".equals(filter)) {
+                eduroamForms = eduroamFormService.findLast100Applications();
+            } else {
+                eduroamForms = eduroamFormService.getAllEduroamForms();
+            }
             model.addAttribute("eduroamForms", eduroamForms);
             model.addAttribute("hasEduroamForms", !eduroamForms.isEmpty());
             model.addAttribute("eduroamStats", getFormStats(eduroamForms));
@@ -116,7 +162,19 @@ public class AdminController {
         }
 
         if (tabPermissions.getOrDefault("ip-mac", false)) {
-            List<IpMacFormData> ipMacForms = ipMacFormService.getAllIpMacForms();
+            List<IpMacFormData> ipMacForms;
+            if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                IpMacFormData ipMacForm = ipMacFormService.findByTcKimlikNo(tcKimlikNo);
+                ipMacForms = ipMacForm != null ? List.of(ipMacForm) : List.of();
+            } else if (status != null && !status.isEmpty()) {
+                ipMacForms = ipMacFormService.findByDurum(status);
+            } else if ("month".equals(filter)) {
+                ipMacForms = ipMacFormService.findLastMonthApplications();
+            } else if ("last100".equals(filter)) {
+                ipMacForms = ipMacFormService.findLast100Applications();
+            } else {
+                ipMacForms = ipMacFormService.getAllIpMacForms();
+            }
             model.addAttribute("ipMacForms", ipMacForms);
             model.addAttribute("hasIpMacForms", !ipMacForms.isEmpty());
             model.addAttribute("ipMacStats", getFormStats(ipMacForms));
@@ -124,7 +182,19 @@ public class AdminController {
         }
 
         if (tabPermissions.getOrDefault("cloud", false)) {
-            List<CloudAccountFormData> cloudForms = cloudAccountFormService.getAllCloudAccountForms();
+            List<CloudAccountFormData> cloudForms;
+            if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                CloudAccountFormData cloudForm = cloudAccountFormService.findByTcKimlikNo(tcKimlikNo);
+                cloudForms = cloudForm != null ? List.of(cloudForm) : List.of();
+            } else if (status != null && !status.isEmpty()) {
+                cloudForms = cloudAccountFormService.findByDurum(status);
+            } else if ("month".equals(filter)) {
+                cloudForms = cloudAccountFormService.findLastMonthApplications();
+            } else if ("last100".equals(filter)) {
+                cloudForms = cloudAccountFormService.findLast100Applications();
+            } else {
+                cloudForms = cloudAccountFormService.getAllCloudAccountForms();
+            }
             model.addAttribute("cloudForms", cloudForms);
             model.addAttribute("hasCloudForms", !cloudForms.isEmpty());
             model.addAttribute("cloudStats", getFormStats(cloudForms));
@@ -132,7 +202,19 @@ public class AdminController {
         }
 
         if (tabPermissions.getOrDefault("vpn", false)) {
-            List<VpnFormData> vpnForms = vpnFormService.getAllVpnForms();
+            List<VpnFormData> vpnForms;
+            if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                VpnFormData vpnForm = vpnFormService.findByTcKimlikNo(tcKimlikNo);
+                vpnForms = vpnForm != null ? List.of(vpnForm) : List.of();
+            } else if (status != null && !status.isEmpty()) {
+                vpnForms = vpnFormService.findByDurum(status);
+            } else if ("month".equals(filter)) {
+                vpnForms = vpnFormService.findLastMonthApplications();
+            } else if ("last100".equals(filter)) {
+                vpnForms = vpnFormService.findLast100Applications();
+            } else {
+                vpnForms = vpnFormService.getAllVpnForms();
+            }
             model.addAttribute("vpnForms", vpnForms);
             model.addAttribute("hasVpnForms", !vpnForms.isEmpty());
             model.addAttribute("vpnStats", getFormStats(vpnForms));
@@ -173,11 +255,11 @@ public class AdminController {
     @PostMapping("/mail/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateMailForm(@PathVariable Long id) {
-        MailFormData mailForm = mailFormService.findById(id)//mailFormRepository.findById(id)
+        MailFormData mailForm = mailFormService.findMailFormById(id)
                 .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
         mailForm.setStatus(true);
         mailForm.setApprovalDate(LocalDateTime.now());
-        mailFormService.saveMailFormData(mailForm);//mailFormRepository.save(mailForm);
+        mailFormService.save(mailForm);
         StudentDto student = studentService.findByOgrenciNo(mailForm.getUsername());
         smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz onaylandı.https://mail2.gantep.edu.tr adresinden oturum açıp şifrenizi değiştirin.");
         return ResponseEntity.ok().build();
@@ -186,11 +268,11 @@ public class AdminController {
     @PostMapping("/eduroam/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateEduroamForm(@PathVariable Long id) {
-        EduroamFormData eduroamForm = eduroamFormService.findById(id)//eduroamFormRepository.findById(id)
+        EduroamFormData eduroamForm = eduroamFormService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
         eduroamForm.setStatus(true);
         eduroamForm.setApprovalDate(LocalDateTime.now());
-        eduroamFormService.saveEduroamFormData(eduroamForm);//eduroamFormRepository.save(eduroamForm);
+        eduroamFormService.saveEduroamFormData(eduroamForm);
         StudentDto student = studentService.findByOgrenciNo(eduroamForm.getUsername());
         smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
         return ResponseEntity.ok().build();
@@ -273,44 +355,43 @@ public class AdminController {
 
             switch (formType) {
                 case "mail":
-                    MailFormData mailForm = mailFormService.findById(id)
+                    MailFormData mailForm = mailFormService.findMailFormById(id)
                             .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
                     mailForm.setStatus(true);
                     mailForm.setApprovalDate(LocalDateTime.now());
-                    mailFormService.saveMailFormData(mailForm);
-                    break;
+                    mailFormService.save(mailForm);
+                    return ResponseEntity.ok("Mail başvurusu onaylandı");
                 case "eduroam":
                     EduroamFormData eduroamForm = eduroamFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
                     eduroamForm.setStatus(true);
                     eduroamForm.setApprovalDate(LocalDateTime.now());
                     eduroamFormService.saveEduroamFormData(eduroamForm);
-                    break;
+                    return ResponseEntity.ok("Eduroam başvurusu onaylandı");
                 case "vpn":
                     VpnFormData vpnForm = vpnFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
                     vpnForm.setStatus(true);
                     vpnForm.setApprovalDate(LocalDateTime.now());
                     vpnFormService.saveVpnFormData(vpnForm);
-                    break;
+                    return ResponseEntity.ok("VPN başvurusu onaylandı");
                 case "ip-mac":
                     IpMacFormData ipMacForm = ipMacFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
                     ipMacForm.setStatus(true);
                     ipMacForm.setApprovalDate(LocalDateTime.now());
                     ipMacFormService.saveIpMacFormData(ipMacForm);
-                    break;
+                    return ResponseEntity.ok("IP-MAC başvurusu onaylandı");
                 case "cloud":
                     CloudAccountFormData cloudForm = cloudAccountFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("Cloud başvurusu bulunamadı"));
                     cloudForm.setStatus(true);
                     cloudForm.setApprovalDate(LocalDateTime.now());
                     cloudAccountFormService.saveCloudAccountFormData(cloudForm);
-                    break;
+                    return ResponseEntity.ok("Cloud başvurusu onaylandı");
                 default:
-                    throw new RuntimeException("Geçersiz form tipi: " + formType);
+                    return ResponseEntity.badRequest().body("Geçersiz form tipi");
             }
-            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Form aktivasyonu başarısız: " + e.getMessage());
         }
@@ -402,4 +483,108 @@ public class AdminController {
                 .body("VPN başvurusu silinemedi: " + e.getMessage());
         }
     }
-} 
+
+    @GetMapping("/pending-applications")
+    public String getPendingApplications(Model model) {
+        // Mail başvuruları
+        List<MailFormData> pendingMailForms = mailFormService.findByDurum("PENDING");
+        model.addAttribute("pendingMailForms", pendingMailForms);
+
+        // Eduroam başvuruları
+        List<EduroamFormData> pendingEduroamForms = eduroamFormService.findByDurum("PENDING");
+        model.addAttribute("pendingEduroamForms", pendingEduroamForms);
+
+        // IP-MAC başvuruları
+        List<IpMacFormData> pendingIpMacForms = ipMacFormService.findByDurum("PENDING");
+        model.addAttribute("pendingIpMacForms", pendingIpMacForms);
+
+        // VPN başvuruları
+        List<VpnFormData> pendingVpnForms = vpnFormService.findByDurum("PENDING");
+        model.addAttribute("pendingVpnForms", pendingVpnForms);
+
+        return "fragments/pending-applications :: content";
+    }
+
+    @GetMapping("/api/applications")
+    @ResponseBody
+    public List<MailFormData> getMailApplicationsByStatus(@RequestParam String status) {
+        List<MailFormData> applications;
+        
+        switch (status.toLowerCase()) {
+            case "pending":
+                applications = mailFormService.findByDurum("PENDING");
+                break;
+            case "approved":
+                applications = mailFormService.findByDurum("APPROVED");
+                break;
+            case "rejected":
+                applications = mailFormService.findByDurum("REJECTED");
+                break;
+            default:
+                applications = mailFormService.getAllMailForms();
+        }
+        
+        return applications;
+    }
+    
+    public List<MailFormData> getAllForms() {
+        return mailFormService.getAllMailForms();
+    }
+
+    @PostMapping("/api/applications/{id}/approve")
+    @ResponseBody
+    public ResponseEntity<String> approveApplication(@PathVariable Long id) {
+        try {
+            formService.approveApplication(id);
+            return ResponseEntity.ok("Application approved successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("Error approving application: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/api/applications/{id}/reject")
+    @ResponseBody
+    public ResponseEntity<String> rejectApplication(@PathVariable Long id) {
+        try {
+            formService.rejectApplication(id);
+            return ResponseEntity.ok("Application rejected successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("Error rejecting application: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/api/applications/{id}")
+    @ResponseBody
+    public ResponseEntity<BaseFormData> getApplicationDetails(@PathVariable Long id) {
+        try {
+            BaseFormData application = formService.getApplicationById(id);
+            return ResponseEntity.ok(application);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).build();
+        }
+    }
+
+    @GetMapping("/applications/{status}")
+    @ResponseBody
+    public ResponseEntity<List<MailFormData>> getApplicationsByStatus(@PathVariable String status) {
+        List<MailFormData> applications;
+        
+        switch (status.toLowerCase()) {
+            case "pending":
+                applications = mailFormService.findByDurum("PENDING");
+                break;
+            case "approved":
+                applications = mailFormService.findByDurum("APPROVED");
+                break;
+            case "rejected":
+                applications = mailFormService.findByDurum("REJECTED");
+                break;
+            default:
+                applications = mailFormService.getAllMailForms();
+        }
+        
+        return ResponseEntity.ok(applications);
+    }
+}

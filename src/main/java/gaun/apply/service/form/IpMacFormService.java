@@ -2,11 +2,13 @@ package gaun.apply.service.form;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
 import gaun.apply.entity.form.IpMacFormData;
 import gaun.apply.repository.form.IpMacFormRepository;
+import gaun.apply.enums.ApplicationStatusEnum;
 
 @Service
 public class IpMacFormService {
@@ -42,5 +44,23 @@ public class IpMacFormService {
 
     public void deleteIpMacForm(Long id) {
         ipMacFormRepository.deleteById(id);
+    }
+
+    public List<IpMacFormData> findLastMonthApplications() {
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+        return ipMacFormRepository.findByApplyDateAfter(oneMonthAgo);
+    }
+
+    public List<IpMacFormData> findLast100Applications() {
+        return ipMacFormRepository.findTop100ByOrderByApplyDateDesc();
+    }
+    
+    public List<IpMacFormData> findByDurum(String durum) {
+        try {
+            ApplicationStatusEnum status = ApplicationStatusEnum.valueOf(durum);
+            return ipMacFormRepository.findByApplicationStatus(status);
+        } catch (IllegalArgumentException e) {
+            return List.of(); // Return empty list if status is invalid
+        }
     }
 }
