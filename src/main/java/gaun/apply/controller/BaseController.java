@@ -74,8 +74,32 @@ public class BaseController {
     }
 
     @GetMapping("/")
-    public String root() {
-        return "redirect:/student/index";
+    public String root(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        String identityNumber = principal.getName();
+        User user = userService.findByidentityNumber(identityNumber);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Get user roles and check in order of priority
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        // Check roles in priority order: ADMIN > STAFF > USER
+        if (roles.contains("ROLE_ADMIN")) {
+            return "redirect:/staff/index";
+        } else if (roles.contains("ROLE_STAFF")) {
+            return "redirect:/staff/index";
+        } else if (roles.contains("ROLE_USER")) {
+            return "redirect:/student/index";
+        }
+        // Fallback to login if no valid role found
+        return "redirect:/login";
     }
 
     @GetMapping("/index")
