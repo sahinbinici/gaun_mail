@@ -61,6 +61,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4>Son Mail Başvuruları</h4>
                     <div class="d-flex">
+                        <!-- Bekleyen Başvuruları İndir Butonu -->
+                        <a th:href="@{/admin/mail/pending-applications-text}" class="btn btn-outline-primary me-2" target="_blank">
+                            <i class="fas fa-download"></i> Bekleyen Başvuruları İndir
+                        </a>
                         <!-- Filtre Seçenekleri -->
                         <div class="dropdown me-2">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="mailFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -107,7 +111,7 @@
                                             <span th:text="${form.username}"></span>
                                         </a>
                                     </td>
-                                    <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                    <td th:text="${form.email + '@mail2.gantep.edu.tr'}"></td>
                                     <td th:text="${form.password}"></td>
                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                     <td>
@@ -148,4 +152,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

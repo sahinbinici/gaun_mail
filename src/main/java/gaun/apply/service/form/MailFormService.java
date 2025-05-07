@@ -10,13 +10,17 @@ import org.springframework.stereotype.Service;
 import gaun.apply.entity.form.MailFormData;
 import gaun.apply.repository.form.MailFormRepository;
 import gaun.apply.enums.ApplicationStatusEnum;
+import gaun.apply.dto.StudentDto;
+import gaun.apply.service.StudentService;
 
 @Service
 public class MailFormService {
     private final MailFormRepository mailFormRepository;
+    private final StudentService studentService;
 
-    public MailFormService(MailFormRepository mailFormRepository) {
+    public MailFormService(MailFormRepository mailFormRepository, StudentService studentService) {
         this.mailFormRepository = mailFormRepository;
+        this.studentService = studentService;
     }
 
     public Optional<MailFormData> findMailFormById(Long id) {
@@ -67,5 +71,68 @@ public class MailFormService {
 
     public MailFormData save(MailFormData mailFormData) {
         return mailFormRepository.save(mailFormData);
+    }
+
+    /**
+     * Returns a list of pending mail applications in text format.
+     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
+     * 
+     * @return String containing all pending applications in the specified format
+     */
+    public String getPendingApplicationsAsText() {
+        // Get applications that are actually pending (not approved and not rejected)
+        List<MailFormData> allApplications = mailFormRepository.findAll();
+        List<MailFormData> pendingApplications = new ArrayList<>();
+        
+        for (MailFormData application : allApplications) {
+            if (!application.isStatus() && !application.isRejected()) {
+                pendingApplications.add(application);
+            }
+        }
+        
+        StringBuilder result = new StringBuilder();
+        
+        for (MailFormData application : pendingApplications) {
+            // Get TC Kimlik No
+            String tcKimlikNo = application.getTcKimlikNo();
+            String ogrenciNo = application.getUsername() != null ? application.getUsername() : "";
+            
+            // Try to get student information from StudentService
+            StudentDto student = studentService.findByOgrenciNo(ogrenciNo);
+            
+            String ad = "";
+            String soyad = "";
+            String fakulte = "";
+            String bolum = "";
+            String gsm1 = "";
+            String email = application.getEmail() != null ? application.getEmail() : "";
+            
+            // If student information is available, use it
+            if (student != null) {
+                ad = student.getAd() != null ? student.getAd() : "";
+                soyad = student.getSoyad() != null ? student.getSoyad() : "";
+                fakulte = student.getFakKod() != null ? student.getFakKod() : "";
+                bolum = student.getBolumAd() != null ? student.getBolumAd() : "";
+                gsm1 = student.getGsm1() != null ? student.getGsm1() : "";
+                
+                // If email is empty in application but available in student, use it
+                if (email.isEmpty() && student.getEposta1() != null) {
+                    email = student.getEposta1();
+                }
+            }
+            
+            // Append the data in the required format
+            result.append(tcKimlikNo).append("#")
+                  .append(ogrenciNo).append("#")
+                  .append(ad).append("#")
+                  .append(soyad).append("#")
+                  .append(fakulte).append("#")
+                  .append(bolum).append("#")
+                  .append(gsm1).append("#")
+                  .append(email)
+                  .append("\n");
+        }
+        
+        return result.toString();
     }
 }

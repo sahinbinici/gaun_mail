@@ -587,4 +587,58 @@ public class AdminController {
         
         return ResponseEntity.ok(applications);
     }
+
+    /**
+     * Returns a list of pending mail applications in text format.
+     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
+     * 
+     * @return String containing all pending applications in the specified format
+     */
+    @GetMapping("/mail/pending-applications-text")
+    @ResponseBody
+    public String getPendingMailApplicationsAsText() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findByidentityNumber(auth.getName());
+        
+        // Check if user is authenticated and has permission
+        if (currentUser == null) {
+            return "Unauthorized access";
+        }
+        
+        // Check if user has permission to view mail tab
+        Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
+        if (!tabPermissions.getOrDefault("mail", false)) {
+            return "Permission denied";
+        }
+        
+        // Get pending applications as text
+        return mailFormService.getPendingApplicationsAsText();
+    }
+
+    /**
+     * Returns a list of pending eduroam applications in text format.
+     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
+     * 
+     * @return String containing all pending applications in the specified format
+     */
+    @GetMapping("/eduroam/pending-applications-text")
+    @ResponseBody
+    public String getPendingEduroamApplicationsAsText() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findByidentityNumber(auth.getName());
+        
+        // Check if user is authenticated and has permission
+        if (currentUser == null) {
+            return "Unauthorized access";
+        }
+        
+        // Check if user has permission to view eduroam tab
+        Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
+        if (!tabPermissions.getOrDefault("eduroam", false)) {
+            return "Permission denied";
+        }
+        
+        // Get pending applications as text
+        return eduroamFormService.getPendingApplicationsAsText();
+    }
 }
