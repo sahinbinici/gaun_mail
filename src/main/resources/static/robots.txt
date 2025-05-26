@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /error/
+
+Sitemap: https://hesap.gantep.edu.tr/sitemap.xml

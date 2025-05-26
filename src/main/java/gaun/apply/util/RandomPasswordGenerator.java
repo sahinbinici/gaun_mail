@@ -9,7 +9,7 @@ public class RandomPasswordGenerator {
     public static String rastgeleSifreUret(int uzunluk) {
 
         String numbers = "0123456789";
-        String specCharacters = "!@#.,*-_+";
+        String specCharacters = "!@#.*-_+";
         String myChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         String allCharacters = numbers + specCharacters + myChars;

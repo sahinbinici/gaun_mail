@@ -219,8 +219,20 @@
                     try {
                         const response = await fetch(`/bim-basvuru/check-mail-exists/${username}`);
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            console.error('Sunucu hatası:', response.status, response.statusText);
+                            // Hata durumunda varsayılan davranış - kullanıcıya form göster
+                            mailModal.show();
+                            return;
                         }
+                        
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            console.error('Sunucu JSON formatında yanıt vermedi:', contentType);
+                            // JSON olmayan yanıt durumunda varsayılan davranış
+                            mailModal.show();
+                            return;
+                        }
+                        
                         const data = await response.json();
 
                         if (data.exists) {
@@ -231,7 +243,8 @@
                         }
                     } catch (error) {
                         console.error('Mail kontrolü sırasında hata:', error);
-                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        // Herhangi bir hata durumunda varsayılan davranış
+                        mailModal.show();
                     }
                 };
 

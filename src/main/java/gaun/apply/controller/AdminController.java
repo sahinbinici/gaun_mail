@@ -130,10 +130,11 @@ public class AdminController {
                 mailForms = mailFormService.findByDurum(status);
             } else if ("month".equals(filter)) {
                 mailForms = mailFormService.findLastMonthApplications();
-            } else if ("last100".equals(filter)) {
-                mailForms = mailFormService.findLast100Applications();
-            } else {
+            } else if ("all".equals(filter)) {
                 mailForms = mailFormService.getAllMailForms();
+            } else {
+                // Default to last 100 applications
+                mailForms = mailFormService.findLast100Applications();
             }
             model.addAttribute("mailForms", mailForms);
             model.addAttribute("hasMailForms", !mailForms.isEmpty());
@@ -150,10 +151,11 @@ public class AdminController {
                 eduroamForms = eduroamFormService.findByDurum(status);
             } else if ("month".equals(filter)) {
                 eduroamForms = eduroamFormService.findLastMonthApplications();
-            } else if ("last100".equals(filter)) {
-                eduroamForms = eduroamFormService.findLast100Applications();
-            } else {
+            } else if ("all".equals(filter)) {
                 eduroamForms = eduroamFormService.getAllEduroamForms();
+            } else {
+                // Default to last 100 applications
+                eduroamForms = eduroamFormService.findLast100Applications();
             }
             model.addAttribute("eduroamForms", eduroamForms);
             model.addAttribute("hasEduroamForms", !eduroamForms.isEmpty());
@@ -170,10 +172,11 @@ public class AdminController {
                 ipMacForms = ipMacFormService.findByDurum(status);
             } else if ("month".equals(filter)) {
                 ipMacForms = ipMacFormService.findLastMonthApplications();
-            } else if ("last100".equals(filter)) {
-                ipMacForms = ipMacFormService.findLast100Applications();
-            } else {
+            } else if ("all".equals(filter)) {
                 ipMacForms = ipMacFormService.getAllIpMacForms();
+            } else {
+                // Default to last 100 applications
+                ipMacForms = ipMacFormService.findLast100Applications();
             }
             model.addAttribute("ipMacForms", ipMacForms);
             model.addAttribute("hasIpMacForms", !ipMacForms.isEmpty());
@@ -190,10 +193,11 @@ public class AdminController {
                 cloudForms = cloudAccountFormService.findByDurum(status);
             } else if ("month".equals(filter)) {
                 cloudForms = cloudAccountFormService.findLastMonthApplications();
-            } else if ("last100".equals(filter)) {
-                cloudForms = cloudAccountFormService.findLast100Applications();
-            } else {
+            } else if ("all".equals(filter)) {
                 cloudForms = cloudAccountFormService.getAllCloudAccountForms();
+            } else {
+                // Default to last 100 applications
+                cloudForms = cloudAccountFormService.findLast100Applications();
             }
             model.addAttribute("cloudForms", cloudForms);
             model.addAttribute("hasCloudForms", !cloudForms.isEmpty());
@@ -210,10 +214,11 @@ public class AdminController {
                 vpnForms = vpnFormService.findByDurum(status);
             } else if ("month".equals(filter)) {
                 vpnForms = vpnFormService.findLastMonthApplications();
-            } else if ("last100".equals(filter)) {
-                vpnForms = vpnFormService.findLast100Applications();
-            } else {
+            } else if ("all".equals(filter)) {
                 vpnForms = vpnFormService.getAllVpnForms();
+            } else {
+                // Default to last 100 applications
+                vpnForms = vpnFormService.findLast100Applications();
             }
             model.addAttribute("vpnForms", vpnForms);
             model.addAttribute("hasVpnForms", !vpnForms.isEmpty());

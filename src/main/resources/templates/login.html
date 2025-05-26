@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Giriş</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gaziantep Üniversitesi E-Posta ve Eduroam Başvuru Sistemi - Öğrenci ve personel e-posta hesabı ve eduroam erişimi için başvuru yapabilirsiniz.">
+    <meta name="keywords" content="GAÜN, Gaziantep Üniversitesi, e-posta, eduroam, başvuru, öğrenci, personel, hesap">
+    <meta name="author" content="Gaziantep Üniversitesi Bilgi İşlem Daire Başkanlığı">
+    <meta name="robots" content="index, follow">
+    <title>GAÜN E-Posta ve Eduroam Başvuru Sistemi</title>
+    <link rel="canonical" href="https://eposta.gantep.edu.tr/login" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
@@ -209,7 +215,17 @@
                 <div th:if="${param.logout}">
                     <div class="alert alert-success">Çıkış yaptınız.</div>
                 </div>
+                <div class="navbar-divider center mb-4 mt-4 w-100 p-2" style="background-color: #0d6efd;border-radius:10px">
+                    <header class="navbar-header" style="text-align: center; margin-top: 10px; margin-bottom: 10px; color: white;font-size: 1.2rem;">
+                        <span>E-Posta - Eduroam Başvuru Sistemi</span>
+                    </header>
 
+                </div>
+                <div class="navbar-divider center w-100 p-2" style="text-align: center;font-size: 1.2rem;font-weight: bold; color: #0d6efd;border-radius:10px">
+                    <header>
+                        <span>Giriş Yap</span>
+                    </header>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -247,10 +263,13 @@
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Giriş</button>
                                         <span>&nbsp;
-                                            <a th:href="@{/register}">Sistemde Kaydınızı Oluşturmak İçin Tıklayın</a>
+                                            <a th:href="@{/register}">Kayıt Ol</a>
                                         </span>
                                     </div>
                                 </form>
+                                <div>
+                                    <span>**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</span>
+                                </div>
                             </div>
 
                             <!-- Personel Giriş Formu -->
@@ -278,11 +297,14 @@
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Giriş</button>
-                                        <span>Kayıt Olmadınız mı? 
-                                            <a th:href="@{/register}">Sistemde Kaydınızı Oluşturmak İçin Tıklayın</a>
+                                        <span>
+                                            <a th:href="@{/register}">Kayıt Ol</a>
                                         </span>
                                     </div>
                                 </form>
+                                <div>
+                                    <span>**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</span><br>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -39,12 +39,13 @@ public class SmsService {
 
     private static String getString(String[] toPhoneNumber,String message) throws JsonProcessingException {
         Map<String, Object> params = new HashMap<>();
+        params.put("api_id", "29d463733f56db81be9eb355");
+        params.put("api_key", "79259ea325e14e8603ab7cf7");
+        params.put("sender", "G.ANTEP UNI");
         params.put("message_type", "normal");
         params.put("message", message);
         params.put("phones",toPhoneNumber );
-
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInputString = mapper.writeValueAsString(params);
-        return jsonInputString;
+        return mapper.writeValueAsString(params);
     }
 } 
