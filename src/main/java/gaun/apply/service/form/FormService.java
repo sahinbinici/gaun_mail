@@ -88,7 +88,7 @@ public class FormService {
             form.setApplicationStatus(ApplicationStatusEnum.REJECTED);
             mailFormRepository.save((MailFormData) form);
             StudentDto student = studentService.findByOgrenciNo(((MailFormData) form).getUsername());
-            smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz reddedildi. Red Sebebi: "+form.getRejectionReason());
+            smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz reddedildi. Red Sebebi : "+form.getRejectionReason());
         } else if (formClass.equals(EduroamFormData.class)) {
             form = eduroamFormRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
@@ -98,7 +98,7 @@ public class FormService {
             form.setApplicationStatus(ApplicationStatusEnum.REJECTED);
             eduroamFormRepository.save((EduroamFormData) form);
             StudentDto student = studentService.findByOgrenciNo(((EduroamFormData) form).getUsername());
-            smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN Eduroam başvurunuz reddedildi. Red Sebebi: "+form.getRejectionReason());
+            smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN Eduroam başvurunuz reddedildi. Red Sebebi : "+form.getRejectionReason());
         } else if (formClass.equals(IpMacFormData.class)) {
             form = ipMacFormRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));

@@ -18,6 +18,9 @@ public class Staff {
     
     @Column(name = "tc_kimlik_no")
     private String tcKimlikNo;
+
+    @Column(name = "sicil_no")
+    private String sicilNo;
     
     @Column(name = "ad")
     private String ad;
@@ -30,6 +33,15 @@ public class Staff {
     
     @Column(name = "unvan")
     private String unvan;
+
+    @Column(name = "gsm")
+    private String gsm;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "dogum_tarihi")
+    private String dogumTarihi;
     
     @Column(name = "isAdmin")
     private boolean isAdmin;

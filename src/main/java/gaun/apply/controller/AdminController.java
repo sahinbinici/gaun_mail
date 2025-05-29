@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaun.apply.dto.StaffDto;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +44,7 @@ import gaun.apply.service.form.MailFormService;
 import gaun.apply.service.form.VpnFormService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 
 @Controller
 @RequestMapping("/admin")
@@ -265,21 +269,31 @@ public class AdminController {
         mailForm.setStatus(true);
         mailForm.setApprovalDate(LocalDateTime.now());
         mailFormService.save(mailForm);
-        StudentDto student = studentService.findByOgrenciNo(mailForm.getUsername());
-        smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz onaylandı.https://mail2.gantep.edu.tr adresinden oturum açıp şifrenizi değiştirin.");
+        StudentDto studentDto = studentService.findByOgrenciNo(Boolean.parseBoolean(mailForm.getUsername()) ? mailForm.getUsername() : mailForm.getTcKimlikNo());
+        StaffDto staffDto = staffService.findByStaffTCKimlikNo(Boolean.parseBoolean(mailForm.getUsername()) ? mailForm.getUsername() : mailForm.getTcKimlikNo());
+        if (studentDto != null && studentDto.getOgrenciNo().length() == 12) {
+            smsService.sendSms(new String[]{studentDto.getGsm1()}, "GAÜN E-posta başvurunuz onaylandı.https://mail2.gaziantep.edu.tr adresinden oturum açıp şifrenizi değiştirin.");
+        } else if (staffDto != null && staffDto.getTcKimlikNo().length() == 11) {
+            smsService.sendSms(new String[]{staffDto.getGsm()}, "GAÜN E-posta başvurunuz onaylandı.https://mail1.gaziantep.edu.tr/ adresinden oturum açıp şifrenizi değiştirin.");
+        }
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/eduroam/activate/{id}")
     @ResponseBody
-    public ResponseEntity<?> activateEduroamForm(@PathVariable Long id) {
+    public ResponseEntity<?> activateEduroamForm(@PathVariable Long id, Model model) {
         EduroamFormData eduroamForm = eduroamFormService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
         eduroamForm.setStatus(true);
         eduroamForm.setApprovalDate(LocalDateTime.now());
         eduroamFormService.saveEduroamFormData(eduroamForm);
-        StudentDto student = studentService.findByOgrenciNo(eduroamForm.getUsername());
-        smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
+        StudentDto studentDto = studentService.findByOgrenciNo(eduroamForm.getUsername());
+        StaffDto staffDto = staffService.findByStaffTCKimlikNo(eduroamForm.getTcKimlikNo());
+        if (studentDto != null && studentDto.getOgrenciNo().length() == 12) {
+            smsService.sendSms(new String[]{studentDto.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
+        } else if(staffDto != null) {
+            smsService.sendSms(new String[]{staffDto.getGsm()}, "GAÜN Eduroam başvurunuz onaylandı");
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -330,6 +344,8 @@ public class AdminController {
                     response.put("soyad", staff.getSoyad());
                     response.put("birim", staff.getCalistigiBirim());
                     response.put("unvan", staff.getUnvan());
+                    response.put("email", staff.getEmail());
+                    response.put("gsm", staff.getGsm());
                 }
             }
 
@@ -601,23 +617,31 @@ public class AdminController {
      */
     @GetMapping("/mail/pending-applications-text")
     @ResponseBody
-    public String getPendingMailApplicationsAsText() {
+    public ResponseEntity<String> getPendingMailApplicationsAsText() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findByidentityNumber(auth.getName());
         
         // Check if user is authenticated and has permission
         if (currentUser == null) {
-            return "Unauthorized access";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
         }
         
         // Check if user has permission to view mail tab
         Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
         if (!tabPermissions.getOrDefault("mail", false)) {
-            return "Permission denied";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permission denied");
         }
         
         // Get pending applications as text
-        return mailFormService.getPendingApplicationsAsText();
+        String textData = mailFormService.getPendingApplicationsAsText();
+        
+        // Format the text for proper display in browser with UTF-8 encoding
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/plain;charset=UTF-8"));
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(textData);
     }
 
     /**
@@ -628,22 +652,30 @@ public class AdminController {
      */
     @GetMapping("/eduroam/pending-applications-text")
     @ResponseBody
-    public String getPendingEduroamApplicationsAsText() {
+    public ResponseEntity<String> getPendingEduroamApplicationsAsText() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findByidentityNumber(auth.getName());
         
         // Check if user is authenticated and has permission
         if (currentUser == null) {
-            return "Unauthorized access";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
         }
         
         // Check if user has permission to view eduroam tab
         Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
         if (!tabPermissions.getOrDefault("eduroam", false)) {
-            return "Permission denied";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Permission denied");
         }
         
         // Get pending applications as text
-        return eduroamFormService.getPendingApplicationsAsText();
+        String textData = eduroamFormService.getPendingApplicationsAsText();
+        
+        // Format the text for proper display in browser with UTF-8 encoding
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/plain;charset=UTF-8"));
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(textData);
     }
 }

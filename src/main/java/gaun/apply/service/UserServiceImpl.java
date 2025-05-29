@@ -122,8 +122,8 @@ public class UserServiceImpl implements UserService {
     public void saveMailApply(MailFormDto mailFormDto) {
         MailFormData mailFormData = new MailFormData();
         mailFormData.setUsername(mailFormDto.getUsername());
-        mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
-        mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
+        mailFormData.setTcKimlikNo(mailFormDto.getUsername());
+        mailFormData.setEmail(staffService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
         mailFormData.setStatus(false); // Başlangıçta onaylanmamış
         mailFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede

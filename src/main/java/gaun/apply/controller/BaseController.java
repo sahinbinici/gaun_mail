@@ -270,20 +270,45 @@ public class BaseController {
     @PostMapping("/mail/apply")
     public String mailApply(@Valid @ModelAttribute("mailFormDto") MailFormDto mailFormDto, 
                         BindingResult result, 
-                        Model model) {
+                        Model model,
+                        Principal principal) {
         try {
             if (result.hasErrors()) {
-                return "redirect:/student/index?error=validation";
+                return determineRedirectUrl(principal, "?error=validation");
             }
             MailFormData existingMailForm = mailFormService.findByUsername(mailFormDto.getUsername());
             if (existingMailForm != null) {
-                return "redirect:/student/index?mailExists=true";
+                return determineRedirectUrl(principal, "?mailExists=true");
             }
             userService.saveMailApply(mailFormDto);
-            return "redirect:/student/index?success=true";
+            return determineRedirectUrl(principal, "?success=true");
         } catch (Exception e) {
-            return "redirect:/student/index?error=true";
+            return determineRedirectUrl(principal, "?error=true");
         }
+    }
+
+    /**
+     * Helper method to determine the appropriate redirect URL based on user role
+     */
+    private String determineRedirectUrl(Principal principal, String queryParams) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        String username = principal.getName();
+        User user = userService.findByidentityNumber(username);
+        
+        if (user != null && user.getRoles() != null) {
+            boolean isStaff = user.getRoles().stream()
+                .anyMatch(role -> "ROLE_STAFF".equals(role.getName()));
+            
+            if (isStaff) {
+                return "redirect:/staff/index" + queryParams;
+            }
+        }
+        
+        // Default to student redirect
+        return "redirect:/student/index" + queryParams;
     }
 
     @GetMapping("/eduroam/apply")
@@ -301,21 +326,22 @@ public class BaseController {
     @PostMapping("/eduroam/apply")
     public String eduroamApply(@Valid @ModelAttribute("eduroamFormDto") EduroamFormDto eduroamFormDto,
                         BindingResult result,
-                        Model model) {
+                        Model model,
+                        Principal principal) {
         try {
             if (result.hasErrors()) {
-                return "redirect:/student/index?error=validation";
+                return determineRedirectUrl(principal, "?error=validation");
             }
 
             EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getUsername());
             if (existingEduroam != null) {
-                return "redirect:/student/index?eduroamExists=true";
+                return determineRedirectUrl(principal, "?eduroamExists=true");
             }
 
             userService.saveEduroamApply(eduroamFormDto);
-            return "redirect:/student/index?success=true";
+            return determineRedirectUrl(principal, "?success=true");
         } catch (Exception e) {
-            return "redirect:/student/index?error=true";
+            return determineRedirectUrl(principal, "?error=true");
         }
     }
 

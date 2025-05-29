@@ -61,7 +61,7 @@ public class StudentUserController {
             EduroamFormDto eduroamFormDto = new EduroamFormDto();
             mailFormDto.setUsername(user.getIdentityNumber());
             mailFormDto.setTcKimlikNo(user.getTcKimlikNo());
-            mailFormDto.setEmail(studentService.createEmailAddress(identityNumber).toLowerCase());
+            mailFormDto.setEmail(studentService.createEmailAddress(identityNumber));
             eduroamFormDto.setUsername(user.getIdentityNumber());
             eduroamFormDto.setTcKimlikNo(user.getTcKimlikNo());
             model.addAttribute("mailFormDto", mailFormDto);

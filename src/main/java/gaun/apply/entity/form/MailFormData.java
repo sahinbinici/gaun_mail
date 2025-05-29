@@ -16,6 +16,7 @@ public class MailFormData extends BaseFormData {
     private String username;
     private String email;
     private String password;
+    private String tcKimlikNo;
     
     @Enumerated(EnumType.STRING)
     private ApplicationStatusEnum applicationStatus = ApplicationStatusEnum.PENDING;

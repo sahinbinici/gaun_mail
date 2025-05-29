@@ -40,6 +40,6 @@ public class StudentService {
         String adIlkHarf=student.getAd().substring(0,1);
         String soyadIlkHarf=student.getSoyad().substring(0,1);
         String numaraSon6=student.getOgrenciNo().substring(student.getOgrenciNo().length()-6);
-        return adIlkHarf+soyadIlkHarf+numaraSon6;
+        return (adIlkHarf+soyadIlkHarf+numaraSon6).toLowerCase().replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g");
     }
 }
