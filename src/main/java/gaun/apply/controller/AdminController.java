@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaun.apply.enums.ApplicationStatusEnum;
 import gaun.apply.dto.StaffDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -267,34 +268,60 @@ public class AdminController {
         MailFormData mailForm = mailFormService.findMailFormById(id)
                 .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
         mailForm.setStatus(true);
+        mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Set application status to APPROVED
         mailForm.setApprovalDate(LocalDateTime.now());
         mailFormService.save(mailForm);
-        StudentDto studentDto = studentService.findByOgrenciNo(Boolean.parseBoolean(mailForm.getUsername()) ? mailForm.getUsername() : mailForm.getTcKimlikNo());
-        StaffDto staffDto = staffService.findByStaffTCKimlikNo(Boolean.parseBoolean(mailForm.getUsername()) ? mailForm.getUsername() : mailForm.getTcKimlikNo());
-        if (studentDto != null && studentDto.getOgrenciNo().length() == 12) {
+        
+        // Try to find by username first (for students this would be the student number)
+        StudentDto studentDto = studentService.findByOgrenciNo(mailForm.getUsername());
+        
+        // If not found and we have a TC Kimlik No, try that for staff
+        StaffDto staffDto = null;
+        if (studentDto == null && mailForm.getTcKimlikNo() != null) {
+            staffDto = staffService.findByStaffTCKimlikNo(mailForm.getTcKimlikNo());
+        }
+        
+        // Send appropriate SMS notification based on user type
+        if (studentDto != null && studentDto.getOgrenciNo() != null && studentDto.getOgrenciNo().length() == 12) {
             smsService.sendSms(new String[]{studentDto.getGsm1()}, "GAÜN E-posta başvurunuz onaylandı.https://mail2.gaziantep.edu.tr adresinden oturum açıp şifrenizi değiştirin.");
-        } else if (staffDto != null && staffDto.getTcKimlikNo().length() == 11) {
+        } else if (staffDto != null && staffDto.getTcKimlikNo() != null && staffDto.getTcKimlikNo().length() == 11) {
             smsService.sendSms(new String[]{staffDto.getGsm()}, "GAÜN E-posta başvurunuz onaylandı.https://mail1.gaziantep.edu.tr/ adresinden oturum açıp şifrenizi değiştirin.");
         }
+        
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/eduroam/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateEduroamForm(@PathVariable Long id, Model model) {
-        EduroamFormData eduroamForm = eduroamFormService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
-        eduroamForm.setStatus(true);
-        eduroamForm.setApprovalDate(LocalDateTime.now());
-        eduroamFormService.saveEduroamFormData(eduroamForm);
-        StudentDto studentDto = studentService.findByOgrenciNo(eduroamForm.getUsername());
-        StaffDto staffDto = staffService.findByStaffTCKimlikNo(eduroamForm.getTcKimlikNo());
-        if (studentDto != null && studentDto.getOgrenciNo().length() == 12) {
-            smsService.sendSms(new String[]{studentDto.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
-        } else if(staffDto != null) {
-            smsService.sendSms(new String[]{staffDto.getGsm()}, "GAÜN Eduroam başvurunuz onaylandı");
+        try {
+            EduroamFormData eduroamForm = eduroamFormService.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
+            eduroamForm.setStatus(true);
+            eduroamForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Set application status to APPROVED
+            eduroamForm.setApprovalDate(LocalDateTime.now());
+            eduroamFormService.saveEduroamFormData(eduroamForm);
+            
+            // Try to find by username first (for students this would be the student number)
+            StudentDto studentDto = studentService.findByOgrenciNo(eduroamForm.getUsername());
+            
+            // If not found and we have a TC Kimlik No, try that for staff
+            StaffDto staffDto = null;
+            if (studentDto == null && eduroamForm.getTcKimlikNo() != null) {
+                staffDto = staffService.findByStaffTCKimlikNo(eduroamForm.getTcKimlikNo());
+            }
+            
+            // Send appropriate SMS notification based on user type
+            if (studentDto != null && studentDto.getOgrenciNo() != null && studentDto.getOgrenciNo().length() == 12) {
+                smsService.sendSms(new String[]{studentDto.getGsm1()}, "GAÜN Eduroam başvurunuz onaylandı");
+            } else if (staffDto != null && staffDto.getTcKimlikNo() != null) {
+                smsService.sendSms(new String[]{staffDto.getGsm()}, "GAÜN Eduroam başvurunuz onaylandı");
+            }
+            
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Eduroam başvurusu onaylanamadı: " + e.getMessage());
         }
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/eduroam/delete/{id}")
@@ -379,6 +406,7 @@ public class AdminController {
                     MailFormData mailForm = mailFormService.findMailFormById(id)
                             .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
                     mailForm.setStatus(true);
+                    mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
                     mailForm.setApprovalDate(LocalDateTime.now());
                     mailFormService.save(mailForm);
                     return ResponseEntity.ok("Mail başvurusu onaylandı");
@@ -386,6 +414,7 @@ public class AdminController {
                     EduroamFormData eduroamForm = eduroamFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
                     eduroamForm.setStatus(true);
+                    eduroamForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
                     eduroamForm.setApprovalDate(LocalDateTime.now());
                     eduroamFormService.saveEduroamFormData(eduroamForm);
                     return ResponseEntity.ok("Eduroam başvurusu onaylandı");
@@ -393,6 +422,7 @@ public class AdminController {
                     VpnFormData vpnForm = vpnFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("VPN başvurusu bulunamadı"));
                     vpnForm.setStatus(true);
+                    vpnForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
                     vpnForm.setApprovalDate(LocalDateTime.now());
                     vpnFormService.saveVpnFormData(vpnForm);
                     return ResponseEntity.ok("VPN başvurusu onaylandı");
@@ -400,6 +430,7 @@ public class AdminController {
                     IpMacFormData ipMacForm = ipMacFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("IP-MAC başvurusu bulunamadı"));
                     ipMacForm.setStatus(true);
+                    ipMacForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
                     ipMacForm.setApprovalDate(LocalDateTime.now());
                     ipMacFormService.saveIpMacFormData(ipMacForm);
                     return ResponseEntity.ok("IP-MAC başvurusu onaylandı");
@@ -407,6 +438,7 @@ public class AdminController {
                     CloudAccountFormData cloudForm = cloudAccountFormService.findById(id)
                             .orElseThrow(() -> new RuntimeException("Cloud başvurusu bulunamadı"));
                     cloudForm.setStatus(true);
+                    cloudForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
                     cloudForm.setApprovalDate(LocalDateTime.now());
                     cloudAccountFormService.saveCloudAccountFormData(cloudForm);
                     return ResponseEntity.ok("Cloud başvurusu onaylandı");

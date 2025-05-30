@@ -122,8 +122,24 @@ public class UserServiceImpl implements UserService {
     public void saveMailApply(MailFormDto mailFormDto) {
         MailFormData mailFormData = new MailFormData();
         mailFormData.setUsername(mailFormDto.getUsername());
-        mailFormData.setTcKimlikNo(mailFormDto.getUsername());
-        mailFormData.setEmail(staffService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
+        mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo()); // Corrected to use actual TC Kimlik No
+        
+        // Check if this is a student or staff to use the correct email format
+        boolean isStudent = false;
+        
+        // For students, username is typically a 12-digit student number
+        if (mailFormDto.getUsername() != null && mailFormDto.getUsername().length() == 12) {
+            isStudent = true;
+        }
+        
+        // Determine the appropriate email format
+        if (isStudent) {
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
+        } else {
+            // For staff, use staffService email formatter
+            mailFormData.setEmail(staffService.createEmailAddress(mailFormDto.getTcKimlikNo()).toLowerCase());
+        }
+        
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
         mailFormData.setStatus(false); // Başlangıçta onaylanmamış
         mailFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede

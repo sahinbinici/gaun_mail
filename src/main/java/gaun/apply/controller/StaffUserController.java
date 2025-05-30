@@ -199,6 +199,7 @@ public class StaffUserController {
         
         // TC Kimlik No'yu set et
         mailFormDto.setUsername(tcKimlikNo);
+        mailFormDto.setTcKimlikNo(tcKimlikNo);  // Set TC Kimlik No for mail form
         eduroamFormDto.setUsername(tcKimlikNo);
         eduroamFormDto.setTcKimlikNo(tcKimlikNo);
         ipMacFormDto.setTcKimlikNo(tcKimlikNo);

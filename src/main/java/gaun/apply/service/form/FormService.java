@@ -87,8 +87,21 @@ public class FormService {
             form.setRejectionDate(LocalDateTime.now());
             form.setApplicationStatus(ApplicationStatusEnum.REJECTED);
             mailFormRepository.save((MailFormData) form);
-            StudentDto student = studentService.findByOgrenciNo(((MailFormData) form).getUsername());
-            smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz reddedildi. Red Sebebi : "+form.getRejectionReason());
+            
+            // Check if it's a student or staff user
+            MailFormData mailForm = (MailFormData) form;
+            String username = mailForm.getUsername();
+            String tcKimlikNo = mailForm.getTcKimlikNo();
+            
+            // First try to find as student
+            StudentDto student = studentService.findByOgrenciNo(username);
+            if (student != null && student.getGsm1() != null) {
+                // It's a student, send SMS to student
+                smsService.sendSms(new String[]{student.getGsm1()}, "GAÜN E-posta başvurunuz reddedildi. Red Sebebi : "+form.getRejectionReason());
+            } else {
+                // If not a student, try to find as staff
+                // TODO: Implement staff user retrieval and SMS sending
+            }
         } else if (formClass.equals(EduroamFormData.class)) {
             form = eduroamFormRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
