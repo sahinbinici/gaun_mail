@@ -50,18 +50,6 @@ function activateEduroamForm(id) {
     activateForm('eduroam', id);
 }
 
-function activateIpMacForm(id) {
-    activateForm('ipmac', id);
-}
-
-function activateCloudForm(id) {
-    activateForm('cloud', id);
-}
-
-function activateVpnForm(id) {
-    activateForm('vpn', id);
-}
-
 // Kullanıcı detayları modalı için fonksiyonlar
 function showUserDetails(element) {
     const username = element.getAttribute('data-username');
@@ -80,25 +68,26 @@ function showUserDetails(element) {
         return response.json();
     })
     .then(data => {
-        if (data.type === 'STUDENT') {
+        console.log('Kullanıcı verileri:', data); // Debug: Gelen verileri logla
+        if (data.userType === 'student') {
             document.getElementById('studentDetails').style.display = 'block';
             document.getElementById('staffDetails').style.display = 'none';
             
             // Öğrenci bilgilerini güncelle
-            document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo || '';
-            document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo || '';
+            document.getElementById('student_ogrenciNo').textContent = data.username || '';
+            document.getElementById('student_tcKimlikNo').textContent = data.identityNumber || '';
             document.getElementById('student_ad').textContent = data.ad || '';
             document.getElementById('student_soyad').textContent = data.soyad || '';
-            document.getElementById('student_fakulte').textContent = data.fakKod || '';
-            document.getElementById('student_bolum').textContent = data.bolumAd || '';
-            document.getElementById('student_program').textContent = data.programAd || '';
-            document.getElementById('student_sinif').textContent = data.sinif || '';
+            document.getElementById('student_fakulte').textContent = data.fakulte || '';
+            document.getElementById('student_bolum').textContent = data.bolum || '';
+            document.getElementById('student_program').textContent = data.program || '';
+            document.getElementById('student_sinif').textContent = data.egitimDerecesi || '';
         } else {
             document.getElementById('studentDetails').style.display = 'none';
             document.getElementById('staffDetails').style.display = 'block';
             
             // Personel bilgilerini güncelle
-            document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo || '';
+            document.getElementById('staff_tcKimlikNo').textContent = data.identityNumber || '';
             document.getElementById('staff_ad').textContent = data.ad || '';
             document.getElementById('staff_soyad').textContent = data.soyad || '';
             document.getElementById('staff_birim').textContent = data.birim || '';
@@ -196,6 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers[header] = token;
             }
             headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            
+            // Debug bilgisi
+            console.log(`Form reddi isteği: /bim-basvuru/admin/${formType}/reject/${formId}`);
+            console.log('Gönderilen sebep:', reason);
             
             fetch(`/bim-basvuru/admin/${formType}/reject/${formId}`, {
                 method: 'POST',

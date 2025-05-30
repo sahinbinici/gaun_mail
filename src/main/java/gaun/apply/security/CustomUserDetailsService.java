@@ -3,6 +3,10 @@ package gaun.apply.security;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import gaun.apply.domain.user.entity.Role;
+import gaun.apply.domain.user.entity.User;
+import gaun.apply.domain.user.repository.UserRepository;
+import gaun.apply.domain.user.service.StaffService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,11 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import gaun.apply.entity.user.Role;
-import gaun.apply.entity.user.User;
-import gaun.apply.repository.UserRepository;
-import gaun.apply.service.StaffService;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService{

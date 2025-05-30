@@ -1,10 +1,10 @@
 package gaun.apply.security;
 
-import gaun.apply.dto.StudentDto;
-import gaun.apply.entity.user.Role;
-import gaun.apply.entity.user.User;
-import gaun.apply.repository.UserRepository;
-import gaun.apply.util.ConvertUtil;
+import gaun.apply.application.dto.StudentDto;
+import gaun.apply.common.util.ConvertUtil;
+import gaun.apply.domain.user.entity.Role;
+import gaun.apply.domain.user.entity.User;
+import gaun.apply.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.ResponseEntity;

@@ -46,15 +46,6 @@
                     <li class="nav-item" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
                         <a class="nav-link" th:classappend="${activeTab == 'eduroam' ? 'active' : ''}" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
                     </li>
-                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
-                        <a class="nav-link" th:classappend="${activeTab == 'ip-mac' ? 'active' : ''}" data-bs-toggle="tab" href="#ip-mac">IP-MAC İşlemleri</a>
-                    </li>
-                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('cloud', false)}">
-                        <a class="nav-link" th:classappend="${activeTab == 'cloud' ? 'active' : ''}" data-bs-toggle="tab" href="#cloud">GAUN BULUT Başvuruları</a>
-                    </li>
-                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('vpn', false)}">
-                        <a class="nav-link" th:classappend="${activeTab == 'vpn' ? 'active' : ''}" data-bs-toggle="tab" href="#vpn">VPN Başvuruları</a>
-                    </li>
                 </ul>
 
                 <!-- Sekme İçerikleri -->
@@ -67,21 +58,6 @@
                     <!-- Eduroam Sekmesi -->
                     <div class="tab-pane fade" th:classappend="${activeTab == 'eduroam' ? 'show active' : ''}" id="eduroam" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
                         <div th:replace="fragments/eduroam-tab :: body"></div>
-                    </div>
-
-                    <!-- IP-MAC Sekmesi -->
-                    <div class="tab-pane fade" th:classappend="${activeTab == 'ip-mac' ? 'show active' : ''}" id="ip-mac" th:if="${tabPermissions.getOrDefault('ip-mac', false)}">
-                        <div th:replace="fragments/ip-mac-tab :: body"></div>
-                    </div>
-
-                    <!-- GAUN Bulut Sekmesi -->
-                    <div class="tab-pane fade" th:classappend="${activeTab == 'cloud' ? 'show active' : ''}" id="cloud" th:if="${tabPermissions.getOrDefault('cloud', false)}">
-                        <div th:replace="fragments/cloud-tab :: body"></div>
-                    </div>
-
-                    <!-- VPN Sekmesi -->
-                    <div class="tab-pane fade" th:classappend="${activeTab == 'vpn' ? 'show active' : ''}" id="vpn" th:if="${tabPermissions.getOrDefault('vpn', false)}">
-                        <div th:replace="fragments/vpn-tab :: body"></div>
                     </div>
                 </div>
             </div>
