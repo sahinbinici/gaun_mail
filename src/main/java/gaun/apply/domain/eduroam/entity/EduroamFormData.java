@@ -5,13 +5,20 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import gaun.apply.domain.common.BaseFormData;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.sql.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Getter
+@Setter
 @Entity
 @Table(name = "eduroam_forms")
 public class EduroamFormData extends BaseFormData {
-    private String username;
+    private String ogrenciNo;
+    private String sicilNo;
     private String password;
     private String ad;
     private String soyad;
@@ -19,6 +26,11 @@ public class EduroamFormData extends BaseFormData {
     private String bolum;
     private String gsm1;
     private String email;
+    private Date dogumTarihi;
+    private String fakkod;
+    private String gsm;
+    private String calistigiBirim;
+    private String unvan;
     
     // Getter methods that are used in AdminController
     public String getAd() {

@@ -17,7 +17,7 @@
                         <div class="col-12">
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                                <div th:with="mailForm=${@mailFormService.findByUsername(user.identityNumber)}">
+                                <div th:with="mailForm=${@mailFormService.findByTcKimlikNo(user.tcKimlikNo)}">
                                     <div th:if="${mailForm != null}"
                                         th:classappend="${mailForm.isStatus() ? 'alert alert-success' : (mailForm.isRejected() ? 'alert alert-danger' : 'alert alert-warning')}">
                                         <div class="row">
@@ -69,7 +69,7 @@
                                 <div class="col-md-6 mb-4" style="display: none;">
                                     <div class="info-group">
                                         <label class="form-label" for="mailUsername">Öğrenci No</label>
-                                        <input type="text" class="form-control" id="mailUsername" th:field="*{username}"
+                                        <input type="text" class="form-control" id="mailUsername" th:field="*{ogrenciNo}"
                                             readonly>
                                     </div>
                                 </div>

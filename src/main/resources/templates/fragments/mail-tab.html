@@ -93,7 +93,7 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Öğrenci No / TC Kimlik No</th>
+                                    <th>TC Kimlik No</th>
                                     <th>Email</th>
                                     <th>Şifre</th>
                                     <th>Başvuru Tarihi</th>
@@ -106,12 +106,12 @@
                                 <tr th:each="form : ${mailForms}" th:data-status="${form.isStatus() ? 'approved' : (form.isRejected() ? 'rejected' : 'pending')}">
                                     <td>
                                         <a href="#" onclick="showUserDetails(this)" 
-                                           th:data-username="${form.username}"
+                                           th:data-username="${form.tcKimlikNo}"
                                            style="text-decoration: underline;">
-                                            <span th:text="${form.username}"></span>
+                                            <span th:text="${form.tcKimlikNo}"></span>
                                         </a>
                                     </td>
-                                    <td th:text="${form.email + '@mail2.gantep.edu.tr'}"></td>
+                                    <td th:text="${form.email + '@gantep.edu.tr'}"></td>
                                     <td th:text="${form.password}"></td>
                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                     <td>

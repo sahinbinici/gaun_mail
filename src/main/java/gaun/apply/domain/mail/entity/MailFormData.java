@@ -9,20 +9,25 @@ import lombok.EqualsAndHashCode;
 import gaun.apply.common.enums.ApplicationStatusEnum;
 import gaun.apply.domain.common.BaseFormData;
 
+import java.sql.Date;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "mail_forms")
 public class MailFormData extends BaseFormData {
-    private String username;
+    private Integer sicil;
+    private String ogrenciNo;
     private String email;
     private String password;
-    private String tcKimlikNo;
     private String ad;
     private String soyad;
-    private String fakulte;
+    private Date dogumTarihi;
+    private String fakkod;
     private String bolum;
-    private String gsm1;
+    private String gsm;
+    private String calistigiBirim;
+    private String unvan;
     
     @Enumerated(EnumType.STRING)
     private ApplicationStatusEnum applicationStatus = ApplicationStatusEnum.PENDING;
@@ -37,7 +42,7 @@ public class MailFormData extends BaseFormData {
     }
     
     public String getFakulte() {
-        return fakulte;
+        return fakkod;
     }
     
     public String getBolum() {
@@ -45,6 +50,6 @@ public class MailFormData extends BaseFormData {
     }
     
     public String getGsm1() {
-        return gsm1;
+        return gsm;
     }
 }

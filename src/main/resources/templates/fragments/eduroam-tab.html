@@ -81,7 +81,7 @@
                                 <tr th:each="form : ${eduroamForms}" th:data-status="${form.isStatus() ? 'approved' : (form.isRejected() ? 'rejected' : 'pending')}">
                                     <td>
                                         <a href="#" onclick="showUserDetails(this)" 
-                                           th:data-username="${form.username}"
+                                           th:data-username="${form.tcKimlikNo}"
                                            style="text-decoration: underline;">
                                             <span th:text="${form.tcKimlikNo}"></span>
                                         </a>

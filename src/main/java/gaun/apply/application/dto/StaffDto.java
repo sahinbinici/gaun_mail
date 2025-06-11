@@ -2,16 +2,18 @@ package gaun.apply.application.dto;
 
 import lombok.Data;
 
+import java.sql.Date;
+
 @Data
 public class StaffDto {
 
-    private String tcKimlikNo;
-    private String sicilNo;
+    private Long tcKimlikNo;
+    private Integer sicilNo;
     private String ad;
     private String soyad;
     private String calistigiBirim;
     private String unvan;
-    private String gsm;
+    private Long gsm;
     private String email;
-    private String dogumTarihi;
+    private Date dogumTarihi;
 }

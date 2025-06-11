@@ -8,4 +8,5 @@ import gaun.apply.domain.user.entity.Student;
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Long> {
     Student findByOgrenciNo(String ogrenciNo);
+    Student findByTcKimlikNo(String tcKimlikNo);
 }

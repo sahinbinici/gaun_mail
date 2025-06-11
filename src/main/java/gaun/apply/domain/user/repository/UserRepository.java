@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByIdentityNumber(String identityNumber);
     long countByActive(boolean active);
+    User findByTcKimlikNo(String tcKimlikNo);
 }

@@ -51,21 +51,21 @@ public class StudentUserController {
         if (user != null) {
             model.addAttribute("user", user);
             // Mail başvurusu kontrolü
-            MailFormData mailForm = mailFormService.findByUsername(user.getIdentityNumber());
+            MailFormData mailForm = mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
             hasMailApp = (mailForm != null);
             
             // Eduroam başvurusu kontrolü
-            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());
+            EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getTcKimlikNo());
             hasEduroamApp = (eduroamForm != null);
             
             // Form DTO'ları için kullanıcı adını set et
             MailFormDto mailFormDto = new MailFormDto();
             EduroamFormDto eduroamFormDto = new EduroamFormDto();
-            mailFormDto.setUsername(user.getIdentityNumber());
+            mailFormDto.setOgrenciNo(user.getIdentityNumber());
             mailFormDto.setTcKimlikNo(user.getTcKimlikNo());
             mailFormDto.setEmail(studentService.createEmailAddress(identityNumber));
-            eduroamFormDto.setUsername(user.getIdentityNumber());
             eduroamFormDto.setTcKimlikNo(user.getTcKimlikNo());
+            eduroamFormDto.setOgrenciNo(user.getIdentityNumber()!=null ? user.getIdentityNumber() : "");
             model.addAttribute("mailFormDto", mailFormDto);
             model.addAttribute("eduroamFormDto", eduroamFormDto);
         }

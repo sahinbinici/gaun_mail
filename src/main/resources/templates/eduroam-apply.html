@@ -73,10 +73,12 @@
                             <div class="mb-4">
                                 <label for="username" class="form-label">Kullanıcı Adı</label>
                                 <input type="text" class="form-control" id="username" 
-                                       th:field="*{username}" required
+                                       th:field="*{tcKimlikNo}" required
                                        placeholder="Kullanıcı adınızı giriniz">
+                                <label for="ogrenciNo">Ogrenci No</label>
+                                <input type="text" class="form-control" id="ogrenciNo" name="ogrenciNo" th:field="*{ogrenciNo}" required >
                                 <div class="text-danger" th:if="${#fields.hasErrors('username')}" 
-                                     th:errors="*{username}">
+                                     th:errors="*{tcKimlikNo}">
                                 </div>
                             </div>
 

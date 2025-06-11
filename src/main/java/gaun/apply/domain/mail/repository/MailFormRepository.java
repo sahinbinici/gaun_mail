@@ -10,8 +10,13 @@ import gaun.apply.domain.common.BaseFormRepository;
 
 @Repository
 public interface MailFormRepository extends BaseFormRepository<MailFormData> {
-    MailFormData findByUsername(String username);
+    // Remove this method since username field doesn't exist
+    // MailFormData findByUsername(String username);
+    
+    // Use existing methods instead
     MailFormData findByTcKimlikNo(String tcKimlikNo);
+    MailFormData findByOgrenciNo(String ogrenciNo);
+    
     List<MailFormData> findTop10ByOrderByApplyDateDesc();
     List<MailFormData> findTop100ByOrderByApplyDateDesc();
     List<MailFormData> findByApplyDateAfter(LocalDateTime date);

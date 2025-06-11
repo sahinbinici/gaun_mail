@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import gaun.apply.application.dto.*;
 import gaun.apply.domain.eduroam.entity.EduroamFormData;
 import gaun.apply.domain.mail.entity.MailFormData;
 import gaun.apply.common.enums.ApplicationStatusEnum;
@@ -14,14 +15,11 @@ import gaun.apply.domain.eduroam.repository.EduroamFormRepository;
 import gaun.apply.domain.mail.repository.MailFormRepository;
 import gaun.apply.common.util.ConvertUtil;
 import gaun.apply.common.util.RandomPasswordGenerator;
-import gaun.apply.application.dto.MailFormDto;
-import gaun.apply.application.dto.EduroamFormDto;
-import gaun.apply.application.dto.StudentDto;
-import gaun.apply.application.dto.UserDto;
 import gaun.apply.domain.user.entity.Staff;
 import gaun.apply.domain.user.entity.Role;
 import gaun.apply.domain.user.entity.User;
 import gaun.apply.domain.user.repository.RoleRepository;
+import gaun.apply.domain.user.repository.StaffRepository;
 import gaun.apply.domain.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final EduroamFormRepository eduroamFormRepository;
     private final StudentService studentService;
     private final Clock clock;
+    private final StaffRepository staffRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -50,7 +49,7 @@ public class UserServiceImpl implements UserService {
                            MailFormRepository mailFormRepository,
                            EduroamFormRepository eduroamFormRepository,
                            StudentService studentService,
-                           Clock clock) {
+                           Clock clock, StaffRepository staffRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -59,6 +58,7 @@ public class UserServiceImpl implements UserService {
         this.eduroamFormRepository = eduroamFormRepository;
         this.studentService = studentService;
         this.clock = clock;
+        this.staffRepository = staffRepository;
     }
 
     @Override
@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setIdentityNumber(userDto.getTcKimlikNo());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setTcKimlikNo(userDto.getTcKimlikNo());
 
         Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
         if (staff != null) {
@@ -111,6 +112,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByIdentityNumber(identityNumber);
     }
 
+    public User findByTcKimlikNo(String tcKimlikNo) {
+        return userRepository.findByTcKimlikNo(tcKimlikNo);
+    }
+
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
@@ -120,26 +125,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveMailApply(MailFormDto mailFormDto) {
+        StaffDto staffDto;
+        StudentDto studentDto;
         MailFormData mailFormData = new MailFormData();
-        mailFormData.setUsername(mailFormDto.getUsername());
-        mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo()); // Corrected to use actual TC Kimlik No
-        
-        // Check if this is a student or staff to use the correct email format
-        boolean isStudent = false;
-        
         // For students, username is typically a 12-digit student number
-        if (mailFormDto.getUsername() != null && mailFormDto.getUsername().length() == 12) {
-            isStudent = true;
-        }
-        
-        // Determine the appropriate email format
-        if (isStudent) {
-            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getUsername()).toLowerCase());
-        } else {
-            // For staff, use staffService email formatter
+        if ((!mailFormDto.getOgrenciNo().isEmpty() || mailFormDto.getFakulteAd()!=null)) {
+            studentDto=studentService.findByOgrenciNo(mailFormDto.getOgrenciNo());
+            mailFormData.setOgrenciNo(studentDto.getOgrenciNo());
+            mailFormData.setAd(studentDto.getAd());
+            mailFormData.setSoyad(studentDto.getSoyad());
+            mailFormData.setFakkod(studentDto.getFakKod());
+            mailFormData.setBolum(studentDto.getBolumAd());
+            mailFormData.setGsm(studentDto.getGsm1());
+            mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase());
+        }else {
+            staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setSicil(staffDto.getSicilNo());
+            mailFormData.setAd(staffDto.getAd());
+            mailFormData.setSoyad(staffDto.getSoyad());
+            mailFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
+            mailFormData.setUnvan(staffDto.getUnvan());
+            mailFormData.setGsm(String.valueOf(staffDto.getGsm()));
             mailFormData.setEmail(staffService.createEmailAddress(mailFormDto.getTcKimlikNo()).toLowerCase());
+            mailFormData.setDogumTarihi(staffDto.getDogumTarihi());
         }
-        
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
         mailFormData.setStatus(false); // Başlangıçta onaylanmamış
         mailFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede
@@ -151,9 +162,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveEduroamApply(EduroamFormDto eduroamFormDto) {
+        StaffDto staffDto;
+        StudentDto studentDto;
         EduroamFormData eduroamFormData = new EduroamFormData();
-        eduroamFormData.setUsername(eduroamFormDto.getUsername());
-        eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
+        if(eduroamFormDto.getOgrenciNo()!=null && !eduroamFormDto.getOgrenciNo().isEmpty()) {
+            studentDto=studentService.findByOgrenciNo(eduroamFormDto.getOgrenciNo());
+            eduroamFormData.setOgrenciNo(studentDto.getOgrenciNo());
+            eduroamFormData.setAd(studentDto.getAd());
+            eduroamFormData.setSoyad(studentDto.getSoyad());
+            eduroamFormData.setEmail(studentDto.getEposta1());
+            eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
+            eduroamFormData.setFakulte(studentDto.getFakKod());
+            eduroamFormData.setBolum(studentDto.getBolumAd());
+            eduroamFormData.setGsm1(studentDto.getGsm1());
+        }else {
+            staffDto=staffService.findStaffDtoByTcKimlikNo(eduroamFormDto.getTcKimlikNo());
+            eduroamFormData.setTcKimlikNo(String.valueOf(staffDto.getTcKimlikNo()));
+            eduroamFormData.setAd(staffDto.getAd());
+            eduroamFormData.setSoyad(staffDto.getSoyad());
+            eduroamFormData.setSicilNo(String.valueOf(staffDto.getSicilNo()));
+            eduroamFormData.setGsm(String.valueOf(staffDto.getGsm()));
+            eduroamFormData.setEmail(staffDto.getEmail());
+            eduroamFormData.setDogumTarihi(staffDto.getDogumTarihi());
+            eduroamFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
+            eduroamFormData.setUnvan(staffDto.getUnvan());
+        }
         eduroamFormData.setPassword(eduroamFormDto.getPassword());
         eduroamFormData.setStatus(false); // Başlangıçta onaylanmamış
         eduroamFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede

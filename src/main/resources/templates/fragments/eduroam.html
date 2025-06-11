@@ -18,7 +18,7 @@
                         <div class="col-12">
                             <div class="info-group">
                                 <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
-                                <div th:with="eduroamForm=${@eduroamFormService.eduroamFormData(user.identityNumber)}">
+                                <div th:with="eduroamForm=${@eduroamFormService.eduroamFormData(user.tcKimlikNo)}">
                                     <div th:if="${eduroamForm != null}"
                                         th:class="${eduroamForm.isStatus() ? 'alert alert-success' : (!eduroamForm.isRejected() ? 'alert alert-warning' : 'alert alert-danger')}">
                                         <div class="row">
@@ -71,7 +71,7 @@
                                     <div class="info-group">
                                         <label class="form-label" for="eduroamUsername">Öğrenci No</label>
                                         <input type="text" class="form-control" id="eduroamUsername"
-                                            th:field="*{username}" readonly>
+                                            th:field="*{ogrenciNo}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">

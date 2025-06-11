@@ -62,16 +62,15 @@ public class FormService {
             
             // Check if it's a student or staff user
             MailFormData mailForm = (MailFormData) form;
-            String username = mailForm.getUsername();
             String tcKimlikNo = mailForm.getTcKimlikNo();
-            
+            String ogrenciNo = mailForm.getOgrenciNo();
             // Öğrenci mi personel mi kontrolü (staff/öğrenci ayrımı - öğrenci ID'si 12 haneli)
-            boolean isStudent = username != null && username.length() == 12 && username.matches("\\d+");
+            boolean isStudent = ogrenciNo != null && ogrenciNo.length() == 12 && ogrenciNo.matches("\\d+");
             
             try {
                 if (isStudent) {
                     // Öğrenci için SMS gönder
-                    StudentDto student = studentService.findByOgrenciNo(username);
+                    StudentDto student = studentService.findByOgrenciNo(ogrenciNo);
                     if (student != null && student.getGsm1() != null) {
                         smsService.sendSms(new String[]{student.getGsm1()}, 
                                 "GAÜN E-posta başvurunuz reddedildi. Red Sebebi: " + form.getRejectionReason());
@@ -104,15 +103,14 @@ public class FormService {
             
             // Check if it's a student or staff user
             EduroamFormData eduroamForm = (EduroamFormData) form;
-            String username = eduroamForm.getUsername();
             
             // Öğrenci mi personel mi kontrolü (staff/öğrenci ayrımı - öğrenci ID'si 12 haneli)
-            boolean isStudent = username != null && username.length() == 12 && username.matches("\\d+");
+            boolean isStudent = eduroamForm.getOgrenciNo() != null;//username != null && username.length() == 12 && username.matches("\\d+");
             
             try {
                 if (isStudent) {
                     // Öğrenci için SMS gönder
-                    StudentDto student = studentService.findByOgrenciNo(username);
+                    StudentDto student = studentService.findByOgrenciNo(eduroamForm.getOgrenciNo());
                     if (student != null && student.getGsm1() != null) {
                         smsService.sendSms(new String[]{student.getGsm1()}, 
                                 "GAÜN Eduroam başvurunuz reddedildi. Red Sebebi: " + form.getRejectionReason());

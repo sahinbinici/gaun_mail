@@ -7,6 +7,8 @@ import gaun.apply.application.dto.StaffDto;
 import gaun.apply.domain.user.entity.Staff;
 import gaun.apply.domain.user.repository.StaffRepository;
 
+import java.sql.Date;
+
 @Service
 public class StaffService {
     private final StaffRepository staffRepository;
@@ -25,8 +27,30 @@ public class StaffService {
         return staffRepository.findByTcKimlikNo(tcKimlikNo);
     }
 
-    public StaffDto findByStaffTCKimlikNo(String tcKimlikNo) {
-        return modelMapper.map(staffRepository.findByTcKimlikNo(tcKimlikNo), StaffDto.class);
+    public StaffDto findStaffDtoByTcKimlikNo(String tcKimlikNo) {
+        StaffDto staffDto = getStaffDto(tcKimlikNo);
+        if (staffDto == null) return null;
+
+        return staffDto;
+    }
+
+    private StaffDto getStaffDto(String tcKimlikNo) {
+        Object[] result = (Object[]) staffRepository.findStaffByTcKimlikNo(tcKimlikNo);
+
+        if (result == null) {
+            return null;
+        }
+
+        StaffDto staffDto = new StaffDto();
+        staffDto.setTcKimlikNo((Long) result[0]);
+        staffDto.setSicilNo((Integer) result[1]);
+        staffDto.setAd((String) result[2]);
+        staffDto.setSoyad((String) result[3]);
+        staffDto.setCalistigiBirim((String) result[4]);
+        staffDto.setUnvan((String) result[5]);
+        staffDto.setGsm((Long) result[6]);
+        staffDto.setDogumTarihi((Date) result[7]);
+        return staffDto;
     }
 
     public void saveStaff(StaffDto staffDto) {
@@ -41,6 +65,6 @@ public class StaffService {
     public String createEmailAddress(String tcKimlikNo) {
         Staff staff=staffRepository.findByTcKimlikNo(tcKimlikNo);
         String adIlkHarf=staff.getAd().substring(0,1);
-        return (adIlkHarf+staff.getSoyad().toLowerCase()).replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g");
+        return (adIlkHarf+staff.getSoyad().toLowerCase()).replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g").replace("ş","s");
     }
 }

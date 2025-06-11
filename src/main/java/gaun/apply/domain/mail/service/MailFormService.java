@@ -27,10 +27,6 @@ public class MailFormService {
         return mailFormRepository.findById(id);
     }
 
-    public MailFormData findByUsername(String username) {
-        return mailFormRepository.findByUsername(username);
-    }
-
     public MailFormData findByTcKimlikNo(String tcKimlikNo) {
         return mailFormRepository.findByTcKimlikNo(tcKimlikNo);
     }
@@ -95,7 +91,7 @@ public class MailFormService {
         for (MailFormData application : pendingApplications) {
             // Get TC Kimlik No
             String tcKimlikNo = application.getTcKimlikNo();
-            String ogrenciNo = application.getUsername() != null ? application.getUsername() : "";
+            String ogrenciNo = application.getOgrenciNo() != null ? application.getOgrenciNo() : "";
             
             // Try to get student information from StudentService
             StudentDto student = studentService.findByOgrenciNo(ogrenciNo);

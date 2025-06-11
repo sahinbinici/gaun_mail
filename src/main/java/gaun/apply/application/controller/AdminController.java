@@ -219,17 +219,15 @@ public class AdminController {
             mailForm.setStatus(true);
             mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Fix: Set status enum to APPROVED
             mailForm.setApprovalDate(LocalDateTime.now());
-            
-            // Email oluşturma stratejisi (kullanıcı türüne göre) - Fix from memory
-            String username = mailForm.getUsername();
+
             // Öğrenci mi personel mi kontrolü (öğrenci ID'si 12 haneli)
-            boolean isStudent = username.length() == 12 && username.matches("\\d+"); 
+            boolean isStudent = mailForm.getOgrenciNo() != null;//username.length() == 12 && username.matches("\\d+");
             
             // Doğru servisi kullanarak e-posta adresi oluşturma
             String emailAddress;
             if (isStudent) {
                 // Öğrenci için email oluştur - DTO'dan TC Kimlik No kullan
-                emailAddress = studentService.createEmailAddress(username);
+                emailAddress = studentService.createEmailAddress(mailForm.getOgrenciNo());
             } else {
                 // Personel için email oluştur
                 emailAddress = staffService.createEmailAddress(mailForm.getTcKimlikNo());
@@ -242,7 +240,7 @@ public class AdminController {
             try {
                 if (isStudent) {
                     // Öğrenci için SMS gönder
-                    StudentDto student = studentService.findByOgrenciNo(username);
+                    StudentDto student = studentService.findByOgrenciNo(mailForm.getOgrenciNo());
                     if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
                         smsService.sendSms(new String[]{student.getGsm1()}, 
                                 "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " + emailAddress);
@@ -289,15 +287,15 @@ public class AdminController {
             
             // Eduroam onay SMS'i gönder
             try {
-                String username = eduroamForm.getUsername();
+                String username = eduroamForm.getTcKimlikNo();
                 String tcKimlikNo = eduroamForm.getTcKimlikNo();
                 
                 // Öğrenci mi personel mi kontrolü (öğrenci ID'si 12 haneli)
-                boolean isStudent = username != null && username.length() == 12 && username.matches("\\d+");
+                boolean isStudent = eduroamForm.getOgrenciNo()!=null;//username != null && username.length() == 12 && username.matches("\\d+");
                 
                 if (isStudent) {
                     // Öğrenci için SMS gönder
-                    StudentDto student = studentService.findByOgrenciNo(username);
+                    StudentDto student = studentService.findByOgrenciNo(eduroamForm.getOgrenciNo());
                     if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
                         smsService.sendSms(new String[]{student.getGsm1()}, 
                                 "GAÜN Eduroam başvurunuz onaylanmıştır. Kullanıcı adınız: " + username);
@@ -347,7 +345,7 @@ public class AdminController {
         try {
             Map<String, Object> response = new HashMap<>();
             
-            User user = userService.findByidentityNumber(username);
+            User user = userService.findByTcKimlikNo(username);
             if (user == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -357,15 +355,17 @@ public class AdminController {
             response.put("tcKimlikNo", user.getIdentityNumber());
             
             // Kullanıcı türünü belirle (öğrenci ID'si 12 haneli sayı olmalı)
-            boolean isStudent = username.length() == 12 && username.matches("\\d+");
+            boolean isStudent = user.getIdentityNumber().length() == 12;
             response.put("userType", isStudent ? "student" : "staff");
             
             // Kullanıcı türüne göre ek bilgileri getir
             if (isStudent) {
                 // Öğrenci bilgilerini ekle
                 try {
-                    StudentDto studentDto = studentService.findByOgrenciNo(username);
+                    StudentDto studentDto = studentService.findByOgrenciNo(user.getIdentityNumber());
                     if (studentDto != null) {
+                        response.put("tcKimlikNo", studentDto.getTcKimlikNo());
+                        response.put("ogrenciNo", studentDto.getOgrenciNo());
                         response.put("ad", studentDto.getAd());
                         response.put("soyad", studentDto.getSoyad());
                         response.put("fakulte", studentDto.getFakKod());
@@ -382,6 +382,7 @@ public class AdminController {
                 try {
                     Staff staff = staffService.findByTcKimlikNo(user.getIdentityNumber());
                     if (staff != null) {
+                        response.put("tcKimlikNo", staff.getTcKimlikNo());
                         response.put("ad", staff.getAd());
                         response.put("soyad", staff.getSoyad());
                         response.put("birim", staff.getCalistigiBirim()); // Doğru alan adı: calistigiBirim
@@ -421,17 +422,15 @@ public class AdminController {
                     mailForm.setStatus(true);
                     mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Fix: Set status enum to APPROVED
                     mailForm.setApprovalDate(LocalDateTime.now());
-                    
-                    // Email oluşturma stratejisi (kullanıcı türüne göre) - Fix from memory
-                    String username = mailForm.getUsername();
+
                     // Öğrenci mi personel mi kontrolü (öğrenci ID'si 12 haneli)
-                    boolean isStudent = username.length() == 12 && username.matches("\\d+"); 
+                    boolean isStudent = mailForm.getOgrenciNo()!=null;//username.length() == 12 && username.matches("\\d+");
                     
                     // Doğru servisi kullanarak e-posta adresi oluşturma
                     String emailAddress;
                     if (isStudent) {
                         // Öğrenci için email oluştur - DTO'dan TC Kimlik No kullan
-                        emailAddress = studentService.createEmailAddress(username);
+                        emailAddress = studentService.createEmailAddress(mailForm.getOgrenciNo());
                     } else {
                         // Personel için email oluştur
                         emailAddress = staffService.createEmailAddress(mailForm.getTcKimlikNo());
@@ -488,7 +487,6 @@ public class AdminController {
             formService.rejectForm(id, formClass, reason);
             return ResponseEntity.ok().body("Başvuru başarıyla reddedildi");
         } catch (Exception e) {
-            e.printStackTrace(); // Hata ayrıntıları için
             return ResponseEntity.badRequest()
                 .body("Form reddi başarısız: " + e.getMessage());
         }
@@ -628,13 +626,15 @@ public class AdminController {
         StringBuilder sb = new StringBuilder();
         for (MailFormData form : pendingForms) {
             sb.append(form.getTcKimlikNo()).append("#")
-              .append(form.getUsername()).append("#")
+              .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicil()).append("#")
               .append(form.getAd()).append("#")
               .append(form.getSoyad()).append("#")
-              .append(form.getFakulte()).append("#")
-              .append(form.getBolum()).append("#")
+              .append(form.getOgrenciNo() !=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
+              .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append("#")
               .append(form.getGsm1()).append("#")
-              .append(form.getEmail()).append("\n");
+              .append(form.getEmail()).append("#")
+                    .append(form.getSicil()!=null ? form.getDogumTarihi() : "").append("#")
+                    .append("\n").append(System.lineSeparator());
         }
         
         return ResponseEntity.ok(sb.toString());
@@ -666,13 +666,14 @@ public class AdminController {
         StringBuilder sb = new StringBuilder();
         for (EduroamFormData form : pendingForms) {
             sb.append(form.getTcKimlikNo()).append("#")
-              .append(form.getUsername()).append("#")
+              .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicilNo()).append("#")
               .append(form.getAd()).append("#")
               .append(form.getSoyad()).append("#")
-              .append(form.getFakulte()).append("#")
-              .append(form.getBolum()).append("#")
+              .append(form.getOgrenciNo()!=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
+              .append(form.getOgrenciNo()!= null ? form.getBolum() : form.getUnvan()).append("#")
               .append(form.getGsm1()).append("#")
-              .append(form.getEmail()).append("\n");
+              .append(form.getEmail()).append("#")
+                    .append(form.getOgrenciNo()==null ? form.getDogumTarihi() : "").append("\n").append(System.lineSeparator());
         }
         
         return ResponseEntity.ok(sb.toString());

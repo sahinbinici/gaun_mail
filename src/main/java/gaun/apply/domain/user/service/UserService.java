@@ -14,6 +14,8 @@ public interface UserService {
 
     User findByidentityNumber(String identityNumber);
 
+    User findByTcKimlikNo(String tcKimlikNo);
+
     List<UserDto> findAllUsers();
 
     void saveMailApply(MailFormDto mailFormDto);

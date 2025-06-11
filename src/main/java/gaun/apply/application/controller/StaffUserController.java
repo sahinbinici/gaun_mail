@@ -78,9 +78,7 @@ public class StaffUserController {
         EduroamFormDto eduroamFormDto = new EduroamFormDto();
         
         // TC Kimlik No'yu set et
-        mailFormDto.setUsername(tcKimlikNo);
         mailFormDto.setTcKimlikNo(tcKimlikNo);  // Set TC Kimlik No for mail form
-        eduroamFormDto.setUsername(tcKimlikNo);
         eduroamFormDto.setTcKimlikNo(tcKimlikNo);
 
         // Model'e ekle

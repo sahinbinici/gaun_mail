@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import gaun.apply.application.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import gaun.apply.application.dto.EduroamFormDto;
-import gaun.apply.application.dto.MailFormDto;
-import gaun.apply.application.dto.SmsVerificationDto;
-import gaun.apply.application.dto.StudentDto;
-import gaun.apply.application.dto.UserDto;
 import gaun.apply.domain.user.entity.Staff;
 import gaun.apply.domain.eduroam.entity.EduroamFormData;
 import gaun.apply.domain.mail.entity.MailFormData;
@@ -194,64 +190,83 @@ public class BaseController {
         // Kod kontrolü
         if (!session.getAttribute("verificationCode").equals(code)) {
             model.addAttribute("error", "Geçersiz doğrulama kodu");
-            model.addAttribute("studentDto", new StudentDto());
+            model.addAttribute(session.getAttribute("studentDto") != null ? "studentDto" : "staffDto", 
+                  session.getAttribute("studentDto") != null ? new StudentDto() : new StaffDto());
             model.addAttribute("userDto", new UserDto());
             return "sms-verification"; // Hata durumunda tekrar form sayfasına dön
         }
-        // Öğrenci bilgilerini oturumdan al
-        StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
-        // Öğrenci kaydını yap
-        studentService.saveStudent(studentDto);
-        userService.saveUserStudent(studentDto);
 
+        if(session.getAttribute("staffDto") != null){
+            StaffDto staffDto = (StaffDto) session.getAttribute("staffDto");
+            UserDto userDto = (UserDto) session.getAttribute("userDto");
+            userDto.setTcKimlikNo(String.valueOf(staffDto.getTcKimlikNo()));
+            staffService.saveStaff(staffDto);
+            userService.saveUserStaff(userDto);
+        }else if(session.getAttribute("studentDto") != null){
+            // Öğrenci bilgilerini oturumdan al
+            StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+            // Öğrenci kaydını yap
+            studentService.saveStudent(studentDto);
+            userService.saveUserStudent(studentDto);
+        }
         return "redirect:/register?success"; // Başarılı kayıt sonrası yönlendirme
     }
 
     @PostMapping("/register/save/staff")
     public String registrationStaff(@Valid @ModelAttribute("userDto") UserDto userDto,
-                                  BindingResult result,
+                                  BindingResult result,HttpSession session,
                                   Model model) {
         try {
-            // Şifre eşleşme kontrolü
-            if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-                result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
-                model.addAttribute("studentDto", new StudentDto());
-                model.addAttribute("userDto", new UserDto());
-                return "register";
-            }
-
             // Önce mevcut kullanıcı kontrolü
             User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
             if (existingUser != null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
-                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("staffDto", new StaffDto());
                 model.addAttribute("userDto", new UserDto());
                 model.addAttribute("error", "Bu TC kimlik numarası ile daha önce kayıt yapılmış. Lütfen farklı bir TC kimlik numarası kullanın.");
                 return "register";
             }
-
-            // Form validasyon kontrolü
+            // Şifre eşleşme kontrolü
+            if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+                result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("userDto", new UserDto());
+                return "register";
+            }
+            StaffDto staffDto = staffService.findStaffDtoByTcKimlikNo(userDto.getTcKimlikNo());
+          /*  // Form validasyon kontrolü
             if (result.hasErrors()) {
-                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("staffDto", new StaffDto());
                 model.addAttribute("userDto", new UserDto());
                 return "register";
             }
 
             // Personel veritabanında kontrol
-            Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
-            if (staff == null) {
+
+            if (staffDto == null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile personel kaydı bulunamadı");
-                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("staffDto", new StaffDto());
                 model.addAttribute("userDto", new UserDto());
                 return "register";
             }
 
             // Personel kaydını yap
+            staffService.saveStaff(staffDto);
             userService.saveUserStaff(userDto);
             return "redirect:/register?success";
-            
+            */
+            // Öğrenci bilgilerini oturumda saklayın
+            String verificationCode = String.valueOf(new Random().nextInt(999999));
+            session.setAttribute("staffDto", staffDto);
+            session.setAttribute("verificationCode", verificationCode);
+            session.setAttribute("userDto", userDto);
+            // SMS gönderimi ve diğer işlemler
+            smsService.sendSms(new String[]{String.valueOf(staffDto.getGsm())}, "Doğrulama Kodu : "+verificationCode);
+
+            model.addAttribute("verificationCode", verificationCode);
+            model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+            return "sms-verification"; // Redirect to SMS verification page
         } catch (Exception e) {
-            e.printStackTrace();
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
             model.addAttribute("studentDto", new StudentDto());
             model.addAttribute("userDto", new UserDto());
@@ -279,7 +294,7 @@ public class BaseController {
             if (result.hasErrors()) {
                 return determineRedirectUrl(principal, "?error=validation");
             }
-            MailFormData existingMailForm = mailFormService.findByUsername(mailFormDto.getUsername());
+            MailFormData existingMailForm = mailFormService.findByTcKimlikNo(mailFormDto.getTcKimlikNo());
             if (existingMailForm != null) {
                 return determineRedirectUrl(principal, "?mailExists=true");
             }
@@ -336,7 +351,7 @@ public class BaseController {
                 return determineRedirectUrl(principal, "?error=validation");
             }
 
-            EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getUsername());
+            EduroamFormData existingEduroam = eduroamFormService.eduroamFormData(eduroamFormDto.getTcKimlikNo());
             if (existingEduroam != null) {
                 return determineRedirectUrl(principal, "?eduroamExists=true");
             }
@@ -344,7 +359,8 @@ public class BaseController {
             userService.saveEduroamApply(eduroamFormDto);
             return determineRedirectUrl(principal, "?success=true");
         } catch (Exception e) {
-            return determineRedirectUrl(principal, "?error=true");
+            e.printStackTrace(); // Log the exception for debugging
+            return determineRedirectUrl(principal, "?error=true&message=" + e.getMessage());
         }
     }
 
@@ -353,11 +369,11 @@ public class BaseController {
         return "eduroam/apply-success";
     }
 
-    @GetMapping("/check-mail-exists/{username}")
+    @GetMapping("/check-mail-exists/{tcKimlikNo}")
     @ResponseBody
-    public Map<String, Object> checkMailExists(@PathVariable String username) {
+    public Map<String, Object> checkMailExists(@PathVariable String tcKimlikNo) {
         Map<String, Object> response = new HashMap<>();
-        MailFormData existingMail = mailFormService.findByUsername(username);
+        MailFormData existingMail = mailFormService.findByTcKimlikNo(tcKimlikNo);
 
         if (existingMail != null) {
             response.put("exists", true);
@@ -378,10 +394,10 @@ public class BaseController {
         
         if (existingEduroam != null) {
             response.put("exists", true);
-            response.put("username", existingEduroam.getUsername());
+            response.put("tcKimlikNo", existingEduroam.getTcKimlikNo());
         } else {
             response.put("exists", false);
-            response.put("username", null);
+            response.put("tcKimlikNo", null);
         }
         
         return response;
@@ -437,11 +453,11 @@ public class BaseController {
                     model.addAttribute("user", user);
                     
                     // Mail başvurusu kontrolü
-                    MailFormData mailForm = mailFormService.findByUsername(user.getIdentityNumber());
+                    MailFormData mailForm = mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
                     model.addAttribute("hasMailApplication", mailForm != null);
                     
                     // Eduroam başvurusu kontrolü
-                    EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getIdentityNumber());
+                    EduroamFormData eduroamForm = eduroamFormService.eduroamFormData(user.getTcKimlikNo());
                     model.addAttribute("hasEduroamApplication", eduroamForm != null);
                 }
             } catch (Exception e) {

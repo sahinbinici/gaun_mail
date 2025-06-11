@@ -30,8 +30,8 @@ public class EduroamFormService {
         this.modelMapper = modelMapper;
     }
 
-    public EduroamFormData eduroamFormData(String username){
-        return eduroamFormRepository.findByUsername(username);
+    public EduroamFormData eduroamFormData(String tcKimlikNo) {
+        return eduroamFormRepository.findByTcKimlikNo(tcKimlikNo);
     }
     
     public EduroamFormData findByTcKimlikNo(String tcKimlikNo) {
@@ -70,6 +70,7 @@ public class EduroamFormService {
     public List<EduroamFormData> findByDurum(String durum) {
         return eduroamFormRepository.findByApplicationStatus(ApplicationStatusEnum.valueOf(durum));
     }
+    /*
     public String getPendingApplicationsAsText() {
         // Get applications that are actually pending (not approved and not rejected)
         List<EduroamFormData> allApplications = eduroamFormRepository.findAll();
@@ -119,4 +120,5 @@ public class EduroamFormService {
         }
         return result.toString();
     }
+    */
 }

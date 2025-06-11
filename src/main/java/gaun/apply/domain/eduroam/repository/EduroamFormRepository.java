@@ -11,7 +11,7 @@ import gaun.apply.domain.common.BaseFormRepository;
 
 @Repository
 public interface EduroamFormRepository extends BaseFormRepository<EduroamFormData> {
-    EduroamFormData findByUsername(String username);
+    EduroamFormData findByOgrenciNo(String ogrenciNo);
     EduroamFormData findByTcKimlikNo(String tcKimlikNo);
     List<EduroamFormData> findTop100ByOrderByApplyDateDesc();
     List<EduroamFormData> findByApplyDateAfter(LocalDateTime date);

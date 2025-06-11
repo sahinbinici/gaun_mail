@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class MailFormDto {
-    private String username;
+    private String ogrenciNo;
     private String tcKimlikNo;
     private String ad;
     private String soyad;

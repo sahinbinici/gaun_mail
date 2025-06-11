@@ -27,6 +27,11 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+    StudentDto findByTcKimlikNo(String tcKimlikNo){
+        Student student = studentRepository.findByTcKimlikNo(tcKimlikNo);
+        return student != null ? modelMapper.map(student, StudentDto.class) : null;
+    }
+
     public StudentDto findByOgrenciNo(String ogrenciNo) {
         Student student = studentRepository.findByOgrenciNo(ogrenciNo);
         return student != null ? modelMapper.map(student, StudentDto.class) : null;

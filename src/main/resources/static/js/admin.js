@@ -20,7 +20,8 @@ function activateForm(formType, id) {
         const activeTabId = activeTab ? activeTab.getAttribute('href') : '#mail';
         window.location.hash = activeTabId;
         
-        const url = `/bim-basvuru/admin/${formType}/activate/${id}`;
+        const baseUrl = window.location.origin;
+        const url = `${baseUrl}/bim-basvuru/admin/${formType}/activate/${id}`;
         
         fetch(url, {
             method: 'POST',
@@ -54,7 +55,9 @@ function activateEduroamForm(id) {
 function showUserDetails(element) {
     const username = element.getAttribute('data-username');
     
-    fetch(`/bim-basvuru/admin/user-details/${username}`, {
+    // Use window.location.origin to get the current protocol and domain
+    const baseUrl = window.location.origin;
+    fetch(`${baseUrl}/bim-basvuru/admin/user-details/${username}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -74,8 +77,8 @@ function showUserDetails(element) {
             document.getElementById('staffDetails').style.display = 'none';
             
             // Öğrenci bilgilerini güncelle
-            document.getElementById('student_ogrenciNo').textContent = data.username || '';
-            document.getElementById('student_tcKimlikNo').textContent = data.identityNumber || '';
+            document.getElementById('student_ogrenciNo').textContent = data.ogrenciNo || '';
+            document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo.toString() || '';
             document.getElementById('student_ad').textContent = data.ad || '';
             document.getElementById('student_soyad').textContent = data.soyad || '';
             document.getElementById('student_fakulte').textContent = data.fakulte || '';
@@ -87,7 +90,7 @@ function showUserDetails(element) {
             document.getElementById('staffDetails').style.display = 'block';
             
             // Personel bilgilerini güncelle
-            document.getElementById('staff_tcKimlikNo').textContent = data.identityNumber || '';
+            document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo || '';
             document.getElementById('staff_ad').textContent = data.ad || '';
             document.getElementById('staff_soyad').textContent = data.soyad || '';
             document.getElementById('staff_birim').textContent = data.birim || '';
@@ -115,7 +118,8 @@ function deleteForm(formType, formId) {
         headers[header] = token;
     }
 
-    fetch(`/bim-basvuru/admin/${formType}/delete/${formId}`, {
+    const baseUrl = window.location.origin;
+    fetch(`${baseUrl}/bim-basvuru/admin/${formType}/delete/${formId}`, {
         method: 'POST',
         headers: headers,
         credentials: 'include'
@@ -190,7 +194,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Form reddi isteği: /bim-basvuru/admin/${formType}/reject/${formId}`);
             console.log('Gönderilen sebep:', reason);
             
-            fetch(`/bim-basvuru/admin/${formType}/reject/${formId}`, {
+            const baseUrl = window.location.origin;
+            fetch(`${baseUrl}/bim-basvuru/admin/${formType}/reject/${formId}`, {
                 method: 'POST',
                 headers: headers,
                 body: `reason=${encodeURIComponent(reason)}`
