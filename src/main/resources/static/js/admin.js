@@ -81,6 +81,7 @@ function showUserDetails(element) {
             document.getElementById('student_tcKimlikNo').textContent = data.tcKimlikNo.toString() || '';
             document.getElementById('student_ad').textContent = data.ad || '';
             document.getElementById('student_soyad').textContent = data.soyad || '';
+            document.getElementById('student_gsm1').textContent = data.gsm1 || '';
             document.getElementById('student_fakulte').textContent = data.fakulte || '';
             document.getElementById('student_bolum').textContent = data.bolum || '';
             document.getElementById('student_program').textContent = data.program || '';
@@ -93,6 +94,7 @@ function showUserDetails(element) {
             document.getElementById('staff_tcKimlikNo').textContent = data.tcKimlikNo || '';
             document.getElementById('staff_ad').textContent = data.ad || '';
             document.getElementById('staff_soyad').textContent = data.soyad || '';
+            document.getElementById('staff_gsm').textContent = data.gsm || '';
             document.getElementById('staff_birim').textContent = data.birim || '';
             document.getElementById('staff_unvan').textContent = data.unvan || '';
         }

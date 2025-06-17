@@ -368,6 +368,7 @@ public class AdminController {
                         response.put("ogrenciNo", studentDto.getOgrenciNo());
                         response.put("ad", studentDto.getAd());
                         response.put("soyad", studentDto.getSoyad());
+                        response.put("gsm1", studentDto.getGsm1());
                         response.put("fakulte", studentDto.getFakKod());
                         response.put("bolum", studentDto.getBolumAd());
                         response.put("program", studentDto.getProgramAd());
@@ -385,6 +386,7 @@ public class AdminController {
                         response.put("tcKimlikNo", staff.getTcKimlikNo());
                         response.put("ad", staff.getAd());
                         response.put("soyad", staff.getSoyad());
+                        response.put("gsm", staff.getGsm());
                         response.put("birim", staff.getCalistigiBirim()); // Doğru alan adı: calistigiBirim
                         response.put("unvan", staff.getUnvan());
                     }
@@ -632,8 +634,8 @@ public class AdminController {
               .append(form.getOgrenciNo() !=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
               .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append("#")
               .append(form.getGsm1()).append("#")
-              .append(form.getEmail()).append("#")
-                    .append(form.getSicil()!=null ? form.getDogumTarihi() : "").append("#")
+              .append(form.getEmail()+"@gantep.edu.tr").append("#")
+                    .append(form.getSicil()!=null ? form.getDogumTarihi() : "")
                     .append("\n").append(System.lineSeparator());
         }
         

@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
             mailFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
             mailFormData.setUnvan(staffDto.getUnvan());
             mailFormData.setGsm(String.valueOf(staffDto.getGsm()));
-            mailFormData.setEmail(staffService.createEmailAddress(mailFormDto.getTcKimlikNo()).toLowerCase());
+            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase());
             mailFormData.setDogumTarihi(staffDto.getDogumTarihi());
         }
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
