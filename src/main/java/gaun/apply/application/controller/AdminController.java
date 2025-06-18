@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -635,11 +636,15 @@ public class AdminController {
               .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append("#")
               .append(form.getGsm1()).append("#")
               .append(form.getEmail()+"@gantep.edu.tr").append("#")
-                    .append(form.getSicil()!=null ? form.getDogumTarihi() : "")
-                    .append("\n").append(System.lineSeparator());
+              .append(form.getSicil()!=null ? form.getDogumTarihi() : "").append("#")
+                    .append(form.getPassword())
+              .append("\n");
         }
         
-        return ResponseEntity.ok(sb.toString());
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(sb.toString());
     }
 
     /**
@@ -675,9 +680,14 @@ public class AdminController {
               .append(form.getOgrenciNo()!= null ? form.getBolum() : form.getUnvan()).append("#")
               .append(form.getGsm1()).append("#")
               .append(form.getEmail()).append("#")
-                    .append(form.getOgrenciNo()==null ? form.getDogumTarihi() : "").append("\n").append(System.lineSeparator());
+              .append(form.getOgrenciNo()==null ? form.getDogumTarihi() : "").append("#")
+                    .append(form.getPassword())
+              .append("\n");
         }
         
-        return ResponseEntity.ok(sb.toString());
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(sb.toString());
     }
 }

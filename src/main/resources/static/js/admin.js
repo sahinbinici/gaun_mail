@@ -21,7 +21,7 @@ function activateForm(formType, id) {
         window.location.hash = activeTabId;
         
         const baseUrl = window.location.origin;
-        const url = `${baseUrl}/bim-basvuru/admin/${formType}/activate/${id}`;
+        const url = `${baseUrl}/admin/${formType}/activate/${id}`;
         
         fetch(url, {
             method: 'POST',
@@ -55,9 +55,9 @@ function activateEduroamForm(id) {
 function showUserDetails(element) {
     const username = element.getAttribute('data-username');
     
-    // Use window.location.origin to get the current protocol and domain
-    const baseUrl = window.location.origin;
-    fetch(`${baseUrl}/bim-basvuru/admin/user-details/${username}`, {
+    // Ensure we're always using HTTPS
+    const baseUrl = window.location.protocol === 'https:' ? window.location.origin : window.location.origin.replace('http:', 'https:');
+    fetch(`${baseUrl}/admin/user-details/${username}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ function deleteForm(formType, formId) {
     }
 
     const baseUrl = window.location.origin;
-    fetch(`${baseUrl}/bim-basvuru/admin/${formType}/delete/${formId}`, {
+    fetch(`${baseUrl}/admin/${formType}/delete/${formId}`, {
         method: 'POST',
         headers: headers,
         credentials: 'include'
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Gönderilen sebep:', reason);
             
             const baseUrl = window.location.origin;
-            fetch(`${baseUrl}/bim-basvuru/admin/${formType}/reject/${formId}`, {
+            fetch(`${baseUrl}/admin/${formType}/reject/${formId}`, {
                 method: 'POST',
                 headers: headers,
                 body: `reason=${encodeURIComponent(reason)}`
