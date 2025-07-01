@@ -1,12 +1,8 @@
 package gaun.apply.application.controller;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import gaun.apply.application.dto.*;
@@ -138,6 +134,7 @@ public class BaseController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("studentDto", new StudentDto());
+        model.addAttribute("staffDto", new StaffDto());
         model.addAttribute("userDto", new UserDto());
         model.addAttribute("smsVerificationDto", new SmsVerificationDto());
         return "register";
@@ -154,17 +151,22 @@ public class BaseController {
             if (existingUser != null) {
                 result.rejectValue("ogrenciNo", null, "Bu öğrenci numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("userDto", new UserDto());
-                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                //model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                return "register";
+            }else if(studentDto.getTcKimlikNo() == null || studentDto.getTcKimlikNo().isEmpty() || result.hasErrors()){
+                model.addAttribute("userDto", new UserDto());
+                result.rejectValue("ogrenciNo", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.");
                 return "register";
             }
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
             studentDto.setPassword(pass);
-
+/*
             if (result.hasErrors()) {
                 model.addAttribute("userDto", new UserDto());
-                result.rejectValue("ogrenciNo", null, "OBS'den öğrenci bilgileri alınamadı");
+                result.rejectValue("ogrenciNo", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.");
                 return "register";
             }
+*/
             // Öğrenci bilgilerini oturumda saklayın
             String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("studentDto", studentDto);
@@ -218,12 +220,12 @@ public class BaseController {
                                   Model model) {
         try {
             // Önce mevcut kullanıcı kontrolü
-            User existingUser = userService.findByidentityNumber(userDto.getTcKimlikNo());
+            User existingUser = userService.findByTcKimlikNo(userDto.getTcKimlikNo());
             if (existingUser != null) {
                 result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("staffDto", new StaffDto());
                 model.addAttribute("userDto", new UserDto());
-                model.addAttribute("error", "Bu TC kimlik numarası ile daha önce kayıt yapılmış. Lütfen farklı bir TC kimlik numarası kullanın.");
+                model.addAttribute("activeTab", "staff");
                 return "register";
             }
             // Şifre eşleşme kontrolü
@@ -231,31 +233,16 @@ public class BaseController {
                 result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
                 model.addAttribute("staffDto", new StaffDto());
                 model.addAttribute("userDto", new UserDto());
+                model.addAttribute("activeTab", "staff");
                 return "register";
             }
             StaffDto staffDto = staffService.findStaffDtoByTcKimlikNo(userDto.getTcKimlikNo());
-          /*  // Form validasyon kontrolü
-            if (result.hasErrors()) {
-                model.addAttribute("staffDto", new StaffDto());
-                model.addAttribute("userDto", new UserDto());
-                return "register";
-            }
-
-            // Personel veritabanında kontrol
-
             if (staffDto == null) {
-                result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile personel kaydı bulunamadı");
-                model.addAttribute("staffDto", new StaffDto());
-                model.addAttribute("userDto", new UserDto());
+                result.rejectValue("tcKimlik", null, "Personel veritabanında kaydınız bulunamadı.");
+                model.addAttribute("activeTab", "staff");
                 return "register";
             }
-
-            // Personel kaydını yap
-            staffService.saveStaff(staffDto);
-            userService.saveUserStaff(userDto);
-            return "redirect:/register?success";
-            */
-            // Öğrenci bilgilerini oturumda saklayın
+            // staff bilgilerini oturumda saklayın
             String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("staffDto", staffDto);
             session.setAttribute("verificationCode", verificationCode);
@@ -270,6 +257,7 @@ public class BaseController {
             model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
             model.addAttribute("studentDto", new StudentDto());
             model.addAttribute("userDto", new UserDto());
+            model.addAttribute("activeTab", "staff");
             return "register";
         }
     }

@@ -13,7 +13,7 @@ public class StaffDto {
     private String soyad;
     private String calistigiBirim;
     private String unvan;
-    private Long gsm;
+    private String gsm;
     private String email;
     private Date dogumTarihi;
 }

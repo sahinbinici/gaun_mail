@@ -18,45 +18,25 @@ public abstract class BaseFormData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "tc_kimlik_no")
     private String tcKimlikNo;
+    @Column(name = "apply_date")
     private LocalDateTime applyDate;
     @Column(name = "is_active")
     private Boolean status = false;
+    @Column(name = "approval_date")
     private LocalDateTime approvalDate;
+    @Column(name = "rejected")
     private boolean rejected;
+    @Column(name = "rejection_reason")
     private String rejectionReason;
+    @Column(name = "rejection_date")
     private LocalDateTime rejectionDate;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "application_status")
     private ApplicationStatusEnum applicationStatus = ApplicationStatusEnum.PENDING;
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public ApplicationStatusEnum getApplicationStatus() {
-        return applicationStatus;
-    }
-
-    public void setApplicationStatus(ApplicationStatusEnum applicationStatus) {
-        this.applicationStatus = applicationStatus;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
 
     public boolean isStatus() {
         return status != null && status;

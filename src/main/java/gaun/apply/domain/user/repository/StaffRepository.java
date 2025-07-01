@@ -18,19 +18,21 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
 //StaffDto findStaffDtoByTcKimlikNo(@Param("tcKimlikNo") String tcKimlikNo);
 
     @Query(value = """
-    SELECT 
-        p.tcKiml AS tcKimlikNo,
-        p.psicno AS sicilNo,
-        p.peradi AS ad,
-        p.soyadi AS soyad,
-        b.BRKK30 AS calistigiBirim,
-        u.unvack AS unvan,
-        p.ceptel AS gsm,
-        p.dogumTarihi AS dogumTarihi
-    FROM person p
-    JOIN brkodu b ON p.brkodu = b.BRKODU
-    JOIN unvkod u ON p.unvkod = u.unvkod
-    WHERE p.tcKiml = :tcKimlikNo AND p.calkod > 0
+
+            SELECT\s
+            p.tcKiml AS tcKimlikNo,
+            p.psicno AS sicilNo,
+            p.peradi AS ad,
+            p.soyadi AS soyad,
+            b.BRKK30 AS calistigiBirim,
+            u.unvack AS unvan,
+            t.telefo AS gsm,
+            p.dogumTarihi AS dogumTarihi
+        FROM person p
+        JOIN brkodu b ON p.brkodu = b.BRKODU
+        JOIN unvkod u ON p.unvkod = u.unvkod
+        JOIN telefo t ON p.esicno = t.esicno
+        WHERE p.tcKiml = :tcKimlikNo AND p.calkod > 0
     """, nativeQuery = true)
     Object findStaffByTcKimlikNo(@Param("tcKimlikNo") String tcKimlikNo);
 

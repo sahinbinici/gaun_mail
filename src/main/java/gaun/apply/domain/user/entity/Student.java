@@ -8,10 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Entity
 @Data
 @Table(name = "student")
-public class Student {
+public class Student implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

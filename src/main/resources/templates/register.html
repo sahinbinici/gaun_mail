@@ -125,12 +125,12 @@
                     <div class="card-header">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#student">
+                                <a th:class="${activeTab == 'staff' ? 'nav-link' : 'nav-link active'}" data-bs-toggle="tab" href="#student">
                                     <i class="fas fa-user-graduate me-2"></i>Öğrenci
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#staff">
+                                <a th:class="${activeTab == 'staff' ? 'nav-link active' : 'nav-link'}" data-bs-toggle="tab" href="#staff">
                                     <i class="fas fa-user-tie me-2"></i>Personel
                                 </a>
                             </li>
@@ -139,7 +139,7 @@
                     <div class="card-body p-4">
                         <div class="tab-content">
                             <!-- Öğrenci Formu -->
-                            <div class="tab-pane fade show active" id="student">
+                            <div th:class="${activeTab == 'staff' ? 'tab-pane fade' : 'tab-pane fade show active'}" id="student">
                                 <form th:action="@{/register/save/student}" method="post" th:object="${studentDto}" class="px-2 py-3">
                                     <div class="form-group mb-4">
                                         <label class="control-label fw-bold mb-2">Öğrenci No</label>
@@ -186,7 +186,7 @@
                             </div>
 
                             <!-- Personel Formu -->
-                            <div class="tab-pane fade" id="staff">
+                            <div th:class="${activeTab == 'staff' ? 'tab-pane fade show active' : 'tab-pane fade'}" id="staff">
                                 <form th:action="@{/register/save/staff}" method="post" th:object="${userDto}" class="px-2 py-3">
                                     <div class="form-group mb-4">
                                         <label class="control-label fw-bold mb-2">TC Kimlik No</label>

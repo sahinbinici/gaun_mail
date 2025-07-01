@@ -1,6 +1,10 @@
 package gaun.apply.domain.user.service;
 
+import gaun.apply.config.db.DbAkademikConfig;
+import gaun.apply.config.db.DbIdariConfig;
+import gaun.apply.config.db.DbSurekliConfig;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import gaun.apply.application.dto.StaffDto;
@@ -13,9 +17,15 @@ import java.sql.Date;
 public class StaffService {
     private final StaffRepository staffRepository;
     private final ModelMapper modelMapper;
+    private final StaffRepository idariRepo;
+    private final StaffRepository akademikRepo;
+    private final StaffRepository surekliRepo;
 
-    public StaffService(StaffRepository staffRepository) {
+    public StaffService(StaffRepository staffRepository, @Qualifier("personelIdariRepository")StaffRepository idariRepo, @Qualifier("personelAkademikRepository")StaffRepository akademikRepo, @Qualifier("personelSurekliRepository")StaffRepository surekliRepo) {
         this.staffRepository = staffRepository;
+        this.idariRepo = idariRepo;
+        this.akademikRepo = akademikRepo;
+        this.surekliRepo = surekliRepo;
         this.modelMapper = new ModelMapper();
 
         modelMapper.getConfiguration()
@@ -29,13 +39,21 @@ public class StaffService {
 
     public StaffDto findStaffDtoByTcKimlikNo(String tcKimlikNo) {
         StaffDto staffDto = getStaffDto(tcKimlikNo);
-        if (staffDto == null) return null;
 
         return staffDto;
     }
 
     private StaffDto getStaffDto(String tcKimlikNo) {
-        Object[] result = (Object[]) staffRepository.findStaffByTcKimlikNo(tcKimlikNo);
+
+        //Object[] result = (Object[]) staffRepository.findStaffByTcKimlikNo(tcKimlikNo);
+        Object[] result = null;
+         if(idariRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null){
+             result = (Object[]) idariRepo.findStaffByTcKimlikNo(tcKimlikNo);
+         } else if (akademikRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null) {
+             result = (Object[]) akademikRepo.findStaffByTcKimlikNo(tcKimlikNo);
+         }else if (surekliRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null) {
+             result = (Object[]) surekliRepo.findStaffByTcKimlikNo(tcKimlikNo);
+         }
 
         if (result == null) {
             return null;
@@ -48,7 +66,7 @@ public class StaffService {
         staffDto.setSoyad((String) result[3]);
         staffDto.setCalistigiBirim((String) result[4]);
         staffDto.setUnvan((String) result[5]);
-        staffDto.setGsm((Long) result[6]);
+        staffDto.setGsm((String) result[6]);
         staffDto.setDogumTarihi((Date) result[7]);
         return staffDto;
     }
@@ -65,6 +83,6 @@ public class StaffService {
     public String createEmailAddress(String tcKimlikNo) {
         Staff staff=staffRepository.findByTcKimlikNo(tcKimlikNo);
         String adIlkHarf=staff.getAd().substring(0,1);
-        return (adIlkHarf+staff.getSoyad().toLowerCase()).replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g").replace("ş","s");
+        return (adIlkHarf+staff.getSoyad().toLowerCase()).replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g").replace("ş","s").toLowerCase();
     }
 }

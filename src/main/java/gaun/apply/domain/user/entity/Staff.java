@@ -28,7 +28,7 @@ public class Staff {
     @Column(name = "soyad")
     private String soyad;
     
-    @Column(name = "calistigiBirim")
+    @Column(name = "calistigi_birim")
     private String calistigiBirim;
     
     @Column(name = "unvan")
@@ -43,6 +43,6 @@ public class Staff {
     @Column(name = "dogum_tarihi")
     private String dogumTarihi;
     
-    @Column(name = "isAdmin")
+    @Column(name ="is_admin")
     private boolean isAdmin;
 }

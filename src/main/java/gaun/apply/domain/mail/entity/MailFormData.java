@@ -1,9 +1,6 @@
 package gaun.apply.domain.mail.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import gaun.apply.common.enums.ApplicationStatusEnum;
@@ -16,17 +13,31 @@ import java.sql.Date;
 @Entity
 @Table(name = "mail_forms")
 public class MailFormData extends BaseFormData {
+    @Column(name = "sicil")
     private Integer sicil;
+    @Column(name = "ogrenci_no")
     private String ogrenciNo;
+    @Column(name = "fakulte")
+    private String fakulteKod;
+    @Column(name = "email")
     private String email;
+    @Column(name = "password")
     private String password;
+    @Column(name = "ad")
     private String ad;
+    @Column(name = "soyad")
     private String soyad;
+    @Column(name = "dogum_tarihi")
     private Date dogumTarihi;
+    @Column(name = "fakkod")
     private String fakkod;
+    @Column(name = "bolum")
     private String bolum;
+    @Column(name = "gsm")
     private String gsm;
+    @Column(name = "calistigi_birim")
     private String calistigiBirim;
+    @Column(name = "unvan")
     private String unvan;
     
     @Enumerated(EnumType.STRING)
