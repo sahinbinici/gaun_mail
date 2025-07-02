@@ -117,6 +117,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updatePassword(String tcKimlikNo, String newPassword) {
+        User user = userRepository.findByTcKimlikNo(tcKimlikNo);
+        if (user != null) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }
+    }
+
+    @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(ConvertUtil::convertEntityToDto)
@@ -138,7 +147,7 @@ public class UserServiceImpl implements UserService {
             mailFormData.setBolum(studentDto.getBolumAd());
             mailFormData.setGsm(studentDto.getGsm1());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
-            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase());
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"gantep.edu.tr");
         }else {
             staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
@@ -148,7 +157,7 @@ public class UserServiceImpl implements UserService {
             mailFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
             mailFormData.setUnvan(staffDto.getUnvan());
             mailFormData.setGsm(String.valueOf(staffDto.getGsm()));
-            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase());
+            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase()+"gantep.edu.tr");
             mailFormData.setDogumTarihi(staffDto.getDogumTarihi());
         }
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));

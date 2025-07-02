@@ -210,7 +210,12 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div th:if="${param.error}">
-                    <div class="alert alert-danger">Yanlış şifre veya kullanıcı numarası.</div>
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        Kullanıcı adı veya şifre hatalı.
+                    </div>
+                    <div th:if="${param.passwordResetSuccess}" class="alert alert-success">
+                        Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.
+                    </div>
                 </div>
                 <div th:if="${param.logout}">
                     <div class="alert alert-success">Çıkış yaptınız.</div>
@@ -297,8 +302,11 @@
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Giriş</button>
-                                        <span>
+                                        <span class="ms-2">
                                             <a th:href="@{/register}">Kayıt Ol</a>
+                                        </span>
+                                        <span class="ms-3">
+                                            <a th:href="@{/forgot-password-staff}">Şifremi Unuttum</a>
                                         </span>
                                     </div>
                                 </form>

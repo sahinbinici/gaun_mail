@@ -364,12 +364,14 @@ public class AdminController {
                 // Öğrenci bilgilerini ekle
                 try {
                     StudentDto studentDto = studentService.findByOgrenciNo(user.getIdentityNumber());
+                    MailFormData mailFormData=mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
                     if (studentDto != null) {
                         response.put("tcKimlikNo", studentDto.getTcKimlikNo());
                         response.put("ogrenciNo", studentDto.getOgrenciNo());
                         response.put("ad", studentDto.getAd());
                         response.put("soyad", studentDto.getSoyad());
                         response.put("gsm1", studentDto.getGsm1());
+                        response.put("eposta1", mailFormData.getEmail()!=null ? mailFormData.getEmail() : studentDto.getEposta1());
                         response.put("fakulte", studentDto.getFakKod());
                         response.put("bolum", studentDto.getBolumAd());
                         response.put("program", studentDto.getProgramAd());
@@ -383,11 +385,13 @@ public class AdminController {
                 // Personel bilgilerini ekle
                 try {
                     Staff staff = staffService.findByTcKimlikNo(user.getIdentityNumber());
+                    MailFormData mailFormData=mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
                     if (staff != null) {
                         response.put("tcKimlikNo", staff.getTcKimlikNo());
                         response.put("ad", staff.getAd());
                         response.put("soyad", staff.getSoyad());
                         response.put("gsm", staff.getGsm());
+                        response.put("eposta",mailFormData.getEmail()!=null ? mailFormData.getEmail() : staff.getEmail());
                         response.put("birim", staff.getCalistigiBirim()); // Doğru alan adı: calistigiBirim
                         response.put("unvan", staff.getUnvan());
                     }

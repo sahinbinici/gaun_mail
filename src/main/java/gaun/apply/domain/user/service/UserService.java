@@ -16,6 +16,8 @@ public interface UserService {
 
     User findByTcKimlikNo(String tcKimlikNo);
 
+    void updatePassword(String tcKimlikNo, String newPassword);
+
     List<UserDto> findAllUsers();
 
     void saveMailApply(MailFormDto mailFormDto);

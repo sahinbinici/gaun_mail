@@ -1,11 +1,16 @@
 package gaun.apply.application.controller;
 
 import java.security.Principal;
-import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import gaun.apply.application.dto.*;
+import gaun.apply.application.dto.PasswordResetDto;
+import gaun.apply.application.dto.SmsVerificationDto;
+import gaun.apply.application.dto.StaffDto;
+import gaun.apply.application.dto.StudentDto;
+import gaun.apply.application.dto.EduroamFormDto;
+import gaun.apply.application.dto.MailFormDto;
+import gaun.apply.application.dto.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -152,10 +157,6 @@ public class BaseController {
                 result.rejectValue("ogrenciNo", null, "Bu öğrenci numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("userDto", new UserDto());
                 //model.addAttribute("smsVerificationDto", new SmsVerificationDto());
-                return "register";
-            }else if(studentDto.getTcKimlikNo() == null || studentDto.getTcKimlikNo().isEmpty() || result.hasErrors()){
-                model.addAttribute("userDto", new UserDto());
-                result.rejectValue("ogrenciNo", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.");
                 return "register";
             }
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
@@ -389,6 +390,75 @@ public class BaseController {
         }
         
         return response;
+    }
+
+    @GetMapping("/forgot-password-staff")
+    public String showForgotPasswordStaffForm(Model model) {
+        return "forgot-password-staff";
+    }
+
+    @PostMapping("/forgot-password-staff")
+    public String handleForgotPasswordStaff(@RequestParam("tcKimlikNo") String tcKimlikNo, HttpSession session, Model model) {
+        try {
+            StaffDto staffDto = staffService.findStaffDtoByTcKimlikNo(tcKimlikNo);
+            if (staffDto == null) {
+                model.addAttribute("error", "Bu TC Kimlik Numarası ile kayıtlı bir personel bulunamadı.");
+                return "forgot-password-staff";
+            }
+
+            String verificationCode = String.valueOf(new Random().nextInt(999999));
+            session.setAttribute("resetPasswordTcKimlikNo", tcKimlikNo);
+            session.setAttribute("verificationCode", verificationCode);
+
+            smsService.sendSms(new String[]{String.valueOf(staffDto.getGsm())}, "Şifre Sıfırlama Doğrulama Kodu: " + verificationCode);
+
+            model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+            return "sms-verification-password-reset";
+        } catch (Exception e) {
+            model.addAttribute("error", "İşlem sırasında bir hata oluştu: " + e.getMessage());
+            return "forgot-password-staff";
+        }
+    }
+
+    @PostMapping("/verify-sms-password-reset")
+    public String verifySmsForPasswordReset(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto,
+                                            BindingResult result, Model model, HttpSession session) {
+        String code = smsVerificationDto.getCode();
+        String sessionCode = (String) session.getAttribute("verificationCode");
+
+        if (sessionCode == null || !sessionCode.equals(code)) {
+            model.addAttribute("error", "Geçersiz doğrulama kodu.");
+            return "sms-verification-password-reset";
+        }
+
+        // Kod doğru, şifre sıfırlama sayfasına yönlendir
+        model.addAttribute("passwordResetDto", new PasswordResetDto());
+        return "reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String handleResetPassword(@Valid @ModelAttribute("passwordResetDto") PasswordResetDto passwordResetDto,
+                                      BindingResult result, Model model, HttpSession session) {
+        if (!passwordResetDto.getPassword().equals(passwordResetDto.getConfirmPassword())) {
+            model.addAttribute("error", "Şifreler eşleşmiyor.");
+            return "reset-password";
+        }
+
+        String tcKimlikNo = (String) session.getAttribute("resetPasswordTcKimlikNo");
+        if (tcKimlikNo == null) {
+            model.addAttribute("error", "Oturum süresi dolmuş veya geçersiz. Lütfen tekrar deneyin.");
+            return "forgot-password-staff";
+        }
+
+        try {
+            userService.updatePassword(tcKimlikNo, passwordResetDto.getPassword());
+            session.removeAttribute("resetPasswordTcKimlikNo");
+            session.removeAttribute("verificationCode");
+            return "redirect:/login?passwordResetSuccess=true";
+        } catch (Exception e) {
+            model.addAttribute("error", "Şifre sıfırlanırken bir hata oluştu: " + e.getMessage());
+            return "reset-password";
+        }
     }
 
     @PostMapping("/admin/update-staff-role/{tcKimlikNo}")

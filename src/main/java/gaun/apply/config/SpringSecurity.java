@@ -43,6 +43,7 @@ public class SpringSecurity {
                         .requestMatchers("/check-eduroam-exists/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/register/verify-sms").permitAll()
+                        .requestMatchers("/forgot-password-staff", "/verify-sms-password-reset", "/reset-password").permitAll()
                         .anyRequest().authenticated()
             ).formLogin(
                 form -> form
