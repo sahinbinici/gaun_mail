@@ -1,11 +1,13 @@
 package gaun.apply.domain.eduroam.service;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
+import gaun.apply.application.dto.EduroamFormDto;
 import gaun.apply.application.dto.StaffDto;
-import gaun.apply.domain.user.entity.Staff;
+import gaun.apply.application.dto.StudentDto;
 import gaun.apply.domain.user.service.StaffService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import gaun.apply.domain.eduroam.entity.EduroamFormData;
 import gaun.apply.domain.eduroam.repository.EduroamFormRepository;
 import gaun.apply.common.enums.ApplicationStatusEnum;
-import gaun.apply.application.dto.StudentDto;
 import gaun.apply.domain.user.service.StudentService;
 
 @Service
@@ -22,8 +23,10 @@ public class EduroamFormService {
     private final StudentService studentService;
     private final StaffService staffService;
     private final ModelMapper modelMapper;
+    private final Clock clock;
 
-    public EduroamFormService(EduroamFormRepository eduroamFormRepository, StudentService studentService, StaffService staffService, ModelMapper modelMapper) {
+    public EduroamFormService(EduroamFormRepository eduroamFormRepository, StudentService studentService, StaffService staffService, ModelMapper modelMapper, Clock clock) {
+        this.clock = clock;
         this.eduroamFormRepository = eduroamFormRepository;
         this.studentService = studentService;
         this.staffService = staffService;
@@ -42,14 +45,6 @@ public class EduroamFormService {
         return findByTcKimlikNo(tcKimlikNo);
     }
 
-    public List<EduroamFormData> findLast100Applications() {
-        return eduroamFormRepository.findTop100ByOrderByApplyDateDesc();
-    }
-    
-    public List<EduroamFormData> findLastMonthApplications() {
-        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
-        return eduroamFormRepository.findByApplyDateAfter(oneMonthAgo);
-    }
 
     public void saveEduroamFormData(EduroamFormData eduroamFormData){
         eduroamFormRepository.save(eduroamFormData);
@@ -69,6 +64,59 @@ public class EduroamFormService {
 
     public List<EduroamFormData> findByDurum(String durum) {
         return eduroamFormRepository.findByApplicationStatus(ApplicationStatusEnum.valueOf(durum));
+    }
+
+    public static StringBuilder getEduroamStringBuilder(List<EduroamFormData> pendingForms) {
+        StringBuilder sb = new StringBuilder();
+        for (EduroamFormData form : pendingForms) {
+            sb.append(form.getTcKimlikNo()).append("#")
+                    .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicilNo()).append("#")
+                    .append(form.getAd()).append("#")
+                    .append(form.getSoyad()).append("#")
+                    .append(form.getOgrenciNo()!=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
+                    .append(form.getOgrenciNo()!= null ? form.getBolum() : form.getUnvan()).append("#")
+                    .append(form.getGsm1()).append("#")
+                    .append(form.getEmail())
+                    .append(form.getOgrenciNo()==null ? form.getDogumTarihi() : "").append("#")
+                    .append(form.getPassword())
+                    .append("\n");
+        }
+        return sb;
+    }
+
+    public void saveEduroamApply(EduroamFormDto eduroamFormDto) {
+        StaffDto staffDto;
+        StudentDto studentDto;
+        EduroamFormData eduroamFormData = new EduroamFormData();
+        if(eduroamFormDto.getOgrenciNo()!=null && !eduroamFormDto.getOgrenciNo().isEmpty()) {
+            studentDto=studentService.findByOgrenciNo(eduroamFormDto.getOgrenciNo());
+            eduroamFormData.setOgrenciNo(studentDto.getOgrenciNo());
+            eduroamFormData.setAd(studentDto.getAd());
+            eduroamFormData.setSoyad(studentDto.getSoyad());
+            eduroamFormData.setEmail(studentDto.getEposta1());
+            eduroamFormData.setTcKimlikNo(eduroamFormDto.getTcKimlikNo());
+            eduroamFormData.setFakulte(studentDto.getFakKod());
+            eduroamFormData.setBolum(studentDto.getBolumAd());
+            eduroamFormData.setGsm1(studentDto.getGsm1());
+        }else {
+            staffDto=staffService.findStaffDtoByTcKimlikNo(eduroamFormDto.getTcKimlikNo());
+            eduroamFormData.setTcKimlikNo(String.valueOf(staffDto.getTcKimlikNo()));
+            eduroamFormData.setAd(staffDto.getAd());
+            eduroamFormData.setSoyad(staffDto.getSoyad());
+            eduroamFormData.setSicilNo(String.valueOf(staffDto.getSicilNo()));
+            eduroamFormData.setGsm(String.valueOf(staffDto.getGsm()));
+            eduroamFormData.setEmail(staffDto.getEmail());
+            eduroamFormData.setDogumTarihi(staffDto.getDogumTarihi());
+            eduroamFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
+            eduroamFormData.setUnvan(staffDto.getUnvan());
+        }
+        eduroamFormData.setPassword(eduroamFormDto.getPassword());
+        eduroamFormData.setStatus(false); // Başlangıçta onaylanmamış
+        eduroamFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede
+        LocalDateTime now = LocalDateTime.now(clock);
+        eduroamFormData.setApplyDate(now);
+        eduroamFormData.setCreatedAt(now);
+        eduroamFormRepository.save(eduroamFormData);
     }
     /*
     public String getPendingApplicationsAsText() {

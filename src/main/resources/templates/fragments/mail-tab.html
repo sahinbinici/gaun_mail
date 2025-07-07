@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        
+        <!--
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Mail Başvuru Tablosu -->
@@ -111,7 +111,7 @@
                                             <span th:text="${form.tcKimlikNo}"></span>
                                         </a>
                                     </td>
-                                    <td th:text="${form.email + '@gantep.edu.tr'}"></td>
+                                    <td th:text="${form.email}"></td>
                                     <td th:text="${form.password}"></td>
                                     <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
                                     <td>

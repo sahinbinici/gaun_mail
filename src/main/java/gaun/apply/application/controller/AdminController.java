@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaun.apply.application.dto.DashboardDataDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,6 +38,9 @@ import gaun.apply.common.enums.ApplicationStatusEnum;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
+import static gaun.apply.domain.eduroam.service.EduroamFormService.getEduroamStringBuilder;
+import static gaun.apply.domain.mail.service.MailFormService.getMailStringBuilder;
 
 @Controller
 @RequestMapping("/admin")
@@ -70,91 +74,64 @@ public class AdminController {
 
     @GetMapping({"", "/"})
     public String showAdminDashboard(Model model, HttpServletRequest request, HttpSession session,
-                                    @RequestParam(required = false) String filter,
-                                    @RequestParam(required = false) String tcKimlikNo,
-                                    @RequestParam(required = false) String status) {
-        // Get current user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findByidentityNumber(auth.getName());
-        
+                                     @RequestParam(required = false) String filter,
+                                     @RequestParam(required = false) String tcKimlikNo,
+                                     @RequestParam(required = false) String status) {
+        User currentUser = getCurrentUser();
         if (currentUser == null) {
             return "redirect:/login";
         }
-        
+
+        setupUserAttributes(model, currentUser);
+        Map<String, Boolean> tabPermissions = setupTabPermissions(model, currentUser);
+        String activeTab = determineActiveTab(session, request, tabPermissions);
+        model.addAttribute("activeTab", activeTab);
+
+        prepareDashboardData(model, filter, tcKimlikNo, status);
+
+        return "admin";
+    }
+
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userService.findByidentityNumber(auth.getName());
+    }
+
+    private void setupUserAttributes(Model model, User currentUser) {
         model.addAttribute("user", currentUser);
         model.addAttribute("userType", "ADMIN");
-        
-        // Get permission settings
-        boolean hasMailTabPermission = adminTabPermissionService.hasTabPermission(currentUser.getId(), "mail");
-        boolean hasEduroamTabPermission = adminTabPermissionService.hasTabPermission(currentUser.getId(), "eduroam");
-        
-        model.addAttribute("hasMailTabPermission", hasMailTabPermission);
-        model.addAttribute("hasEduroamTabPermission", hasEduroamTabPermission);
-        
-        // Create tabPermissions map for template
-        Map<String, Boolean> tabPermissions = new HashMap<>();
-        tabPermissions.put("mail", hasMailTabPermission);
-        tabPermissions.put("eduroam", hasEduroamTabPermission);
+    }
+
+    private Map<String, Boolean> setupTabPermissions(Model model, User currentUser) {
+        Map<String, Boolean> tabPermissions = adminTabPermissionService.getTabPermissions(currentUser.getId());
+
+        model.addAttribute("hasMailTabPermission", tabPermissions.getOrDefault("mail", false));
+        model.addAttribute("hasEduroamTabPermission", tabPermissions.getOrDefault("eduroam", false));
         model.addAttribute("tabPermissions", tabPermissions);
-        
-        // Get active tab from session or request
+
+        return tabPermissions;
+    }
+
+    private String determineActiveTab(HttpSession session, HttpServletRequest request, Map<String, Boolean> tabPermissions) {
         String activeTab = (String) session.getAttribute("activeTab");
         if (activeTab == null) {
             activeTab = request.getParameter("tab");
             if (activeTab == null) {
-                activeTab = hasMailTabPermission ? "mail" : "eduroam";
+                activeTab = tabPermissions.getOrDefault("mail", false) ? "mail" : "eduroam";
             }
             session.setAttribute("activeTab", activeTab);
         }
-        model.addAttribute("activeTab", activeTab);
-        
-        // Handle form filter based on selected tab
-        List<MailFormData> mailForms;
-        List<EduroamFormData> eduroamForms;
-        
-        // Apply filters if specified
-        if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
-            mailForms = mailFormService.findByTcKimlikNo(tcKimlikNo) != null ? 
-                    List.of(mailFormService.findByTcKimlikNo(tcKimlikNo)) : 
-                    new ArrayList<>();
-            
-            eduroamForms = eduroamFormService.eduroamFormDataTc(tcKimlikNo) != null ? 
-                    List.of(eduroamFormService.eduroamFormDataTc(tcKimlikNo)) : 
-                    new ArrayList<>();
-        } else if (status != null && !status.isEmpty()) {
-            mailForms = mailFormService.findByDurum(status);
-            eduroamForms = eduroamFormService.findByDurum(status);
-        } else if (filter != null && filter.equals("pending")) {
-            mailForms = mailFormService.findByDurum("PENDING");
-            eduroamForms = eduroamFormService.findByDurum("PENDING");
-        } else if (filter != null && filter.equals("approved")) {
-            mailForms = mailFormService.findByDurum("APPROVED");
-            eduroamForms = eduroamFormService.findByDurum("APPROVED");
-        } else if (filter != null && filter.equals("rejected")) {
-            mailForms = mailFormService.findByDurum("REJECTED");
-            eduroamForms = eduroamFormService.findByDurum("REJECTED");
-        } else {
-            // Default: show all forms
-            mailForms = mailFormService.getAllMailForms();
-            eduroamForms = eduroamFormService.getAllEduroamForms();
-        }
-        
-        // Add form statistics with null-safety
-        Map<String, Long> mailStats = getFormStats(mailForms != null ? mailForms : new ArrayList<>());
-        Map<String, Long> eduroamStats = getFormStats(eduroamForms != null ? eduroamForms : new ArrayList<>());
-        
-        // Add user statistics
-        Map<String, Long> userStats = getUserStats();
-        
-        model.addAttribute("mailStats", mailStats);
-        model.addAttribute("eduroamStats", eduroamStats);
-        model.addAttribute("userStats", userStats);
-        
-        // Add form data to model
-        model.addAttribute("mailForms", mailForms);
-        model.addAttribute("eduroamForms", eduroamForms);
-        
-        return "admin";
+        return activeTab;
+    }
+
+    private void prepareDashboardData(Model model, String filter, String tcKimlikNo, String status) {
+        DashboardDataDTO dashboardData = formService.prepareDashboardData(filter, tcKimlikNo, status);
+
+        model.addAttribute("mailForms", dashboardData.getMailForms());
+        model.addAttribute("eduroamForms", dashboardData.getEduroamForms());
+        model.addAttribute("mailStats", dashboardData.getMailStats());
+        model.addAttribute("eduroamStats", dashboardData.getEduroamStats());
+        model.addAttribute("userStats", dashboardData.getUserStats());
     }
 
     /**
@@ -170,46 +147,65 @@ public class AdminController {
         
         return stats;
     }
-    
-    /**
-     * Calculates statistics for form data
-     */
-    private Map<String, Long> getFormStats(List<? extends BaseFormData> forms) {
-        Map<String, Long> stats = new HashMap<>();
-        
-        if (forms == null || forms.isEmpty()) {
-            stats.put("total", 0L);
-            stats.put("pending", 0L);
-            stats.put("approved", 0L);
-            stats.put("rejected", 0L);
-            return stats;
-        }
-        
-        long total = forms.size();
-        long pending = forms.stream()
-                .filter(form -> "PENDING".equals(form.getApplicationStatus().name()))
-                .count();
-        long approved = forms.stream()
-                .filter(form -> "APPROVED".equals(form.getApplicationStatus().name()))
-                .count();
-        long rejected = forms.stream()
-                .filter(form -> "REJECTED".equals(form.getApplicationStatus().name()))
-                .count();
-        
-        stats.put("total", total);
-        stats.put("pending", pending);
-        stats.put("approved", approved);
-        stats.put("rejected", rejected);
-        
-        return stats;
-    }
 
     @GetMapping("/users")
     public String users(Model model) {
         model.addAttribute("users", userService.findAllUsers());
         return "admin/users";
     }
+    @PostMapping("/mail/activate/{id}")
+    @ResponseBody
+    public ResponseEntity<?> activateMailForm(@PathVariable Long id) {
+        try {
+            MailFormData mailForm = mailFormService.findMailFormById(id)
+                    .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
 
+            mailForm.setStatus(true);
+            mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
+            mailForm.setApprovalDate(LocalDateTime.now());
+
+            boolean isStudent = mailForm.getOgrenciNo() != null;
+
+            String emailAddress = isStudent
+                    ? studentService.createEmailAddress(mailForm.getOgrenciNo())
+                    : staffService.createEmailAddress(mailForm.getTcKimlikNo());
+
+            mailForm.setEmail(emailAddress);
+            mailFormService.save(mailForm);
+
+            sendApprovalSms(mailForm, emailAddress, isStudent);
+
+            return ResponseEntity.ok().body("Mail başvurusu onaylandı");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Mail başvurusu onaylanamadı: " + e.getMessage());
+        }
+    }
+
+    private void sendApprovalSms(MailFormData mailForm, String emailAddress, boolean isStudent) {
+        try {
+            String message = "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " +
+                    emailAddress + "Şifreniz: " + mailForm.getPassword();
+
+            if (isStudent) {
+                StudentDto student = studentService.findByOgrenciNo(mailForm.getOgrenciNo());
+                if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
+                    smsService.sendSms(new String[]{student.getGsm1()}, message);
+                }
+            } else {
+                String tcKimlikNo = mailForm.getTcKimlikNo();
+                if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+                    Staff staff = staffService.findByTcKimlikNo(tcKimlikNo);
+                    if (staff != null && staff.getGsm() != null && !staff.getGsm().isEmpty()) {
+                        smsService.sendSms(new String[]{staff.getGsm()}, message);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Mail başvurusu onay SMS'i gönderiminde hata: " + ex.getMessage());
+        }
+    }
+/*
     @PostMapping("/mail/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateMailForm(@PathVariable Long id) {
@@ -244,8 +240,7 @@ public class AdminController {
                     StudentDto student = studentService.findByOgrenciNo(mailForm.getOgrenciNo());
                     if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
                         smsService.sendSms(new String[]{student.getGsm1()}, 
-                                "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " + emailAddress);
-                        System.out.println("Öğrenci " + student.getAd() + " " + student.getSoyad() + " için onay SMS'i gönderildi");
+                                "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " + emailAddress + "Şifreniz: " + mailForm.getPassword());
                     }
                 } else {
                     // Personel için SMS gönder
@@ -254,10 +249,7 @@ public class AdminController {
                         Staff staff = staffService.findByTcKimlikNo(tcKimlikNo);
                         if (staff != null && staff.getGsm() != null && !staff.getGsm().isEmpty()) {
                             smsService.sendSms(new String[]{staff.getGsm()}, 
-                                    "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " + emailAddress);
-                            System.out.println("Personel " + staff.getAd() + " " + staff.getSoyad() + " için onay SMS'i gönderildi");
-                        } else {
-                            System.out.println("Personel için telefon numarası bulunamadı: " + tcKimlikNo);
+                                    "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " + emailAddress + "Şifreniz: " + mailForm.getPassword());
                         }
                     }
                 }
@@ -273,58 +265,68 @@ public class AdminController {
                     .body("Mail başvurusu onaylanamadı: " + e.getMessage());
         }
     }
-
+    */
     @PostMapping("/eduroam/activate/{id}")
     @ResponseBody
     public ResponseEntity<?> activateEduroamForm(@PathVariable Long id, Model model) {
         try {
-            EduroamFormData eduroamForm = eduroamFormService.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
-            
-            eduroamForm.setStatus(true);
-            eduroamForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Fix: Set status enum to APPROVED
-            eduroamForm.setApprovalDate(LocalDateTime.now());
-            eduroamFormService.saveEduroamFormData(eduroamForm);
-            
-            // Eduroam onay SMS'i gönder
-            try {
-                String username = eduroamForm.getTcKimlikNo();
-                String tcKimlikNo = eduroamForm.getTcKimlikNo();
-                
-                // Öğrenci mi personel mi kontrolü (öğrenci ID'si 12 haneli)
-                boolean isStudent = eduroamForm.getOgrenciNo()!=null;//username != null && username.length() == 12 && username.matches("\\d+");
-                
-                if (isStudent) {
-                    // Öğrenci için SMS gönder
-                    StudentDto student = studentService.findByOgrenciNo(eduroamForm.getOgrenciNo());
-                    if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
-                        smsService.sendSms(new String[]{student.getGsm1()}, 
-                                "GAÜN Eduroam başvurunuz onaylanmıştır. Kullanıcı adınız: " + username);
-                        System.out.println("Öğrenci " + student.getAd() + " " + student.getSoyad() + " için Eduroam onay SMS'i gönderildi");
-                    }
-                } else {
-                    // Personel için SMS gönder
-                    if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
-                        Staff staff = staffService.findByTcKimlikNo(tcKimlikNo);
-                        if (staff != null && staff.getGsm() != null && !staff.getGsm().isEmpty()) {
-                            smsService.sendSms(new String[]{staff.getGsm()}, 
-                                    "GAÜN Eduroam başvurunuz onaylanmıştır. Kullanıcı adınız: " + tcKimlikNo);
-                            System.out.println("Personel " + staff.getAd() + " " + staff.getSoyad() + " için Eduroam onay SMS'i gönderildi");
-                        } else {
-                            System.out.println("Personel için telefon numarası bulunamadı: " + tcKimlikNo);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                System.err.println("Eduroam başvurusu onay SMS'i gönderiminde hata: " + ex.getMessage());
-                // SMS gönderimindeki hata başvuru onayını etkilememeli
-            }
-            
+            EduroamFormData eduroamForm = findAndActivateForm(id);
+            sendActivationNotification(eduroamForm);
             return ResponseEntity.ok().body("Eduroam başvurusu onaylandı");
         } catch (Exception e) {
-            // Error handling in form approval methods - Fix from memory
             return ResponseEntity.badRequest()
                     .body("Eduroam başvurusu onaylanamadı: " + e.getMessage());
+        }
+    }
+
+    private EduroamFormData findAndActivateForm(Long id) {
+        EduroamFormData eduroamForm = eduroamFormService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
+
+        eduroamForm.setStatus(true);
+        eduroamForm.setApplicationStatus(ApplicationStatusEnum.APPROVED);
+        eduroamForm.setApprovalDate(LocalDateTime.now());
+        eduroamFormService.saveEduroamFormData(eduroamForm);
+
+        return eduroamForm;
+    }
+
+    private void sendActivationNotification(EduroamFormData eduroamForm) {
+        try {
+            String tcKimlikNo = eduroamForm.getTcKimlikNo();
+            boolean isStudent = isStudentApplication(eduroamForm);
+
+            if (isStudent) {
+                sendStudentNotification(eduroamForm, tcKimlikNo);
+            } else {
+                sendStaffNotification(tcKimlikNo);
+            }
+        } catch (Exception ex) {
+            System.err.println("Eduroam başvurusu onay SMS'i gönderiminde hata: " + ex.getMessage());
+        }
+    }
+
+    private boolean isStudentApplication(EduroamFormData eduroamForm) {
+        return eduroamForm.getOgrenciNo() != null;
+    }
+
+    private void sendStudentNotification(EduroamFormData eduroamForm, String username) {
+        StudentDto student = studentService.findByOgrenciNo(eduroamForm.getOgrenciNo());
+        if (student != null && student.getGsm1() != null && !student.getGsm1().isEmpty()) {
+            String message = "GAÜN Eduroam başvurunuz onaylanmıştır. Kullanıcı adınız: " + username;
+            smsService.sendSms(new String[]{student.getGsm1()}, message);
+        }
+    }
+
+    private void sendStaffNotification(String tcKimlikNo) {
+        if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
+            Staff staff = staffService.findByTcKimlikNo(tcKimlikNo);
+            if (staff != null && staff.getGsm() != null && !staff.getGsm().isEmpty()) {
+                String message = "GAÜN Eduroam başvurunuz onaylanmıştır. Kullanıcı adınız: " + tcKimlikNo;
+                smsService.sendSms(new String[]{staff.getGsm()}, message);
+            } else {
+                System.out.println("Personel için telefon numarası bulunamadı: " + tcKimlikNo);
+            }
         }
     }
 
@@ -344,64 +346,10 @@ public class AdminController {
     @ResponseBody
     public ResponseEntity<?> getUserDetails(@PathVariable String username) {
         try {
-            Map<String, Object> response = new HashMap<>();
-            
-            User user = userService.findByTcKimlikNo(username);
-            if (user == null) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            // Temel kullanıcı bilgilerini ekle
-            response.put("username", user.getIdentityNumber());
-            response.put("tcKimlikNo", user.getIdentityNumber());
-            
-            // Kullanıcı türünü belirle (öğrenci ID'si 12 haneli sayı olmalı)
-            boolean isStudent = user.getIdentityNumber().length() == 12;
-            response.put("userType", isStudent ? "student" : "staff");
-            
-            // Kullanıcı türüne göre ek bilgileri getir
-            if (isStudent) {
-                // Öğrenci bilgilerini ekle
-                try {
-                    StudentDto studentDto = studentService.findByOgrenciNo(user.getIdentityNumber());
-                    MailFormData mailFormData=mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
-                    if (studentDto != null) {
-                        response.put("tcKimlikNo", studentDto.getTcKimlikNo());
-                        response.put("ogrenciNo", studentDto.getOgrenciNo());
-                        response.put("ad", studentDto.getAd());
-                        response.put("soyad", studentDto.getSoyad());
-                        response.put("gsm1", studentDto.getGsm1());
-                        response.put("eposta1", mailFormData.getEmail()!=null ? mailFormData.getEmail() : studentDto.getEposta1());
-                        response.put("fakulte", studentDto.getFakKod());
-                        response.put("bolum", studentDto.getBolumAd());
-                        response.put("program", studentDto.getProgramAd());
-                        response.put("egitimDerecesi", studentDto.getEgitimDerecesi());
-                    }
-                } catch (Exception ex) {
-                    // Öğrenci bilgileri alınamadıysa hata mesajı ekle
-                    response.put("error", "Öğrenci bilgileri alınamadı: " + ex.getMessage());
-                }
-            } else {
-                // Personel bilgilerini ekle
-                try {
-                    Staff staff = staffService.findByTcKimlikNo(user.getIdentityNumber());
-                    MailFormData mailFormData=mailFormService.findByTcKimlikNo(user.getTcKimlikNo());
-                    if (staff != null) {
-                        response.put("tcKimlikNo", staff.getTcKimlikNo());
-                        response.put("ad", staff.getAd());
-                        response.put("soyad", staff.getSoyad());
-                        response.put("gsm", staff.getGsm());
-                        response.put("eposta",mailFormData.getEmail()!=null ? mailFormData.getEmail() : staff.getEmail());
-                        response.put("birim", staff.getCalistigiBirim()); // Doğru alan adı: calistigiBirim
-                        response.put("unvan", staff.getUnvan());
-                    }
-                } catch (Exception ex) {
-                    // Personel bilgileri alınamadıysa hata mesajı ekle
-                    response.put("error", "Personel bilgileri alınamadı: " + ex.getMessage());
-                }
-            }
-
+            Map<String, Object> response = formService.getUserDetails(username);
             return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body("Kullanıcı bilgileri alınamadı: " + e.getMessage());
@@ -418,48 +366,15 @@ public class AdminController {
             if (currentUser == null || !adminTabPermissionService.hasTabPermission(currentUser.getId(), formType)) {
                 return ResponseEntity.status(403).body("Bu işlem için yetkiniz yok");
             }
-
             // Aktif sekme bilgisini session'a kaydet
             session.setAttribute("activeTab", formType);
-
-            switch (formType) {
-                case "mail":
-                    MailFormData mailForm = mailFormService.findMailFormById(id)
-                            .orElseThrow(() -> new RuntimeException("Mail başvurusu bulunamadı"));
-                    mailForm.setStatus(true);
-                    mailForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Fix: Set status enum to APPROVED
-                    mailForm.setApprovalDate(LocalDateTime.now());
-
-                    // Öğrenci mi personel mi kontrolü (öğrenci ID'si 12 haneli)
-                    boolean isStudent = mailForm.getOgrenciNo()!=null;//username.length() == 12 && username.matches("\\d+");
-                    
-                    // Doğru servisi kullanarak e-posta adresi oluşturma
-                    String emailAddress;
-                    if (isStudent) {
-                        // Öğrenci için email oluştur - DTO'dan TC Kimlik No kullan
-                        emailAddress = studentService.createEmailAddress(mailForm.getOgrenciNo());
-                    } else {
-                        // Personel için email oluştur
-                        emailAddress = staffService.createEmailAddress(mailForm.getTcKimlikNo());
-                    }
-                    
-                    mailForm.setEmail(emailAddress);
-                    mailFormService.save(mailForm);
-                    return ResponseEntity.ok("Mail başvurusu onaylandı");
-                    
-                case "eduroam":
-                    EduroamFormData eduroamForm = eduroamFormService.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Eduroam başvurusu bulunamadı"));
-                    eduroamForm.setStatus(true);
-                    eduroamForm.setApplicationStatus(ApplicationStatusEnum.APPROVED); // Fix: Set status enum to APPROVED
-                    eduroamForm.setApprovalDate(LocalDateTime.now());
-                    eduroamFormService.saveEduroamFormData(eduroamForm);
-                    return ResponseEntity.ok("Eduroam başvurusu onaylandı");
-                default:
-                    return ResponseEntity.badRequest().body("Geçersiz form tipi");
-            }
+            // FormService üzerinden form aktivasyonu
+            String successMessage = formService.activateForm(formType, id);
+            return ResponseEntity.ok(successMessage);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            // Error handling in form approval methods - Fix from memory
             return ResponseEntity.badRequest().body("Form aktivasyonu başarısız: " + e.getMessage());
         }
     }
@@ -545,10 +460,6 @@ public class AdminController {
         
         return applications;
     }
-    
-    public List<MailFormData> getAllForms() {
-        return mailFormService.getAllMailForms();
-    }
 
     @PostMapping("/api/applications/{id}/approve")
     @ResponseBody
@@ -607,12 +518,6 @@ public class AdminController {
         return ResponseEntity.ok(applications);
     }
 
-    /**
-     * Returns a list of pending mail applications in text format.
-     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
-     * 
-     * @return String containing all pending applications in the specified format
-     */
     @GetMapping("/mail/pending-applications-text")
     @ResponseBody
     public ResponseEntity<String> getPendingMailApplicationsAsText() {
@@ -629,34 +534,15 @@ public class AdminController {
         if (pendingForms.isEmpty()) {
             return ResponseEntity.ok("Bekleyen başvuru bulunamadı");
         }
-        
-        StringBuilder sb = new StringBuilder();
-        for (MailFormData form : pendingForms) {
-            sb.append(form.getTcKimlikNo()).append("#")
-              .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicil()).append("#")
-              .append(form.getAd()).append("#")
-              .append(form.getSoyad()).append("#")
-              .append(form.getOgrenciNo() !=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
-              .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append("#")
-              .append(form.getGsm1()).append("#")
-              .append(form.getEmail()+"@gantep.edu.tr").append("#")
-              .append(form.getSicil()!=null ? form.getDogumTarihi() : "").append("#")
-                    .append(form.getPassword())
-              .append("\n");
-        }
-        
+
+        StringBuilder sb = getMailStringBuilder(pendingForms);
+
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(sb.toString());
     }
 
-    /**
-     * Returns a list of pending eduroam applications in text format.
-     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
-     * 
-     * @return String containing all pending applications in the specified format
-     */
     @GetMapping("/eduroam/pending-applications-text")
     @ResponseBody
     public ResponseEntity<String> getPendingEduroamApplicationsAsText() {
@@ -673,22 +559,9 @@ public class AdminController {
         if (pendingForms.isEmpty()) {
             return ResponseEntity.ok("Bekleyen başvuru bulunamadı");
         }
-        
-        StringBuilder sb = new StringBuilder();
-        for (EduroamFormData form : pendingForms) {
-            sb.append(form.getTcKimlikNo()).append("#")
-              .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicilNo()).append("#")
-              .append(form.getAd()).append("#")
-              .append(form.getSoyad()).append("#")
-              .append(form.getOgrenciNo()!=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
-              .append(form.getOgrenciNo()!= null ? form.getBolum() : form.getUnvan()).append("#")
-              .append(form.getGsm1()).append("#")
-              .append(form.getEmail()).append("#")
-              .append(form.getOgrenciNo()==null ? form.getDogumTarihi() : "").append("#")
-                    .append(form.getPassword())
-              .append("\n");
-        }
-        
+
+        StringBuilder sb = getEduroamStringBuilder(pendingForms);
+
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)

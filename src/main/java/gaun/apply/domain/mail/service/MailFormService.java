@@ -1,10 +1,15 @@
 package gaun.apply.domain.mail.service;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
+import gaun.apply.application.dto.MailFormDto;
+import gaun.apply.application.dto.StaffDto;
+import gaun.apply.common.util.RandomPasswordGenerator;
+import gaun.apply.domain.user.service.StaffService;
 import org.springframework.stereotype.Service;
 
 import gaun.apply.domain.mail.entity.MailFormData;
@@ -17,8 +22,12 @@ import gaun.apply.domain.user.service.StudentService;
 public class MailFormService {
     private final MailFormRepository mailFormRepository;
     private final StudentService studentService;
+    private final StaffService staffService;
+    private final Clock clock;
 
-    public MailFormService(MailFormRepository mailFormRepository, StudentService studentService) {
+    public MailFormService(MailFormRepository mailFormRepository, StudentService studentService, StaffService staffService, Clock clock) {
+        this.clock = clock;
+        this.staffService = staffService;
         this.mailFormRepository = mailFormRepository;
         this.studentService = studentService;
     }
@@ -29,19 +38,6 @@ public class MailFormService {
 
     public MailFormData findByTcKimlikNo(String tcKimlikNo) {
         return mailFormRepository.findByTcKimlikNo(tcKimlikNo);
-    }
-
-    public List<MailFormData> findTop10ByOrderByApplyDateDesc() {
-        return mailFormRepository.findTop10ByOrderByApplyDateDesc();
-    }
-
-    public List<MailFormData> findLast100Applications() {
-        return mailFormRepository.findTop100ByOrderByApplyDateDesc();
-    }
-
-    public List<MailFormData> findLastMonthApplications() {
-        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
-        return mailFormRepository.findByApplyDateAfter(oneMonthAgo);
     }
 
     public void deleteMailForm(Long id) {
@@ -68,67 +64,59 @@ public class MailFormService {
     public MailFormData save(MailFormData mailFormData) {
         return mailFormRepository.save(mailFormData);
     }
-
-    /**
-     * Returns a list of pending mail applications in text format.
-     * Format: tcKimlikNo#ogrenciNo#ad#soyad#fakülte#bölüm#gsm1#e-posta1
-     * 
-     * @return String containing all pending applications in the specified format
-     */
-    public String getPendingApplicationsAsText() {
-        // Get applications that are actually pending (not approved and not rejected)
-        List<MailFormData> allApplications = mailFormRepository.findAll();
-        List<MailFormData> pendingApplications = new ArrayList<>();
-        
-        for (MailFormData application : allApplications) {
-            if (!application.isStatus() && !application.isRejected()) {
-                pendingApplications.add(application);
-            }
+    
+    public static StringBuilder getMailStringBuilder(List<MailFormData> pendingForms) {
+        StringBuilder sb = new StringBuilder();
+        for (MailFormData form : pendingForms) {
+            sb.append(form.getTcKimlikNo()).append("#")
+                    .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicil()).append("#")
+                    .append(form.getAd()).append("#")
+                    .append(form.getSoyad()).append("#")
+                    .append(form.getOgrenciNo() !=null ? form.getFakulte() : form.getCalistigiBirim()).append("#")
+                    .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append("#")
+                    .append(form.getGsm1()).append("#")
+                    .append(form.getEmail())
+                    .append(form.getSicil()!=null ? form.getDogumTarihi() : "").append("#")
+                    .append(form.getPassword())
+                    .append("\n");
         }
-        
-        StringBuilder result = new StringBuilder();
-        
-        for (MailFormData application : pendingApplications) {
-            // Get TC Kimlik No
-            String tcKimlikNo = application.getTcKimlikNo();
-            String ogrenciNo = application.getOgrenciNo() != null ? application.getOgrenciNo() : "";
-            
-            // Try to get student information from StudentService
-            StudentDto student = studentService.findByOgrenciNo(ogrenciNo);
-            
-            String ad = "";
-            String soyad = "";
-            String fakulte = "";
-            String bolum = "";
-            String gsm1 = "";
-            String email = application.getEmail() != null ? application.getEmail() : "";
-            
-            // If student information is available, use it
-            if (student != null) {
-                ad = student.getAd() != null ? student.getAd() : "";
-                soyad = student.getSoyad() != null ? student.getSoyad() : "";
-                fakulte = student.getFakKod() != null ? student.getFakKod() : "";
-                bolum = student.getBolumAd() != null ? student.getBolumAd() : "";
-                gsm1 = student.getGsm1() != null ? student.getGsm1() : "";
-                
-                // If email is empty in application but available in student, use it
-                if (email.isEmpty() && student.getEposta1() != null) {
-                    email = student.getEposta1();
-                }
-            }
-            
-            // Append the data in the required format
-            result.append(tcKimlikNo).append("#")
-                  .append(ogrenciNo).append("#")
-                  .append(ad).append("#")
-                  .append(soyad).append("#")
-                  .append(fakulte).append("#")
-                  .append(bolum).append("#")
-                  .append(gsm1).append("#")
-                  .append(email)
-                  .append("\n");
-        }
-        
-        return result.toString();
+        return sb;
     }
+
+    public void saveMailApply(MailFormDto mailFormDto) {
+        StaffDto staffDto;
+        StudentDto studentDto;
+        MailFormData mailFormData = new MailFormData();
+        // For students, username is typically a 12-digit student number
+        if ((!mailFormDto.getOgrenciNo().isEmpty() || mailFormDto.getFakulteAd()!=null)) {
+            studentDto=studentService.findByOgrenciNo(mailFormDto.getOgrenciNo());
+            mailFormData.setOgrenciNo(studentDto.getOgrenciNo());
+            mailFormData.setAd(studentDto.getAd());
+            mailFormData.setSoyad(studentDto.getSoyad());
+            mailFormData.setFakkod(studentDto.getFakKod());
+            mailFormData.setBolum(studentDto.getBolumAd());
+            mailFormData.setGsm(studentDto.getGsm1());
+            mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"@gantep.edu.tr");
+        }else {
+            staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
+            mailFormData.setSicil(staffDto.getSicilNo());
+            mailFormData.setAd(staffDto.getAd());
+            mailFormData.setSoyad(staffDto.getSoyad());
+            mailFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
+            mailFormData.setUnvan(staffDto.getUnvan());
+            mailFormData.setGsm(String.valueOf(staffDto.getGsm()));
+            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase()+"@gantep.edu.tr");
+            mailFormData.setDogumTarihi(staffDto.getDogumTarihi());
+        }
+        mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
+        mailFormData.setStatus(false); // Başlangıçta onaylanmamış
+        mailFormData.setApplicationStatus(ApplicationStatusEnum.PENDING); // Başlangıçta beklemede
+        LocalDateTime now = LocalDateTime.now(clock);
+        mailFormData.setApplyDate(now);
+        mailFormData.setCreatedAt(now);
+        mailFormRepository.save(mailFormData);
+    }
+
 }

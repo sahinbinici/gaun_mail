@@ -19,12 +19,9 @@ public interface UserService {
     void updatePassword(String tcKimlikNo, String newPassword);
 
     List<UserDto> findAllUsers();
-
+/*
     void saveMailApply(MailFormDto mailFormDto);
 
     void saveEduroamApply(EduroamFormDto eduroamFormDto);
-
-    long countActiveUsers();
-
-    long countUsers();
+    */
 }

@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(ConvertUtil::convertEntityToDto)
                 .collect(Collectors.toList());
     }
-
+/*
     @Override
     public void saveMailApply(MailFormDto mailFormDto) {
         StaffDto staffDto;
@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
             mailFormData.setBolum(studentDto.getBolumAd());
             mailFormData.setGsm(studentDto.getGsm1());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
-            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"gantep.edu.tr");
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase());
         }else {
             staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
             mailFormData.setCalistigiBirim(staffDto.getCalistigiBirim());
             mailFormData.setUnvan(staffDto.getUnvan());
             mailFormData.setGsm(String.valueOf(staffDto.getGsm()));
-            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase()+"gantep.edu.tr");
+            mailFormData.setEmail(mailFormDto.getEmail().toLowerCase());
             mailFormData.setDogumTarihi(staffDto.getDogumTarihi());
         }
         mailFormData.setPassword(RandomPasswordGenerator.rastgeleSifreUret(8));
@@ -204,14 +204,5 @@ public class UserServiceImpl implements UserService {
         eduroamFormData.setCreatedAt(now);
         eduroamFormRepository.save(eduroamFormData);
     }
-
-    @Override
-    public long countUsers() {
-        return userRepository.count();
-    }
-
-    @Override
-    public long countActiveUsers() {
-        return userRepository.countByActive(true);
-    }
+    */
 }

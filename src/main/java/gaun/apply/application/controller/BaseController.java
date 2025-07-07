@@ -262,7 +262,7 @@ public class BaseController {
             return "register";
         }
     }
-
+/*
     @GetMapping("/mail/apply")
     public String showMailApplyResult(@RequestParam(required = false) String success,
                                     @RequestParam(required = false) String error,
@@ -273,7 +273,7 @@ public class BaseController {
         }
         return "mail-apply";
     }
-
+*/
     @PostMapping("/mail/apply")
     public String mailApply(@Valid @ModelAttribute("mailFormDto") MailFormDto mailFormDto, 
                         BindingResult result, 
@@ -287,7 +287,7 @@ public class BaseController {
             if (existingMailForm != null) {
                 return determineRedirectUrl(principal, "?mailExists=true");
             }
-            userService.saveMailApply(mailFormDto);
+            mailFormService.saveMailApply(mailFormDto);
             return determineRedirectUrl(principal, "?success=true");
         } catch (Exception e) {
             return determineRedirectUrl(principal, "?error=true");
@@ -345,7 +345,7 @@ public class BaseController {
                 return determineRedirectUrl(principal, "?eduroamExists=true");
             }
 
-            userService.saveEduroamApply(eduroamFormDto);
+            eduroamFormService.saveEduroamApply(eduroamFormDto);
             return determineRedirectUrl(principal, "?success=true");
         } catch (Exception e) {
             e.printStackTrace(); // Log the exception for debugging

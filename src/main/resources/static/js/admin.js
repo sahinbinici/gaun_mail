@@ -82,9 +82,10 @@ function showUserDetails(element) {
             document.getElementById('student_ad').textContent = data.ad || '';
             document.getElementById('student_soyad').textContent = data.soyad || '';
             document.getElementById('student_gsm1').textContent = data.gsm1 || '';
+            document.getElementById('student_eposta1').textContent = data.eposta1 || '';
             document.getElementById('student_fakulte').textContent = data.fakulte || '';
-            document.getElementById('student_bolum').textContent = data.bolum || '';
-            document.getElementById('student_program').textContent = data.program || '';
+            document.getElementById('student_bolumAd').textContent = data.bolumAd || '';
+            document.getElementById('student_programAd').textContent = data.programAd || '';
             document.getElementById('student_sinif').textContent = data.egitimDerecesi || '';
         } else {
             document.getElementById('studentDetails').style.display = 'none';
