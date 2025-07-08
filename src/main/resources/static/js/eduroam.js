@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Şifre regex kontrolü
-            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
             if (!passwordRegex.test(password)) {
                 alert('Şifre en az 8 karakter olmalı ve en az 1 harf ve 1 rakam içermelidir!');
                 return;

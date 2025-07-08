@@ -67,6 +67,7 @@ public class UserServiceImpl implements UserService {
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
         user.setTcKimlikNo(studentDto.getTcKimlikNo());
+        user.setSmsCode(studentDto.getSmsCode());
         user.setRoles(getOrCreateRole("ROLE_USER"));
         user.setActive(true);
         userRepository.save(user);
@@ -78,6 +79,7 @@ public class UserServiceImpl implements UserService {
         user.setIdentityNumber(userDto.getTcKimlikNo());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setTcKimlikNo(userDto.getTcKimlikNo());
+        user.setSmsCode(userDto.getSmsCode());
 
         Staff staff = staffService.findByTcKimlikNo(userDto.getTcKimlikNo());
         if (staff != null) {

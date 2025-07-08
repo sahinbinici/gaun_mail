@@ -30,6 +30,8 @@ public class User {
     private String password;
     @Column(name = "register_date")
     private LocalDate registerDate = LocalDate.now();
+    @Column(name = "sms_code")
+    private String smsCode;
     @Column(name = "active")
     private boolean active = true;
 

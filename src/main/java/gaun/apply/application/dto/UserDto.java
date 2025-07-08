@@ -20,6 +20,8 @@ public class UserDto {
     
     @NotEmpty(message = "Şifre tekrarı boş olamaz")
     private String confirmPassword;
+
+    private String smsCode;
     
     private boolean enabled;
 }

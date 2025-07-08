@@ -161,13 +161,7 @@ public class BaseController {
             }
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
             studentDto.setPassword(pass);
-/*
-            if (result.hasErrors()) {
-                model.addAttribute("userDto", new UserDto());
-                result.rejectValue("ogrenciNo", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.", "OBS'den öğrenci bilgileri alınamadı veya OBS şifrenizi hatalı girdiniz.");
-                return "register";
-            }
-*/
+
             // Öğrenci bilgilerini oturumda saklayın
             String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("studentDto", studentDto);
@@ -203,11 +197,13 @@ public class BaseController {
             StaffDto staffDto = (StaffDto) session.getAttribute("staffDto");
             UserDto userDto = (UserDto) session.getAttribute("userDto");
             userDto.setTcKimlikNo(String.valueOf(staffDto.getTcKimlikNo()));
+            userDto.setSmsCode(code);
             staffService.saveStaff(staffDto);
             userService.saveUserStaff(userDto);
         }else if(session.getAttribute("studentDto") != null){
             // Öğrenci bilgilerini oturumdan al
             StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+            studentDto.setSmsCode(code);
             // Öğrenci kaydını yap
             studentService.saveStudent(studentDto);
             userService.saveUserStudent(studentDto);

@@ -1,11 +1,7 @@
 package gaun.apply.domain.common;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import gaun.apply.application.dto.DashboardDataDTO;
@@ -72,8 +68,11 @@ public class FormService {
         DashboardDataDTO dashboardData = new DashboardDataDTO();
 
         // Form verilerini filtrele
+        //List<MailFormData> mailForms = getFilteredMailForms(filter, tcKimlikNo, status);
         List<MailFormData> mailForms = getFilteredMailForms(filter, tcKimlikNo, status);
+        mailForms.sort(Comparator.comparing(MailFormData::getApplyDate).reversed());
         List<EduroamFormData> eduroamForms = getFilteredEduroamForms(filter, tcKimlikNo, status);
+        eduroamForms.sort(Comparator.comparing(EduroamFormData::getApplyDate).reversed());
 
         dashboardData.setMailForms(mailForms);
         dashboardData.setEduroamForms(eduroamForms);
