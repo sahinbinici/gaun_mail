@@ -9,4 +9,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByIdentityNumber(String identityNumber);
     long countByActive(boolean active);
     User findByTcKimlikNo(String tcKimlikNo);
+    boolean existsByIdentityNumber(String identityNumber);
+    boolean existsByTcKimlikNo(String tcKimlikNo);
+    boolean existsByIdentityNumberOrTcKimlikNo(String identityNumber, String tcKimlikNo);
 }

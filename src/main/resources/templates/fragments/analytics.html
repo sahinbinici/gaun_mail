@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="analytics">
+    <!-- Google Tag Manager -->
+    <script th:if="${@environment.getProperty('google.gtm.id')}">
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',/*[[${@environment.getProperty('google.gtm.id')}]]*/'GTM-XXXXXXX');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Analytics -->
+    <script async th:if="${@environment.getProperty('google.analytics.id')}" 
+            th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${@environment.getProperty('google.analytics.id')}"></script>
+    <script th:if="${@environment.getProperty('google.analytics.id')}">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', /*[[${@environment.getProperty('google.analytics.id')}]]*/'GA_MEASUREMENT_ID');
+    </script>
+    <!-- End Google Analytics -->
+</head>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="analytics">
+    <!-- Google Tag Manager -->
+    <script th:if="${@environment.getProperty('google.gtm.id')}">
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',/*[[${@environment.getProperty('google.gtm.id')}]]*/'GTM-XXXXXXX');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Analytics -->
+    <script async th:if="${@environment.getProperty('google.analytics.id')}" 
+            th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${@environment.getProperty('google.analytics.id')}"></script>
+    <script th:if="${@environment.getProperty('google.analytics.id')}">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', /*[[${@environment.getProperty('google.analytics.id')}]]*/'GA_MEASUREMENT_ID');
+    </script>
+    <!-- End Google Analytics -->
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript th:if="${@environment.getProperty('google.gtm.id')}">
+        <iframe th:src="'https://www.googletagmanager.com/ns.html?id=' + ${@environment.getProperty('google.gtm.id')}"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+</body>
+</html>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript th:if="${@environment.getProperty('google.gtm.id')}">
+        <iframe th:src="'https://www.googletagmanager.com/ns.html?id=' + ${@environment.getProperty('google.gtm.id')}"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+</body>
+</html>

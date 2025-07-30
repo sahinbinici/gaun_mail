@@ -8,24 +8,23 @@
     <meta name="author" content="Gaziantep Üniversitesi Bilgi İşlem Daire Başkanlığı">
     <meta name="robots" content="index, follow">
     <title>GAÜN E-Posta ve Eduroam Hesap Oluşturma</title>
-    <link rel="canonical" href="https://eposta.gantep.edu.tr/register" />
+    <link rel="canonical" href="https://hesap.gantep.edu.tr/register" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
         }
-        
+
         .navbar {
-            background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,.1);
-            padding: 0.6rem 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background-color: #0d6efd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 0.5rem 1rem;
         }
-        
+
         .navbar-brand {
-            font-size: 1.2rem;
-            font-weight: 500;
+            font-size: 1.25rem;
+            font-weight: 600;
             color: #fff !important;
             margin-left: 1rem;
             display: flex;
@@ -34,15 +33,15 @@
         }
 
         .navbar-brand small {
-            font-size: 0.9rem;
-            opacity: 0.95;
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
 
         .navbar .nav-link {
             color: rgba(255,255,255,0.9) !important;
             font-weight: 500;
             padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .navbar .nav-link:hover {
@@ -53,58 +52,70 @@
 
         .navbar .nav-link.active {
             color: #fff !important;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             border-radius: 4px;
         }
 
         .navbar-logo-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .navbar-logo {
-            height: 45px;
-            transition: transform 0.3s ease;
+            height: 40px;
         }
 
-        .navbar-logo:hover {
-            transform: scale(1.05);
-        }
-        
         .card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,.08);
-        }
-        
-        /* ... Login sayfasındaki diğer stiller ... */
-        .nav-tabs { display: none !important; }
-
-        /* Toggle button styling */
-        #toggleRegButton {
-            color: #0d6efd !important; /* keep original text color */
-            background: #e7f1ff;       /* subtle background to stand out */
-            border: 2px solid #0d6efd;
-            border-radius: 8px;
-            font-weight: 600;
-            padding: 0.55rem 1.25rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
         }
 
-        #toggleRegButton:hover,
-        #toggleRegButton:focus {
-            background: #d0e7ff;       /* slightly darker on hover */
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
-            transform: translateY(-1px);
-            color: #0d6efd !important;
-            text-decoration: none;
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem;
         }
 
-        #toggleRegButton:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        .form-control {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            color: #495057;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
         }
     </style>
 </head>
@@ -129,44 +140,38 @@
                             <i class="fas fa-sign-in-alt me-1"></i> Giriş Yap
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a id="helpLinkReg" class="nav-link active ms-2" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle me-1"></i> Yardım
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <div class="container mt-5">
-
         <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <div class="navbar-divider center mb-4 mt-4 w-100 p-2" style="background-color: #0d6efd;border-radius:10px">
-                    <header class="navbar-header" style="text-align: center; margin-top: 10px; margin-bottom: 10px; color: white;font-size: 1.2rem;">
-                        <span>E-Posta - Eduroam Başvuru Sistemi</span>
-                    </header>
-                </div>
-                <div class="navbar-divider center w-100 p-2" style="text-align: center;font-size: 1.2rem;font-weight: bold; color: #0d6efd;border-radius:10px">
-                    <header>
-                        <span>Kayıt Ol</span>
-                    </header>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a th:class="${activeTab == 'staff' ? 'nav-link' : 'nav-link active'}" data-bs-toggle="tab" href="#student">
+            <div class="col-md-8 offset-md-2">
+                <div class="card mb-4">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">GAÜN E-Posta ve Eduroam Başvuru Sistemi</h3>
+                        <p class="mt-2 mb-0 text-white">Hesap Oluşturma</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-pills mb-4 justify-content-center" id="registerTabs">
+                            <li class="nav-item me-3">
+                                <a th:class="${activeTab == 'staff' ? 'nav-link' : 'nav-link active'}" id="student-tab" data-bs-toggle="pill" href="#student">
                                     <i class="fas fa-user-graduate me-2"></i>Öğrenci
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a th:class="${activeTab == 'staff' ? 'nav-link active' : 'nav-link'}" data-bs-toggle="tab" href="#staff">
+                                <a th:class="${activeTab == 'staff' ? 'nav-link active' : 'nav-link'}" id="staff-tab" data-bs-toggle="pill" href="#staff">
                                     <i class="fas fa-user-tie me-2"></i>Personel
                                 </a>
                             </li>
                         </ul>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="text-end mb-3">
-                            <button id="toggleRegButton" class="btn btn-link" style="font-weight: 500;">Personel Kaydı İçin Tıklayın</button>
-                        </div>
+
                         <div class="tab-content">
                             <!-- Öğrenci Formu -->
                             <div th:class="${activeTab == 'staff' ? 'tab-pane fade' : 'tab-pane fade show active'}" id="student">
@@ -295,6 +300,40 @@
                 <div th:if="${param.error}" class="alert alert-danger mt-3">
                     <i class="fas fa-exclamation-circle me-2"></i>
                     <span th:text="${error}">Hata mesajı</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yardım Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Yardım</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Eduroam ve E-Posta başvurusunda bulunmak için öncelikle kayıt olmalısınız.</li>
+                        <li>Öğrenci numarası ve OBS şifresi ile kayıt olabilirsiniz. E-devlet şifresi ile kayıt olamazsınız.</li>
+                        <li>Kayıt olurken OBS'de bulunan cep telefonu numarasının güncel olduğuna emin olmalısınız aksi halde cep telefonunuza doğrulama kodu gönderilemeyecektir.</li>
+                        <li>Cep telefonunuza gelen kodu doğrulama ekranına girip doğrulayın.</li>
+                        <li>Kaydınız tamamlandıktan sonra sisteme giriş yapabilirsiniz.</li>
+                        <br>
+                        <h5>E-posta Başvurusu</h5>
+                        <li>E-posta hesabınız adınızın ilk harfi, soyadınızın ilk harfi ve öğrenci numaranızın son 6 hanesini alınarak belirlenmektedir.</li>
+                        <li>E-posta kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>E-posta hesabınızın şifresi otomatik olarak belirlenmektedir. Başvurunuz onaylandıktan sonra <a href="https://mail2.gaziantep.edu.tr/" target="_blank" rel="noopener noreferrer">mail2.gaziantep.edu.tr</a> giriş yapıp değiştirmelisiniz.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                        <li>E-posta ayarları için <a href="https://bidb.gantep.edu.tr/pages.php?url=e-mail-hizmetleri-20" target="_blank" rel="noopener noreferrer">tıklayın.</a></li>
+                        <br>
+                        <h5>Eduroam Başvurusu</h5>
+                        <li>Eduroam kullanıcı adınız TC Kimlik numaranız olarak belirlenmektedir.</li>
+                        <li>Eduroam kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                        <li>Eduroam ayarları için <a href="https://eduroam.gantep.edu.tr/index.php" target="_blank" rel="noopener noreferrer">tıklayın.</a></li>
+                    </ul>
                 </div>
             </div>
         </div>

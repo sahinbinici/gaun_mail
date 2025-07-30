@@ -8,21 +8,21 @@
     <meta name="author" content="Gaziantep Üniversitesi Bilgi İşlem Daire Başkanlığı">
     <meta name="robots" content="index, follow">
     <title>GAÜN E-Posta ve Eduroam Başvuru Sistemi</title>
-    <link rel="canonical" href="https://eposta.gantep.edu.tr/login" />
+    <link rel="canonical" href="https://hesap.gantep.edu.tr/login" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
         }
-        
+
         .navbar {
             background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,.1);
             padding: 0.6rem 1rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .navbar-brand {
             font-size: 1.2rem;
             font-weight: 500;
@@ -71,24 +71,24 @@
         .navbar-logo:hover {
             transform: scale(1.05);
         }
-        
+
         .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,.08);
         }
-        
+
         .card-header {
             background: white;
             border-bottom: none;
             padding: 1.5rem 1.5rem 0;
         }
-        
+
         .nav-tabs {
             border: none;
             margin-bottom: -1px;
         }
-        
+
         .nav-tabs .nav-link {
             border: none;
             color: #6c757d;
@@ -96,85 +96,85 @@
             font-weight: 500;
             transition: all 0.3s;
         }
-        
+
         .nav-tabs .nav-link:hover {
             border: none;
             color: #0d6efd;
         }
-        
+
         .nav-tabs .nav-link.active {
             color: #0d6efd;
             background: none;
             border-bottom: 2px solid #0d6efd;
         }
-        
+
         .card-body {
             padding: 2rem;
         }
-        
+
         .form-control {
             border-radius: 8px;
             padding: 0.75rem 1rem;
             border: 1px solid #dee2e6;
             transition: all 0.3s;
         }
-        
+
         .form-control:focus {
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
         }
-        
+
         .btn-primary {
             padding: 0.75rem 2rem;
             border-radius: 8px;
             font-weight: 500;
             transition: all 0.3s;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(13,110,253,.2);
         }
-        
+
         .alert {
             border-radius: 10px;
             border: none;
             padding: 1rem 1.5rem;
         }
-        
+
         .form-text {
             color: #6c757d;
             font-size: 0.875rem;
             margin-top: 0.5rem;
         }
-        
+
         .form-group {
             margin-bottom: 1.5rem;
         }
-        
+
         label {
             font-weight: 500;
             margin-bottom: 0.5rem;
             color: #495057;
         }
-        
+
         /* Form içindeki linkler için stil */
         .form-group span a {
             color: #0d6efd;
             text-decoration: none;
             transition: all 0.3s;
         }
-        
+
         .form-group span a:hover {
             text-decoration: underline;
         }
-        
+
         /* Input ikonları için stil */
         .input-group-text {
             background: none;
             border-right: none;
         }
-        
+
         .input-group .form-control {
             border-left: none;
         }
@@ -182,45 +182,28 @@
 
         /* Toggle button styling */
         #toggleButton {
-            color: #0d6efd !important;
-            background: #e7f1ff;
+            color: #0d6efd !important; /* keep original text color */
+            background: #e7f1ff;       /* subtle background to stand out */
             border: 2px solid #0d6efd;
             border-radius: 8px;
             font-weight: 600;
             padding: 0.55rem 1.25rem;
             transition: all 0.3s ease;
             text-decoration: none;
-            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1);
-        }
-
-        /* Student mode (default) */
-        .student-mode #toggleButton {
-            background: #e7f1ff;
-            border-color: #0d6efd;
-            color: #0d6efd !important;
-        }
-
-        /* Staff mode */
-        .staff-mode #toggleButton {
-            background: #0d6efd;
-            border-color: #0d6efd;
-            color: white !important;
         }
 
         #toggleButton:hover,
         #toggleButton:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-        }
-        
-        #toggleButton:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+            background: #d0e7ff;       /* slightly darker on hover */
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+            transform: translateY(-1px);
+            color: #0d6efd !important; /* ensure text color stays the same */
+            text-decoration: none;
         }
 
-        /* Add smooth transition for form switch */
-        .tab-pane {
-            transition: opacity 0.3s ease-in-out;
+        #toggleButton:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
         }
     </style>
 </head>
@@ -245,6 +228,11 @@
                             <i class="fas fa-user-plus me-1"></i> Kayıt
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a id="helpLink" class="nav-link active" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle me-1"></i> Yardım
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -254,115 +242,145 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div th:if="${param.error}">
-                    <div th:if="${param.error}" class="alert alert-danger">
+                    <div class="alert alert-danger">
                         Kullanıcı adı veya şifre hatalı.
-                    </div>
-                    <div th:if="${param.passwordResetSuccess}" class="alert alert-success">
-                        Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.
                     </div>
                 </div>
                 <div th:if="${param.logout}">
                     <div class="alert alert-success">Çıkış yaptınız.</div>
                 </div>
-                <div class="navbar-divider center mb-4 mt-4 w-100 p-2" style="background-color: #0d6efd;border-radius:10px">
-                    <header class="navbar-header" style="text-align: center; margin-top: 10px; margin-bottom: 10px; color: white;font-size: 1.2rem;">
-                        <span>E-Posta - Eduroam Başvuru Sistemi</span>
-                    </header>
-
-                </div>
-                <div class="navbar-divider center w-100 p-2" style="text-align: center;font-size: 1.2rem;font-weight: bold; color: #0d6efd;border-radius:10px">
-                    <header>
-                        <span>Giriş Yap</span>
-                    </header>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#student">Öğrenci</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#staff">Personel</a>
-                            </li>
-                        </ul>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h4 class="mb-0">GAÜN E-Posta ve Eduroam Başvuru Sistemi</h4>
                     </div>
                     <div class="card-body">
-                        <div class="text-end mb-3">
-                            <button id="toggleButton" class="btn btn-link" style="font-weight: 500;">Personel Girişi için tıklayın</button>
+                        <div class="text-center mb-4">
+                            <h5 class="card-title">Kullanıcı Girişi</h5>
                         </div>
+
+                        <ul class="nav nav-pills mb-4 justify-content-center" id="loginTabs">
+                            <li class="nav-item me-2">
+                                <a class="nav-link active px-4" id="student-tab" data-bs-toggle="pill" href="#student">Öğrenci</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-4" id="staff-tab" data-bs-toggle="pill" href="#staff">Personel</a>
+                            </li>
+                        </ul>
+
                         <div class="tab-content">
                             <!-- Öğrenci Giriş Formu -->
                             <div class="tab-pane fade show active" id="student">
                                 <form method="post" role="form" th:action="@{/login}" class="form-horizontal">
                                     <div class="form-group mb-3">
-                                        <label class="control-label">Öğrenci No</label>
-                                        <input type="text" 
-                                               id="username" 
-                                               name="username" 
-                                               class="form-control" 
-                                               placeholder="Öğrenci Numaranızı Girin" />
+                                        <label class="control-label fw-bold">Öğrenci No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text" 
+                                                   id="username" 
+                                                   name="username" 
+                                                   class="form-control" 
+                                                   placeholder="Öğrenci Numaranızı Girin" />
+                                        </div>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label class="control-label">Şifre</label>
-                                        <input type="password" 
-                                               id="password" 
-                                               name="password"
-                                               class="form-control" 
-                                               placeholder="OBS Şifrenizi Girin (E-Devlet Şifresi ile Giriş Yapılmamaktadır!)" />
+                                        <label class="control-label fw-bold">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" 
+                                                   id="password" 
+                                                   name="password"
+                                                   class="form-control" 
+                                                   placeholder="OBS Şifrenizi Girin" />
+                                        </div>
+                                        <small class="form-text text-danger">E-Devlet şifresi ile giriş yapılamaz!</small>
                                     </div>
 
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Giriş</button>
-                                        <span>&nbsp;
-                                            <a th:href="@{/register}">Kayıt Ol</a>
-                                        </span>
+                                    <div class="form-group d-grid gap-2 mb-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+                                    </div>
+
+                                    <div class="form-group text-center">
+                                        <p class="mb-1">Henüz hesabınız yok mu? <a th:href="@{/register}" class="fw-bold">Kayıt Ol</a></p>
+                                        <p class="text-muted small">**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</p>
                                     </div>
                                 </form>
-                                <div>
-                                    <span>**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</span>
-                                </div>
                             </div>
 
                             <!-- Personel Giriş Formu -->
                             <div class="tab-pane fade" id="staff">
                                 <form method="post" role="form" th:action="@{/login}" class="form-horizontal">
                                     <div class="form-group mb-3">
-                                        <label class="control-label">TC Kimlik No</label>
-                                        <input type="text" 
-                                               id="staffUsername" 
-                                               name="username" 
-                                               class="form-control" 
-                                               placeholder="TC Kimlik Numaranızı Girin"
-                                               pattern="\d{11}" 
-                                               title="TC Kimlik No 11 haneli olmalıdır" />
+                                        <label class="control-label fw-bold">TC Kimlik No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text" 
+                                                   id="staffUsername" 
+                                                   name="username" 
+                                                   class="form-control" 
+                                                   placeholder="TC Kimlik Numaranızı Girin"
+                                                   pattern="\d{11}" 
+                                                   title="TC Kimlik No 11 haneli olmalıdır" />
+                                        </div>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label class="control-label">Şifre</label>
-                                        <input type="password" 
-                                               id="staffPassword" 
-                                               name="password" 
-                                               class="form-control" 
-                                               placeholder="Şifrenizi Girin" />
+                                        <label class="control-label fw-bold">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" 
+                                                   id="staffPassword" 
+                                                   name="password" 
+                                                   class="form-control" 
+                                                   placeholder="Şifrenizi Girin" />
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Giriş</button>
-                                        <span class="ms-2">
-                                            <a th:href="@{/register}">Kayıt Ol</a>
-                                        </span>
-                                        <span class="ms-3">
-                                            <a th:href="@{/forgot-password-staff}">Şifremi Unuttum</a>
-                                        </span>
+                                    <div class="form-group d-grid gap-2 mb-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+                                    </div>
+
+                                    <div class="form-group text-center">
+                                        <p class="mb-1">Henüz hesabınız yok mu? <a th:href="@{/register}" class="fw-bold">Kayıt Ol</a></p>
+                                        <p class="mb-1">Şifrenizi mi unuttunuz? <a th:href="@{/forgot-password-staff}" class="fw-bold">Şifremi Unuttum</a></p>
+                                        <p class="text-muted small">**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</p>
                                     </div>
                                 </form>
-                                <div>
-                                    <span>**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</span><br>
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yardım Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Yardım</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Eduroam ve E-Posta başvurusunda bulunmak için öncelikle kayıt olmalısınız.</li>
+                        <li>Öğrenci numarası ve OBS şifresi ile kayıt olabilirsiniz. E-devlet şifresi ile kayıt olamazsınız.</li>
+                        <li>Kayıt olurken OBS'de bulunan cep telefonu numarasının güncel olduğuna emin olmalısınız aksi halde cep telefonunuza doğrulama kodu gönderilemeyecektir.</li>
+                        <li>Cep telefonunuza gelen kodu doğrulama ekranına girip doğrulayın.</li>
+                        <li>Kaydınız tamamlandıktan sonra sisteme giriş yapabilirsiniz.</li>
+                        <br>
+                        <h5>E-posta Başvurusu</h5>
+                        <li>E-posta hesabınız adınızın ilk harfi, soyadınızın ilk harfi ve öğrenci numaranızın son 6 hanesini alınarak belirlenmektedir.</li>
+                        <li>E-posta kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>E-posta hesabınızın şifresi otomatik olarak belirlenmektedir. Başvurunuz onaylandıktan sonra <a href="https://mail2.gaziantep.edu.tr/" target="_blank" rel="noopener noreferrer">mail2.gaziantep.edu.tr</a> giriş yapıp değiştirmelisiniz.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                        <br>
+                        <h5>Eduroam Başvurusu</h5>
+                        <li>Eduroam kullanıcı adınız TC Kimlik numaranız olarak belirlenmektedir.</li>
+                        <li>Eduroam kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                    </ul>
                 </div>
             </div>
         </div>

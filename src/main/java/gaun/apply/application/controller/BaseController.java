@@ -162,6 +162,12 @@ public class BaseController {
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
             studentDto.setPassword(pass);
 
+            if (studentDto.getOgrenciNo() == null) {
+                result.rejectValue("ogrenciNo", null, "Öğrenci numarası veya OBS şifresi yanlış!!!");
+                model.addAttribute("userDto", new UserDto());
+                return "register";
+            }
+
             // Öğrenci bilgilerini oturumda saklayın
             String verificationCode = String.valueOf(new Random().nextInt(999999));
             session.setAttribute("studentDto", studentDto);

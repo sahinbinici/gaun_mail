@@ -63,6 +63,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUserStudent(StudentDto studentDto) {
+        // Check if user already exists with this identity number or TCKN
+        if (userRepository.existsByIdentityNumberOrTcKimlikNo(studentDto.getOgrenciNo(), studentDto.getTcKimlikNo())) {
+            throw new RuntimeException("Bu öğrenci numarası veya TC Kimlik numarası ile daha önce kayıt yapılmıştır.");
+        }
+        
         User user = new User();
         user.setIdentityNumber(studentDto.getOgrenciNo());
         user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
@@ -75,6 +80,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUserStaff(UserDto userDto) {
+        // Check if user already exists with this TCKN
+        if (userRepository.existsByTcKimlikNo(userDto.getTcKimlikNo())) {
+            throw new RuntimeException("Bu TC Kimlik numarası ile daha önce kayıt yapılmıştır.");
+        }
+        
         User user = new User();
         user.setIdentityNumber(userDto.getTcKimlikNo());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));

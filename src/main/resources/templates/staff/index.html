@@ -1,12 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
 
 <head>
     <meta charset="UTF-8">
-    <title>Personel İşlemleri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personel İşlemleri - Gaziantep Üniversitesi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Gaziantep Üniversitesi personel e-posta ve eduroam başvuru sayfası. GAÜN personeli için dijital hizmetler.">
+    <meta name="keywords" content="Gaziantep Üniversitesi, GAÜN, personel, e-posta, eduroam, başvuru, dijital hizmetler">
+    <meta name="author" content="Gaziantep Üniversitesi">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://hesap.gantep.edu.tr/staff" />
+    
+    <!-- OpenGraph -->
+    <meta property="og:site_name" content="Gaziantep Üniversitesi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Personel İşlemleri - Gaziantep Üniversitesi" />
+    <meta property="og:description" content="Gaziantep Üniversitesi personel e-posta ve eduroam başvuru sayfası" />
+    <meta property="og:url" content="https://hesap.gantep.edu.tr/staff" />
+    <meta property="og:image" content="https://hesap.gantep.edu.tr/images/gaun_logo.png" />
+    <meta property="og:locale" content="tr_TR" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Personel İşlemleri - Gaziantep Üniversitesi" />
+    <meta name="twitter:description" content="Gaziantep Üniversitesi personel e-posta ve eduroam başvuru sayfası" />
+    <meta name="twitter:image" content="https://hesap.gantep.edu.tr/images/gaun_logo.png" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Gaziantep Üniversitesi",
+      "url": "https://hesap.gantep.edu.tr",
+      "logo": "https://hesap.gantep.edu.tr/images/gaun_logo.png",
+      "sameAs": [
+        "https://www.gantep.edu.tr",
+        "https://twitter.com/gantepuni",
+        "https://www.facebook.com/gantepuniversitesi"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+90-342-360-1010",
+        "contactType": "customer service"
+      }
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <!-- Analytics -->
+    <th:block th:replace="fragments/analytics :: analytics"></th:block>
 </head>
-
+<!-- Mevcut body içeriği aynı kalabilir -->
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">

@@ -22,9 +22,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "identity_number")
+    @Column(name = "identity_number", unique = true)
     private String identityNumber;
-    @Column(name = "tc_kimlik_no")
+    @Column(name = "tc_kimlik_no", unique = true)
     private String tcKimlikNo;
     @Column(name = "password")
     private String password;
