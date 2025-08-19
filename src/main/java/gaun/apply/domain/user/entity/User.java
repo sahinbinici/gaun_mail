@@ -15,7 +15,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_users_tc_kimlik_no", columnNames = "tc_kimlik_no")
+        })
+
 public class User {
 
     @Id

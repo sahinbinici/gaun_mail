@@ -165,27 +165,29 @@ public class AdminController {
             mailForm.setApprovalDate(LocalDateTime.now());
 
             boolean isStudent = mailForm.getOgrenciNo() != null;
+            MailFormData existingMailForm = mailFormService.findByTcKimlikNo(mailForm.getTcKimlikNo());
 
+            /*
             String emailAddress = isStudent
                     ? studentService.createEmailAddress(mailForm.getOgrenciNo())
-                    : staffService.createEmailAddress(mailForm.getTcKimlikNo());
+                    : staffService.createEmailAddress(mailForm.getTcKimlikNo()); */
 
-            mailForm.setEmail(emailAddress);
+            mailForm.setEmail(existingMailForm.getEmail());
             mailFormService.save(mailForm);
 
-            sendApprovalSms(mailForm, emailAddress, isStudent);
+            sendApprovalSms(mailForm, existingMailForm.getEmail(), isStudent);
 
-            return ResponseEntity.ok().body("Mail başvurusu onaylandı");
+            return ResponseEntity.ok().body("Mail başvurusu onaylandı ");
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body("Mail başvurusu onaylanamadı: " + e.getMessage());
+                    .body(" Mail başvurusu onaylanamadı: " + e.getMessage());
         }
     }
 
     private void sendApprovalSms(MailFormData mailForm, String emailAddress, boolean isStudent) {
         try {
             String message = "GAÜN E-posta başvurunuz onaylanmıştır. E-posta adresiniz: " +
-                    emailAddress + "Şifreniz: " + mailForm.getPassword();
+                    emailAddress + " Şifreniz: " + mailForm.getPassword();
 
             if (isStudent) {
                 StudentDto student = studentService.findByOgrenciNo(mailForm.getOgrenciNo());

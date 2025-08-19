@@ -97,7 +97,7 @@ public class MailFormService {
             mailFormData.setBolum(studentDto.getBolumAd());
             mailFormData.setGsm(studentDto.getGsm1());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
-            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"@gantep.edu.tr");
+            mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"@mail2.gantep.edu.tr");
         }else {
             staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());

@@ -44,6 +44,11 @@ public class SpringSecurity {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/register/verify-sms").permitAll()
                         .requestMatchers("/forgot-password-staff", "/verify-sms-password-reset", "/reset-password").permitAll()
+                        // SEO ve Search Engine doğrulama dosyaları
+                        .requestMatchers("/robots.txt", "/sitemap.xml").permitAll()
+                        .requestMatchers("/google*.html", "/BingSiteAuth.xml", "/yandex_*.html").permitAll()
+                        .requestMatchers("/.well-known/**").permitAll()
+                        .requestMatchers("/manifest.json").permitAll()
                         .anyRequest().authenticated()
             ).formLogin(
                 form -> form
