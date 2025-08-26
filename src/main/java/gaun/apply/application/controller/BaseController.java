@@ -147,24 +147,40 @@ public class BaseController {
 
     @PostMapping("/register/save/student")
     public String registrationStudent(@Valid @ModelAttribute("studentDto") StudentDto studentDto,
-                                    BindingResult result,
-                                    HttpSession session,
-                                    Model model) {
+                                      BindingResult result,
+                                      HttpSession session,
+                                      Model model) {
         String pass = studentDto.getPassword();
         try {
+            // Check for validation errors first
+            if (result.hasErrors()) {
+                // Add all necessary model attributes for proper form rendering
+                model.addAttribute("userDto", new UserDto());
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                model.addAttribute("activeTab", "student");
+                return "register";
+            }
+            
             User existingUser = userService.findByidentityNumber(studentDto.getOgrenciNo());
             if (existingUser != null) {
                 result.rejectValue("ogrenciNo", null, "Bu öğrenci numarası ile daha önce kayıt yapılmış");
                 model.addAttribute("userDto", new UserDto());
-                //model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                model.addAttribute("activeTab", "student");
                 return "register";
             }
+            
             studentDto = ConvertUtil.getStudentFromObs(studentDto);
             studentDto.setPassword(pass);
 
             if (studentDto.getOgrenciNo() == null) {
                 result.rejectValue("ogrenciNo", null, "Öğrenci numarası veya OBS şifresi yanlış!!!");
                 model.addAttribute("userDto", new UserDto());
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                model.addAttribute("activeTab", "student");
                 return "register";
             }
 
@@ -174,17 +190,23 @@ public class BaseController {
             session.setAttribute("verificationCode", verificationCode);
             // SMS gönderimi ve diğer işlemler
             smsService.sendSms(new String[]{studentDto.getGsm1()}, "Doğrulama Kodu : "+verificationCode);
-
+            model.addAttribute("gsm", studentDto.getGsm1());
             model.addAttribute("verificationCode", verificationCode);
             model.addAttribute("smsVerificationDto", new SmsVerificationDto());
             return "sms-verification"; // Redirect to SMS verification page
         } catch (Exception e) {
-            model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu");
+            //model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
+            result.rejectValue("ogrenciNo", null, "Öğrenci bilgileri OBS sisteminden alınamadı. Bilgi İşlem Daire Başkanlığı ile iletişime geçin.");
+            // Ensure studentDto retains the submitted values for display
+            model.addAttribute("studentDto", studentDto);
             model.addAttribute("userDto", new UserDto());
+            model.addAttribute("staffDto", new StaffDto());
             model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+            model.addAttribute("activeTab", "student");
             return "register";
         }
     }
+
 
     @PostMapping("/register/verify-sms")
     public String verifySms(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto, 
@@ -222,26 +244,42 @@ public class BaseController {
                                   BindingResult result,HttpSession session,
                                   Model model) {
         try {
-            // Önce mevcut kullanıcı kontrolü
-            User existingUser = userService.findByTcKimlikNo(userDto.getTcKimlikNo());
-            if (existingUser != null) {
-                result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
+            // Check for validation errors first
+            if (result.hasErrors()) {
+                // Add all necessary model attributes for proper form rendering
                 model.addAttribute("staffDto", new StaffDto());
-                model.addAttribute("userDto", new UserDto());
+                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("userDto", userDto);
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
                 model.addAttribute("activeTab", "staff");
                 return "register";
             }
+
             // Şifre eşleşme kontrolü
             if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
                 result.rejectValue("confirmPassword", null, "Şifreler eşleşmiyor");
                 model.addAttribute("staffDto", new StaffDto());
-                model.addAttribute("userDto", new UserDto());
+                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
                 model.addAttribute("activeTab", "staff");
                 return "register";
             }
+            
+            // Önce mevcut kullanıcı kontrolü
             StaffDto staffDto = staffService.findStaffDtoByTcKimlikNo(userDto.getTcKimlikNo());
-            if (staffDto == null) {
-                result.rejectValue("tcKimlik", null, "Personel veritabanında kaydınız bulunamadı.");
+            User existingUser = userService.findByTcKimlikNo(userDto.getTcKimlikNo());
+            if (existingUser != null) {
+                result.rejectValue("tcKimlikNo", null, "Bu TC kimlik numarası ile daha önce kayıt yapılmış");
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+                model.addAttribute("activeTab", "staff");
+                return "register";
+            }else if(staffDto==null){
+                result.rejectValue("tcKimlikNo", null, "Girilen TC Kimlik numarası ile personel bilgisi bulunamadı. Bilgi İşlem Daire Başkanlığı ile iletişime geçin.");
+                model.addAttribute("staffDto", new StaffDto());
+                model.addAttribute("studentDto", new StudentDto());
+                model.addAttribute("smsVerificationDto", new SmsVerificationDto());
                 model.addAttribute("activeTab", "staff");
                 return "register";
             }
@@ -252,14 +290,16 @@ public class BaseController {
             session.setAttribute("userDto", userDto);
             // SMS gönderimi ve diğer işlemler
             smsService.sendSms(new String[]{String.valueOf(staffDto.getGsm())}, "Doğrulama Kodu : "+verificationCode);
-
+            model.addAttribute("gsm", staffDto.getGsm());
             model.addAttribute("verificationCode", verificationCode);
             model.addAttribute("smsVerificationDto", new SmsVerificationDto());
             return "sms-verification"; // Redirect to SMS verification page
         } catch (Exception e) {
-            model.addAttribute("error", "Kayıt işlemi sırasında bir hata oluştu: " + e.getMessage());
+            result.rejectValue("tcKimlikNo", null, "Girilen TC Kimlik numarası ile personel bilgisi bulunamadı. Bilgi İşlem Daire Başkanlığı ile iletişime geçin.");
+            model.addAttribute("userDto", userDto);
             model.addAttribute("studentDto", new StudentDto());
-            model.addAttribute("userDto", new UserDto());
+            model.addAttribute("staffDto", new StaffDto());
+            model.addAttribute("smsVerificationDto", new SmsVerificationDto());
             model.addAttribute("activeTab", "staff");
             return "register";
         }
