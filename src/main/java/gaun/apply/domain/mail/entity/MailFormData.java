@@ -21,6 +21,8 @@ public class MailFormData extends BaseFormData {
     private String fakulteKod;
     @Column(name = "email")
     private String email;
+    @Column(name="mail_kullaniciAdi")
+    private String mailKullaniciAdi;
     @Column(name = "password")
     private String password;
     @Column(name = "ad")

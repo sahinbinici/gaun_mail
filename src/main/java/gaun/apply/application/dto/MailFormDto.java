@@ -11,6 +11,7 @@ public class MailFormDto {
     private String fakulteAd;
     private String bolumAd;
     private String email;
+    private String mailKullaniciAdi;
     private String password;
     private String confirmPassword;
     private boolean status;

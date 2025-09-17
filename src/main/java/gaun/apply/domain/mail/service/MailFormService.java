@@ -1,6 +1,8 @@
 package gaun.apply.domain.mail.service;
 
+import java.text.SimpleDateFormat;
 import java.time.Clock;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,15 +10,15 @@ import java.time.LocalDateTime;
 
 import gaun.apply.application.dto.MailFormDto;
 import gaun.apply.application.dto.StaffDto;
+import gaun.apply.application.dto.StudentDto;
+import gaun.apply.common.enums.ApplicationStatusEnum;
 import gaun.apply.common.util.RandomPasswordGenerator;
+import gaun.apply.common.util.TurkishCharReplace;
+import gaun.apply.domain.user.service.StudentService;
 import gaun.apply.domain.user.service.StaffService;
-import org.springframework.stereotype.Service;
-
 import gaun.apply.domain.mail.entity.MailFormData;
 import gaun.apply.domain.mail.repository.MailFormRepository;
-import gaun.apply.common.enums.ApplicationStatusEnum;
-import gaun.apply.application.dto.StudentDto;
-import gaun.apply.domain.user.service.StudentService;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MailFormService {
@@ -64,7 +66,25 @@ public class MailFormService {
     public MailFormData save(MailFormData mailFormData) {
         return mailFormRepository.save(mailFormData);
     }
-    
+
+    public static StringBuilder getMailStringBuilder(List<MailFormData> pendingForms) {
+        StringBuilder sb = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (MailFormData form : pendingForms) {
+            sb.append(form.getMailKullaniciAdi()).append(":")
+                    .append(form.getAd()).append(".").append(form.getSoyad()).append(":")
+                    .append(form.getOgrenciNo()!=null ? form.getOgrenciNo() : form.getSicil()).append(":")
+                    .append(form.getOgrenciNo()!=null ? form.getBolum() : form.getUnvan()).append(":")
+                    .append(form.getGsm1()).append(":")
+                    .append(form.getApplyDate().toLocalDate().format(formatter)).append(":")
+                    .append(form.getPassword())
+                    .append("\n");
+        }
+        TurkishCharReplace.replaceTurkishChars(sb);
+        return sb;
+    }
+
+    /*
     public static StringBuilder getMailStringBuilder(List<MailFormData> pendingForms) {
         StringBuilder sb = new StringBuilder();
         for (MailFormData form : pendingForms) {
@@ -80,9 +100,10 @@ public class MailFormService {
                     .append(form.getPassword())
                     .append("\n");
         }
+        TurkishCharReplace.replaceTurkishChars(sb);
         return sb;
     }
-
+*/
     public void saveMailApply(MailFormDto mailFormDto) {
         StaffDto staffDto;
         StudentDto studentDto;
@@ -98,6 +119,7 @@ public class MailFormService {
             mailFormData.setGsm(studentDto.getGsm1());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());
             mailFormData.setEmail(studentService.createEmailAddress(mailFormDto.getOgrenciNo()).toLowerCase()+"@mail2.gantep.edu.tr");
+            mailFormData.setMailKullaniciAdi(studentService.createEmailAddress(mailFormDto.getOgrenciNo().toLowerCase()));
         }else {
             staffDto=staffService.findStaffDtoByTcKimlikNo(mailFormDto.getTcKimlikNo());
             mailFormData.setTcKimlikNo(mailFormDto.getTcKimlikNo());

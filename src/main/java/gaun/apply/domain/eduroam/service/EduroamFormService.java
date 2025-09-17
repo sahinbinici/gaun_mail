@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import gaun.apply.application.dto.EduroamFormDto;
 import gaun.apply.application.dto.StaffDto;
 import gaun.apply.application.dto.StudentDto;
+import gaun.apply.common.util.TurkishCharReplace;
 import gaun.apply.domain.user.service.StaffService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,7 @@ public class EduroamFormService {
                     .append(form.getPassword())
                     .append("\n");
         }
+        TurkishCharReplace.replaceTurkishChars(sb);
         return sb;
     }
 

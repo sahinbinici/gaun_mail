@@ -389,40 +389,47 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add initial mode class
-            document.body.classList.add('student-mode');
-            const studentPane = document.getElementById('student');
-            const staffPane = document.getElementById('staff');
-            const toggleBtn = document.getElementById('toggleButton');
-
-            function showStudent() {
-                studentPane.classList.add('show', 'active');
-                staffPane.classList.remove('show', 'active');
-                toggleBtn.textContent = 'Personel Girişi için tıklayın';
-                document.body.classList.remove('staff-mode');
-                document.body.classList.add('student-mode');
-            }
-
-            function showStaff() {
-                studentPane.classList.remove('show', 'active');
-                staffPane.classList.add('show', 'active');
-                toggleBtn.textContent = 'Öğrenci Girişi için tıklayın';
-                document.body.classList.remove('student-mode');
-                document.body.classList.add('staff-mode');
-            }
-
-            toggleBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (studentPane.classList.contains('active')) {
-                    showStaff();
-                } else {
-                    showStudent();
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Get tab elements
+                const studentTab = document.getElementById('student-tab');
+                const staffTab = document.getElementById('staff-tab');
+                
+                // Only proceed if both tabs exist
+                if (!studentTab || !staffTab) {
+                    console.warn('Tab elements not found');
+                    return;
                 }
-            });
 
-            // Initial state
-            showStudent();
+                // Function to update body class based on active tab
+                function updateBodyClass() {
+                    try {
+                        if (document.querySelector('#student-tab.active') !== null) {
+                            document.body.classList.remove('staff-mode');
+                            document.body.classList.add('student-mode');
+                        } else if (document.querySelector('#staff-tab.active') !== null) {
+                            document.body.classList.remove('student-mode');
+                            document.body.classList.add('staff-mode');
+                        }
+                    } catch (e) {
+                        console.error('Error updating body class:', e);
+                    }
+                }
+                
+                // Set initial state
+                updateBodyClass();
+                
+                // Update on tab change using event delegation
+                document.addEventListener('shown.bs.tab', function(e) {
+                    if (e.target && (e.target.id === 'student-tab' || e.target.id === 'staff-tab')) {
+                        updateBodyClass();
+                    }
+                });
+                
+            } catch (e) {
+                console.error('Error initializing login page:', e);
+            }
         });
     </script>
 </body>

@@ -1,7 +1,6 @@
 package gaun.apply.application.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -536,13 +535,11 @@ public class AdminController {
         if (pendingForms.isEmpty()) {
             return ResponseEntity.ok("Bekleyen başvuru bulunamadı");
         }
-
         StringBuilder sb = getMailStringBuilder(pendingForms);
-
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(sb.toString());
+                .body(sb.toString().toLowerCase());
     }
 
     @GetMapping("/eduroam/pending-applications-text")
@@ -563,10 +560,9 @@ public class AdminController {
         }
 
         StringBuilder sb = getEduroamStringBuilder(pendingForms);
-
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(sb.toString());
+                .body(sb.toString().toLowerCase());
     }
 }
