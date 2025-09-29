@@ -1,6 +1,7 @@
 package gaun.apply.common.util;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -40,10 +41,17 @@ public class ConvertUtil {
 
     public static String convertPasswordToMD5(String param) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] messageDigest  = md.digest(param.getBytes());
+        byte[] messageDigest = md.digest(param.getBytes(StandardCharsets.UTF_8));
         BigInteger no = new BigInteger(1, messageDigest);
-        return no.toString(16).toUpperCase();
+
+        // 32 karaktere tamamla (başta sıfır eksilirse doldur)
+        String hashText = no.toString(16).toUpperCase();
+        while (hashText.length() < 32) {
+            hashText = "0" + hashText;
+        }
+        return hashText;
     }
+
 
     public static boolean compareBirthDates(String inputBirthDate, String obsBirthDate) {
         try {
@@ -66,8 +74,7 @@ public class ConvertUtil {
         String url = baseUrl + "?check=gaun_mobil&u=" + studentDto.getOgrenciNo() + "&p=" + pass;
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            StudentDto studentFromService = ConvertUtil.convertJsonToStudentDto(response.getBody());
-            return studentFromService;
+            return ConvertUtil.convertJsonToStudentDto(response.getBody());
         } else {
             return null;
         }

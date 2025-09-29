@@ -16,7 +16,7 @@ public class StudentService {
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
         this.modelMapper = new ModelMapper();
-        
+
         modelMapper.getConfiguration()
             .setFieldMatchingEnabled(true)
             .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
@@ -24,7 +24,9 @@ public class StudentService {
 
     public void saveStudent(StudentDto studentDto) {
         Student student = modelMapper.map(studentDto, Student.class);
-        studentRepository.save(student);
+        if(studentRepository.findByTcKimlikNo(student.getTcKimlikNo())==null){
+            studentRepository.save(student);
+        }
     }
 
     StudentDto findByTcKimlikNo(String tcKimlikNo){
@@ -42,6 +44,10 @@ public class StudentService {
         String adIlkHarf=student.getAd().substring(0,1);
         String soyadIlkHarf=student.getSoyad().substring(0,1);
         String numaraSon6=student.getOgrenciNo().substring(student.getOgrenciNo().length()-6);
-        return (adIlkHarf+soyadIlkHarf+numaraSon6).toLowerCase().replace("ı","i").replace("ö","o").replace("ü","u").replace("ğ","g");
+        return (adIlkHarf+soyadIlkHarf+numaraSon6).toLowerCase().replace("ı","i").replace("ö","o")
+                .replace("ü","u").replace("ğ","g").replace("ç","c")
+                .replace("Ç","c").replace("Ö","o").replace("Ü","u")
+                .replace("İ","i").replace("ş","s").replace("Ş","s")
+                .replace("I","i");
     }
 }
