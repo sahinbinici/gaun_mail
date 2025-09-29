@@ -209,6 +209,28 @@
     </style>
 </head>
 <body>
+    <!-- Registration Required Modal -->
+    <div class="modal fade" id="registrationRequiredModal" tabindex="-1" aria-labelledby="registrationRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="registrationRequiredModalLabel">Dikkat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <p class="lead">Giriş yapabilmeniz için öncelikle <b>öğrenci numaranız</b> ve <b> OBS şifreniz</b> ile sisteme kayıt olmanız gerekmektedir.</p>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a th:href="@{/register}" class="btn btn-primary">Kayıt Ol</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <div class="navbar-logo-container">
@@ -276,10 +298,10 @@
                                         <label class="control-label fw-bold">Öğrenci No</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                            <input type="text" 
-                                                   id="username" 
-                                                   name="username" 
-                                                   class="form-control" 
+                                            <input type="text"
+                                                   id="username"
+                                                   name="username"
+                                                   class="form-control"
                                                    placeholder="Öğrenci Numaranızı Girin" />
                                         </div>
                                     </div>
@@ -288,10 +310,10 @@
                                         <label class="control-label fw-bold">Şifre</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                            <input type="password" 
-                                                   id="password" 
+                                            <input type="password"
+                                                   id="password"
                                                    name="password"
-                                                   class="form-control" 
+                                                   class="form-control"
                                                    placeholder="OBS Şifrenizi Girin" />
                                         </div>
                                         <small class="form-text text-danger">E-Devlet şifresi ile giriş yapılamaz!</small>
@@ -315,12 +337,12 @@
                                         <label class="control-label fw-bold">TC Kimlik No</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                            <input type="text" 
-                                                   id="staffUsername" 
-                                                   name="username" 
-                                                   class="form-control" 
+                                            <input type="text"
+                                                   id="staffUsername"
+                                                   name="username"
+                                                   class="form-control"
                                                    placeholder="TC Kimlik Numaranızı Girin"
-                                                   pattern="\d{11}" 
+                                                   pattern="\d{11}"
                                                    title="TC Kimlik No 11 haneli olmalıdır" />
                                         </div>
                                     </div>
@@ -329,10 +351,10 @@
                                         <label class="control-label fw-bold">Şifre</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                            <input type="password" 
-                                                   id="staffPassword" 
-                                                   name="password" 
-                                                   class="form-control" 
+                                            <input type="password"
+                                                   id="staffPassword"
+                                                   name="password"
+                                                   class="form-control"
                                                    placeholder="Şifrenizi Girin" />
                                         </div>
                                     </div>
@@ -395,7 +417,7 @@
                 // Get tab elements
                 const studentTab = document.getElementById('student-tab');
                 const staffTab = document.getElementById('staff-tab');
-                
+
                 // Only proceed if both tabs exist
                 if (!studentTab || !staffTab) {
                     console.warn('Tab elements not found');
@@ -416,20 +438,26 @@
                         console.error('Error updating body class:', e);
                     }
                 }
-                
+
                 // Set initial state
                 updateBodyClass();
-                
+
                 // Update on tab change using event delegation
                 document.addEventListener('shown.bs.tab', function(e) {
                     if (e.target && (e.target.id === 'student-tab' || e.target.id === 'staff-tab')) {
                         updateBodyClass();
                     }
                 });
-                
+
             } catch (e) {
                 console.error('Error initializing login page:', e);
             }
+        });
+
+        // Show registration required modal when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            var registrationModal = new bootstrap.Modal(document.getElementById('registrationRequiredModal'));
+            registrationModal.show();
         });
     </script>
 </body>
