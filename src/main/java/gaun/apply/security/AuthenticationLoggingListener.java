@@ -32,6 +32,7 @@ public class AuthenticationLoggingListener implements ApplicationListener<Abstra
         this.restTemplate = restTemplate;
         this.passwordEncoder = passwordEncoder;
     }
+
     User user = new User();
 
     @Override
@@ -39,34 +40,12 @@ public class AuthenticationLoggingListener implements ApplicationListener<Abstra
         if (event instanceof AuthenticationFailureBadCredentialsEvent) {
             AuthenticationFailureBadCredentialsEvent failureEvent = (AuthenticationFailureBadCredentialsEvent) event;
             System.out.println("Giriş Denemesi Detayları:");
-            String identityNumber= failureEvent.getAuthentication().getPrincipal().toString();
-            String password= failureEvent.getAuthentication().getCredentials().toString();
+            String identityNumber = failureEvent.getAuthentication().getPrincipal().toString();
+            String password = failureEvent.getAuthentication().getCredentials().toString();
 
-
-            try {
-                // Şifre bilgisini authentication request'ten al
-                String url = baseUrl + "?check=gaun_mobil&u=" + identityNumber + "&p=" + password;
-
-                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                    StudentDto studentDto = ConvertUtil.convertJsonToStudentDto(response.getBody());
-
-                    // Yeni kullanıcı oluştur
-                    user.setIdentityNumber(studentDto.getOgrenciNo());
-                    user.setPassword(passwordEncoder.encode(studentDto.getPassword()));
-                    // Varsayılan rol ataması
-                    List<Role> roles = new ArrayList<>();
-                    roles.add(new Role("ROLE_USER"));
-                    user.setRoles(roles);
-
-                    userRepository.save(user);
-                } else {
-                    throw new UsernameNotFoundException("Kullanıcı bulunamadı");
-                }
-            } catch (Exception e) {
-                throw new UsernameNotFoundException("Servis hatası: " + e.getMessage());
-            }
+            // Otomatik kayıt işlemi devre dışı bırakıldı
+            // Kayıt işlemi artık CustomAuthenticationProvider tarafından yönetiliyor
+            System.out.println("Başarısız giriş denemesi: " + identityNumber);
         }
     }
-} 
+}

@@ -1,5 +1,7 @@
 package gaun.apply.config;
 
+import gaun.apply.security.CustomAuthenticationFailureHandler;
+import gaun.apply.security.CustomAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SpringSecurity {
     @Autowired
     private UserDetailsService userDetailsService;
+    
+    @Autowired
+    private CustomAuthenticationProvider customAuthenticationProvider;
+    
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
@@ -43,6 +51,7 @@ public class SpringSecurity {
                         .requestMatchers("/check-eduroam-exists/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/register/verify-sms").permitAll()
+                        .requestMatchers("/login/verify-sms", "/login/verify-sms-submit").permitAll()
                         .requestMatchers("/forgot-password-staff", "/verify-sms-password-reset", "/reset-password").permitAll()
                         // SEO ve Search Engine doğrulama dosyaları
                         .requestMatchers("/robots.txt", "/sitemap.xml").permitAll()
@@ -55,6 +64,7 @@ public class SpringSecurity {
                     .loginPage("/login")
                     .loginProcessingUrl("/login")
                     .defaultSuccessUrl("/index")
+                    .failureHandler(customAuthenticationFailureHandler)
                     .permitAll()
             ).logout(
                 logout -> logout
@@ -68,7 +78,6 @@ public class SpringSecurity {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
-            .userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder());
+            .authenticationProvider(customAuthenticationProvider);
     }
 }

@@ -90,8 +90,8 @@
                                     <div class="info-group">
                                         <label class="form-label" for="eduroamPassword">Şifre</label>
                                         <input type="password" class="form-control" id="eduroamPassword"
-                                            th:field="*{password}" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,10}$"
-                                            title="8-10 karakter arası, en az bir harf ve bir rakam içermelidir.">
+                                            th:field="*{password}" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,10}$"
+                                            title="8-10 karakter arası, en az bir harf ve bir rakam içermelidir.Özel karakter kabul edilmez.">
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">

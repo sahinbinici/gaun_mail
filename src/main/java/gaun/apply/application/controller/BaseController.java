@@ -38,7 +38,13 @@ import gaun.apply.domain.eduroam.service.EduroamFormService;
 import gaun.apply.domain.mail.service.MailFormService;
 import gaun.apply.common.util.ConvertUtil;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 /**
  * BaseController
@@ -134,6 +140,75 @@ public class BaseController {
     @GetMapping("/login")
     public String login(@ModelAttribute("user") User user) {
         return "login";
+    }
+
+    @GetMapping("/login/verify-sms")
+    public String showLoginSmsVerification(Model model, HttpSession session) {
+        StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+        if (studentDto == null) {
+            return "redirect:/login?error=session";
+        }
+        
+        model.addAttribute("gsm", studentDto.getGsm1());
+        model.addAttribute("smsVerificationDto", new SmsVerificationDto());
+        return "sms-verification-login";
+    }
+
+    @PostMapping("/login/verify-sms-submit")
+    public String verifyLoginSms(@Valid @ModelAttribute("smsVerificationDto") SmsVerificationDto smsVerificationDto,
+                                BindingResult result, Model model, HttpSession session, HttpServletRequest request) {
+        String code = smsVerificationDto.getCode();
+        String sessionCode = (String) session.getAttribute("verificationCode");
+        StudentDto studentDto = (StudentDto) session.getAttribute("studentDto");
+
+        if (sessionCode == null || !sessionCode.equals(code)) {
+            model.addAttribute("error", "Geçersiz doğrulama kodu");
+            model.addAttribute("gsm", studentDto != null ? studentDto.getGsm1() : "");
+            return "sms-verification-login";
+        }
+
+        if (studentDto == null) {
+            return "redirect:/login?error=session";
+        }
+
+        try {
+            // Öğrenci ve kullanıcı kaydı yap
+            studentDto.setSmsCode(code);
+            studentService.saveStudent(studentDto);
+            userService.saveUserStudent(studentDto);
+
+            // Kullanıcıyı otomatik login yap
+            User user = userService.findByidentityNumber(studentDto.getOgrenciNo());
+            if (user != null) {
+                // Authentication token oluştur
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    user.getIdentityNumber(),
+                    null,
+                    user.getRoles().stream()
+                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(role.getName()))
+                        .collect(Collectors.toList())
+                );
+                
+                // Security context'e kaydet
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+                securityContext.setAuthentication(authentication);
+                
+                // Session'a security context'i kaydet
+                session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            }
+
+            // Session'daki geçici bilgileri temizle
+            session.removeAttribute("studentDto");
+            session.removeAttribute("verificationCode");
+            session.removeAttribute("fromLogin");
+
+            // Ana sayfaya yönlendir (otomatik login yapıldı)
+            return "redirect:/index";
+        } catch (Exception e) {
+            model.addAttribute("error", "Kayıt sırasında bir hata oluştu: " + e.getMessage());
+            model.addAttribute("gsm", studentDto.getGsm1());
+            return "sms-verification-login";
+        }
     }
 
     @GetMapping("/register")

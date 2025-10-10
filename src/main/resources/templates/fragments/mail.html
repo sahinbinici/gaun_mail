@@ -55,11 +55,22 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col mb-3 mt-3" th:if="${mailForm.isRejected() || mailForm.isStatus() == false}">
+                                        <span class="alert alert-danger">Ortalama 1-3 iş günü içerisinde başvurunuz değerlendirilip <b>SMS</b> ile bilgilendirileceksiniz.</span>
+                                    </div>
                                     <div>
                                         <span th:if="${mailForm.isStatus()}">
-                                            <a href="https://mail1.gantep.edu.tr/">Oturum açmak ve şifrenizi değiştirmek için tıklayın..</a>
+                                            <span th:if="${mailForm.getSicil()==null}">
+                                                <a href="https://mail2.gantep.edu.tr/">Oturum açmak ve şifrenizi değiştirmek için tıklayın..</a>
+                                            <br>
+                                            <a href="https://mail2.gaziantep.edu.tr/sss/">Yardım klavuzu için tıklayın..</a>
+                                            </span>
+                                            <span th:if="${mailForm.getSicil()!=null}">
+                                                <a href="https://mail1.gantep.edu.tr/">Oturum açmak ve şifrenizi değiştirmek için tıklayın..</a>
                                             <br>
                                             <a href="https://mail1.gaziantep.edu.tr/sss/">Yardım klavuzu için tıklayın..</a>
+                                            </span>
+
                                         </span>
                                     </div>
                                 </div>

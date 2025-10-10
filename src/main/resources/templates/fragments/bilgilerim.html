@@ -47,17 +47,17 @@
                             <label class="text-muted">Sınıf</label>
                             <h5 th:text="${student.sinif}" class="mb-0"></h5>
                         </div>
-                    </div>
+                    </div> <!--
                     <div class="col-md-6">
                         <div class="info-group">
                             <label class="text-muted">Öğrenim Durumu</label>
                             <h5>
-                                <span th:text="${student.durumu}" 
+                                <span th:text="${student.durumu}"
                                       th:class="${student.durumu == 'Aktif' ? 'badge bg-success' : 'badge bg-warning'}">
                                 </span>
                             </h5>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Personel Bilgileri -->
@@ -89,7 +89,7 @@
                 </div>
 
                 <!-- Kullanıcı bulunamadı mesajı -->
-                <div th:if="${(userType == 'STUDENT' && student == null) || (userType == 'STAFF' && staff == null)}" 
+                <div th:if="${(userType == 'STUDENT' && student == null) || (userType == 'STAFF' && staff == null)}"
                      class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     Kullanıcı bilgileri bulunamadı.
@@ -132,4 +132,4 @@
         </style>
     </div>
 </body>
-</html> 
+</html>
