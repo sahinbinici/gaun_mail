@@ -105,7 +105,7 @@
 
                             <input type="hidden" id="eduroamStatus" th:field="*{status}" value="false">
 
-                            <div class="alert alert-info mt-3">
+                            <div class="alert alert-warning mt-3">
                                 <i class="fas fa-info-circle me-2"></i>
                                 <small>Şifreniz 8-10 karakter arası olmalı, en az bir harf ve bir rakam içermelidir.</small>
                             </div>
@@ -117,9 +117,10 @@
                             </div>
                         </form>
                         <br>
-                        <div>
-                            <i class="fas fa-info-circle me-2 text-warning"></i>
+                        <div class="alert alert-secondary mt-3">
                             <small>Eduroam Hesabınız var ve şifrenizi hatırlamıyorsanız, <a href="http://sof1.gantep.edu.tr/htlt.php" target="_blank">Eduroam</a> sayfasından sıfırlayabilirsiniz.</small>
+                        <br>
+                            <small>Eduroam hakkında daha detaylı destek için, <a href="https://eduroam.gaziantep.edu.tr/" target="_blank">EDUROAM bilgi sayfasını ziyaret edin.</a></small>
                         </div>
                     </div>
                 </div>
@@ -196,6 +197,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="info-group">
+                        <h5 class="text-danger mb-3">Destek ve Yardım</h5>
+                        <i>Eduroam hesap ve ayarları hakkında bilgi almak için aşağıdaki personel ile iletişime geçebilirsiniz</i>
+                        <hr>
                         <h5 class="card-title mb-3"> Eduroam Hesap Yönetimi</h5>
                         <label class="text-muted">Ad Soyad
                             <h5 class="card-info mb-3">Derya KURTOĞLU</h5></label>

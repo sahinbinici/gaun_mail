@@ -103,6 +103,11 @@
                                                 th:field="*{email}" th:readonly="${#lists.contains(user.roles.![name], 'ROLE_USER')}">
                                             <span class="input-group-text">@gantep.edu.tr</span>
                                         </div>
+                                        <div class="text-end mt-4">
+                                            <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">
+                                                <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
+                                            </button>
+                                        </div>
                                     </div>
                                         <label class="form-label" th:if="${#lists.contains(user.roles.![name], 'ROLE_USER')}">**E-Posta adresiniz adınızın ilk harfi, soyadınızın ilk harfi ve öğrenci numaranızın son 6 hanesini alınarak belirlenmektedir.</label>
                                 </div>
@@ -110,11 +115,6 @@
 
                             <input type="hidden" id="mailStatus" th:field="*{status}" value="false">
 
-                            <div class="text-end mt-4">
-                                <button type="button" class="btn btn-primary" onclick="showMailConfirmationPopup()">
-                                    <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
-                                </button>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -125,6 +125,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="info-group">
+                        <h5 class="text-danger mb-3">Destek ve Yardım</h5>
+                        <i>E-posta hesap ve ayarları hakkında bilgi almak için aşağıdaki personel ile iletişime geçebilirsiniz</i>
+                        <hr>
                         <h5 class="card-title mb-3"> E-POSTA Kullanıcı Hesap Yönetimi</h5>
                         <label class="text-muted">Ad Soyad
                             <h5 class="card-info mb-3">Pınar BAKKALLAR</h5></label>
