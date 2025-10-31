@@ -1,0 +1,30 @@
+spring.application.name=PersonSmsService
+spring.datasource.db1.jdbcUrl=jdbc:mysql://193.140.136.26:3306/basvuruformlari
+spring.datasource.db1.username=sahinbey
+spring.datasource.db1.password=sahinbey_
+spring.datasource.db1.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Aşağıdakiler yorum satırında, ihtiyaç halinde açabilirsin:
+
+# spring.datasource.db2.jdbcUrl=jdbc:mysql://localhost:3306/database2
+# spring.datasource.db2.username=db2user
+# spring.datasource.db2.password=db2password
+# spring.datasource.db2.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# spring.datasource.db3.jdbcUrl=jdbc:mysql://localhost:3306/database3
+# spring.datasource.db3.username=db3user
+# spring.datasource.db3.password=db3password
+# spring.datasource.db3.driver-class-name=com.mysql.cj.jdbc.Driver
+
+
+# HikariCP Configuration
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=1200000
+spring.datasource.hikari.maximum-pool-size=10
+
+# SMS Service Configuration
+sms.service.url=https://api.vatansms.net/api/v1/1toN
+sms.service.api-id=29d463733f56db81be9eb355
+sms.service.api-key=79259ea325e14e8603ab7cf7
+sms.service.sender-name=G.ANTEP UNI
