@@ -91,7 +91,7 @@ public class FormService {
     private List<MailFormData> getFilteredMailForms(String filter, String tcKimlikNo, String status) {
         if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
             MailFormData mailForm = mailFormService.findByTcKimlikNo(tcKimlikNo);
-            return mailForm != null ? List.of(mailForm) : new ArrayList<>();
+            return mailForm != null ? new ArrayList<>(List.of(mailForm)) : new ArrayList<>();
         } else if (status != null && !status.isEmpty()) {
             return mailFormService.findByDurum(status);
         } else if (filter != null) {
@@ -116,7 +116,7 @@ public class FormService {
     private List<EduroamFormData> getFilteredEduroamForms(String filter, String tcKimlikNo, String status) {
         if (tcKimlikNo != null && !tcKimlikNo.isEmpty()) {
             EduroamFormData eduroamForm = eduroamFormService.eduroamFormDataTc(tcKimlikNo);
-            return eduroamForm != null ? List.of(eduroamForm) : new ArrayList<>();
+            return eduroamForm != null ? new ArrayList<>(List.of(eduroamForm)) : new ArrayList<>();
         } else if (status != null && !status.isEmpty()) {
             return eduroamFormService.findByDurum(status);
         } else if (filter != null) {

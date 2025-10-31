@@ -1,31 +1,38 @@
 package gaun.apply.domain.user.service;
 
-import gaun.apply.config.db.DbAkademikConfig;
-import gaun.apply.config.db.DbIdariConfig;
-import gaun.apply.config.db.DbSurekliConfig;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import gaun.apply.application.dto.StaffDto;
 import gaun.apply.domain.user.entity.Staff;
+import gaun.apply.domain.user.repository.CalyerKurumdisiRepository;
 import gaun.apply.domain.user.repository.StaffRepository;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 
 @Service
 public class StaffService {
+    private static final Logger logger = LoggerFactory.getLogger(StaffService.class);
+
     private final StaffRepository staffRepository;
     private final ModelMapper modelMapper;
     private final StaffRepository idariRepo;
     private final StaffRepository akademikRepo;
     private final StaffRepository surekliRepo;
+    private final CalyerKurumdisiRepository calyerKurumdisiRepo;
 
-    public StaffService(StaffRepository staffRepository, @Qualifier("personelIdariRepository")StaffRepository idariRepo, @Qualifier("personelAkademikRepository")StaffRepository akademikRepo, @Qualifier("personelSurekliRepository")StaffRepository surekliRepo) {
+    public StaffService(StaffRepository staffRepository,
+                       @Qualifier("personelIdariRepository")StaffRepository idariRepo,
+                       @Qualifier("personelAkademikRepository")StaffRepository akademikRepo,
+                       @Qualifier("personelSurekliRepository")StaffRepository surekliRepo,
+                       @Qualifier("calyerKurumdisiAkademikRepository")CalyerKurumdisiRepository calyerKurumdisiRepo) {
         this.staffRepository = staffRepository;
         this.idariRepo = idariRepo;
         this.akademikRepo = akademikRepo;
         this.surekliRepo = surekliRepo;
+        this.calyerKurumdisiRepo = calyerKurumdisiRepo;
         this.modelMapper = new ModelMapper();
 
         modelMapper.getConfiguration()
@@ -44,30 +51,53 @@ public class StaffService {
     }
 
     private StaffDto getStaffDto(String tcKimlikNo) {
+        logger.debug("TC Kimlik No ile personel aranıyor: {}", tcKimlikNo);
 
-        //Object[] result = (Object[]) staffRepository.findStaffByTcKimlikNo(tcKimlikNo);
         Object[] result = null;
-         if(idariRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null){
-             result = (Object[]) idariRepo.findStaffByTcKimlikNo(tcKimlikNo);
-         } else if (akademikRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null) {
-             result = (Object[]) akademikRepo.findStaffByTcKimlikNo(tcKimlikNo);
-         }else if (surekliRepo.findStaffByTcKimlikNo(tcKimlikNo)!=null) {
-             result = (Object[]) surekliRepo.findStaffByTcKimlikNo(tcKimlikNo);
-         }
 
-        if (result == null) {
-            return null;
+        // İdari personel kontrolü
+        result = (Object[]) idariRepo.findStaffByTcKimlikNo(tcKimlikNo);
+        if(result != null){
+            logger.debug("Personel idari tablosunda bulundu: {}", tcKimlikNo);
+            return mapToStaffDto(result);
         }
 
+        // Akademik personel kontrolü
+        result = (Object[]) akademikRepo.findStaffByTcKimlikNo(tcKimlikNo);
+        if (result != null) {
+            logger.debug("Personel akademik tablosunda bulundu: {}", tcKimlikNo);
+            return mapToStaffDto(result);
+        }
+
+        // Sürekli personel kontrolü
+        result = (Object[]) surekliRepo.findStaffByTcKimlikNo(tcKimlikNo);
+        if (result != null) {
+            logger.debug("Personel sürekli tablosunda bulundu: {}", tcKimlikNo);
+            return mapToStaffDto(result);
+        }
+
+        // Çalışma yeri kurum dışı kontrolü
+        logger.debug("Personel person tablolarında bulunamadı, calyerkurumdisi tablosuna bakılıyor: {}", tcKimlikNo);
+        result = (Object[]) calyerKurumdisiRepo.findStaffByTcKimlikNo(tcKimlikNo);
+        if (result != null) {
+            logger.debug("Personel calyerkurumdisi tablosunda bulundu: {}", tcKimlikNo);
+            return mapToStaffDto(result);
+        }
+
+        logger.warn("Personel hiçbir tabloda bulunamadı: {}", tcKimlikNo);
+        return null;
+    }
+
+    private StaffDto mapToStaffDto(Object[] result) {
         StaffDto staffDto = new StaffDto();
         staffDto.setTcKimlikNo((Long) result[0]);
-        staffDto.setSicilNo((Integer) result[1]);
+        staffDto.setSicilNo(result[1] != null ? (Integer) result[1] : null);
         staffDto.setAd((String) result[2]);
         staffDto.setSoyad((String) result[3]);
-        staffDto.setCalistigiBirim((String) result[4]);
-        staffDto.setUnvan((String) result[5]);
-        staffDto.setGsm((String) result[6]);
-        staffDto.setDogumTarihi((Date) result[7]);
+        staffDto.setCalistigiBirim(result[4] != null ? (String) result[4] : null);
+        staffDto.setUnvan(result[5] != null ? (String) result[5] : null);
+        staffDto.setGsm(result[6] != null ? (String) result[6] : null);
+        staffDto.setDogumTarihi(result[7] != null ? (Date) result[7] : null);
         return staffDto;
     }
 
