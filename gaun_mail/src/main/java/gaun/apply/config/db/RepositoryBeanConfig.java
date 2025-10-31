@@ -1,6 +1,5 @@
 package gaun.apply.config.db;
 
-import gaun.apply.domain.user.repository.CalyerKurumdisiRepository;
 import gaun.apply.domain.user.repository.StaffRepository;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,11 +26,5 @@ public class RepositoryBeanConfig {
     public StaffRepository personelSurekliRepository(
             @Qualifier("dbSurekliEntityManagerFactory") EntityManagerFactory emf) {
         return new JpaRepositoryFactory(emf.createEntityManager()).getRepository(StaffRepository.class);
-    }
-
-    @Bean(name = "calyerKurumdisiAkademikRepository")
-    public CalyerKurumdisiRepository calyerKurumdisiAkademikRepository(
-            @Qualifier("dbAkademikEntityManagerFactory") EntityManagerFactory emf) {
-        return new JpaRepositoryFactory(emf.createEntityManager()).getRepository(CalyerKurumdisiRepository.class);
     }
 }
