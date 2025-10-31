@@ -1,0 +1,33 @@
+# robots.txt - Web Crawler Configuration
+# Defines crawling rules for search engines and web crawlers
+
+User-agent: *
+
+# Public Resources - Allowed for all crawlers
+Allow: /
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /google*.html
+Allow: /BingSiteAuth.xml
+Allow: /yandex_*.html
+Allow: /.well-known/
+
+# Administrative and Internal Areas - Restricted
+Disallow: /admin/
+Disallow: /error/
+Disallow: /api/
+Disallow: /actuator/
+
+# User Account Management - Restricted
+Disallow: /sms-verification*
+Disallow: /reset-password*
+
+# Private Content - Restricted
+Disallow: */private/
+
+# Crawler Behavior Settings
+Crawl-delay: 1
+
+# Sitemap Location
+Sitemap: https://hesap.gantep.edu.tr/bim-basvuru/sitemap.xml

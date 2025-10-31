@@ -1,0 +1,12 @@
+<!-- Rol bazlı menü öğeleri -->
+<div sec:authorize="hasRole('ADMIN')">
+    <a href="/admin" class="nav-link">Admin Paneli</a>
+</div>
+
+<div sec:authorize="hasRole('STAFF')">
+    <a href="/staff/index" class="nav-link">Personel Paneli</a>
+</div>
+
+<div sec:authorize="hasRole('USER')">
+    <a href="/student/index" class="nav-link">Öğrenci Paneli</a>
+</div>

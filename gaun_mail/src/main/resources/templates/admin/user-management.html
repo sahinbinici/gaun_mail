@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi - GAÜN BİDB</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- CSRF token -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/admin}">GAÜN BİDB Admin Paneli</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin}">
+                            <i class="fas fa-home me-1"></i>Ana Sayfa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/admin/user-management}">
+                            <i class="fas fa-users me-1"></i>Kullanıcı Yönetimi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="fas fa-sign-out-alt me-1"></i>Çıkış Yap
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-users me-2"></i>Kullanıcı Yönetimi</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Arama ve Filtre -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" id="searchInput" class="form-control" placeholder="TC Kimlik No veya Kullanıcı Adı ile ara...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="statusFilter" class="form-select">
+                                    <option value="">Tüm Durumlar</option>
+                                    <option value="active">Aktif</option>
+                                    <option value="inactive">Pasif</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="roleFilter" class="form-select">
+                                    <option value="">Tüm Roller</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="personel">Personel</option>
+                                    <option value="öğrenci">Öğrenci</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Kullanıcı Tablosu -->
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kullanıcı Adı</th>
+                                        <th>TC Kimlik No</th>
+                                        <th>Ad</th>
+                                        <th>Soyad</th>
+                                        <th>Roller</th>
+                                        <th>Durum</th>
+                                        <th>Kayıt Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                    <tr th:each="user : ${users}">
+                                        <td th:text="${user.id}"></td>
+                                        <td th:text="${user.identityNumber}"></td>
+                                        <td th:text="${user.tcKimlikNo}"></td>
+                                        <td th:text="${user.ad}"></td>
+                                        <td th:text="${user.soyad}"></td>
+                                        <td>
+                                            <span th:each="role, iterStat : ${user.roles}"
+                                                  th:class="${role.name == 'ROLE_ADMIN' ? 'badge bg-danger me-1' :
+                                                           (role.name == 'ROLE_STAFF' ? 'badge bg-warning me-1' : 'badge bg-info me-1')}"
+                                                  th:text="${role.name == 'ROLE_ADMIN' ? 'Admin' :
+                                                           (role.name == 'ROLE_STAFF' ? 'Personel' : 'Öğrenci')}">
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${user.active ? 'badge bg-success' : 'badge bg-secondary'}"
+                                                  th:text="${user.active ? 'Aktif' : 'Pasif'}">
+                                            </span>
+                                        </td>
+                                        <td th:text="${#temporals.format(user.registerDate, 'dd-MM-yyyy')}"></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-info"
+                                                        th:onclick="'viewUser(' + ${user.id} + ')'"
+                                                        title="Görüntüle">
+                                                    <i class="fas fa-eye"></i> Detay
+                                                </button>
+                                                <button class="btn btn-warning"
+                                                        th:onclick="'toggleUserStatus(' + ${user.id} + ', ' + ${user.active} + ')'"
+                                                        th:title="${user.active ? 'Pasif Yap' : 'Aktif Yap'}">
+                                                    <i th:class="${user.active ? 'fas fa-ban' : 'fas fa-check'}"></i> Durum Değiştir
+                                                </button>
+                                                <button class="btn btn-danger"
+                                                        th:onclick="'deleteUser(' + ${user.id} + ')'"
+                                                        title="Sil">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Detay Modal -->
+    <div class="modal fade" id="userDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-user me-2"></i>Kullanıcı Detayları</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="userDetailContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/admin.js(v=${#dates.createNow().time})}"></script>
+    <script>
+        // Arama ve filtreleme
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput')?.addEventListener('input', filterTable);
+            document.getElementById('statusFilter')?.addEventListener('change', filterTable);
+            document.getElementById('roleFilter')?.addEventListener('change', filterTable);
+        });
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+            const rows = document.querySelectorAll('#userTableBody tr');
+
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matchesSearch = text.includes(searchTerm);
+                const matchesStatus = !statusFilter ||
+                    (statusFilter === 'active' && text.includes('aktif')) ||
+                    (statusFilter === 'inactive' && text.includes('pasif'));
+                const matchesRole = !roleFilter || text.includes(roleFilter.toLowerCase());
+
+                const isVisible = matchesSearch && matchesStatus && matchesRole;
+                row.style.display = isVisible ? '' : 'none';
+                if (isVisible) visibleCount++;
+            });
+
+            // Eğer arama terimi var ve hiç sonuç yoksa, backend'e sorgu at
+            if (searchTerm && visibleCount === 0 && !statusFilter && !roleFilter) {
+                searchFromDatabase(searchTerm);
+            }
+        }
+
+        function searchFromDatabase(query) {
+            const baseUrl = window.location.origin;
+            const tbody = document.getElementById('userTableBody');
+            
+            // Loading göster
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary"></div> Veritabanında aranıyor...</td></tr>';
+            
+            fetch(`${baseUrl}/bim-basvuru/admin/users/search?query=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(users => {
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Sonuç bulunamadı</td></tr>';
+                    return;
+                }
+                
+                // Sonuçları tabloya ekle
+                tbody.innerHTML = users.map(user => {
+                    const roleNameMap = {
+                        'ROLE_USER': 'Öğrenci',
+                        'ROLE_STAFF': 'Personel',
+                        'ROLE_ADMIN': 'Admin'
+                    };
+                    const roles = user.roles.map(r => {
+                        const roleName = roleNameMap[r.name] || r.name;
+                        const badgeClass = r.name === 'ROLE_ADMIN' ? 'bg-danger' : (r.name === 'ROLE_STAFF' ? 'bg-warning' : 'bg-info');
+                        return `<span class="badge ${badgeClass} me-1">${roleName}</span>`;
+                    }).join('');
+                    
+                    const statusBadge = user.active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-secondary">Pasif</span>';
+                    const registerDate = new Date(user.registerDate).toLocaleDateString('tr-TR');
+                    
+                    return `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.identityNumber}</td>
+                            <td>${user.tcKimlikNo}</td>
+                            <td>${user.ad || '-'}</td>
+                            <td>${user.soyad || '-'}</td>
+                            <td>${roles}</td>
+                            <td>${statusBadge}</td>
+                            <td>${registerDate}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-info" onclick="viewUser(${user.id})" title="Görüntüle">
+                                        <i class="fas fa-eye"></i> Detay
+                                    </button>
+                                    <button class="btn btn-warning" onclick="toggleUserStatus(${user.id}, ${user.active})" title="${user.active ? 'Pasif Yap' : 'Aktif Yap'}">
+                                        <i class="${user.active ? 'fas fa-ban' : 'fas fa-check'}"></i> Durum Değiştir
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteUser(${user.id})" title="Sil">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            })
+            .catch(error => {
+                console.error('Arama hatası:', error);
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Arama sırasında hata oluştu</td></tr>';
+            });
+        }
+    </script>
+</body>
+</html>

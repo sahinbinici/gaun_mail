@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Dashboard - Gaziantep Üniversitesi</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <!-- Additional head content -->
+    <!-- Analytics -->
+    <th:block th:replace="fragments/analytics :: analytics"></th:block>
+</head>
+<body>
+    <!-- Template content based on your model attributes -->
+    <h1>Admin Dashboard</h1>
+    
+    <!-- Display active tab and tab permissions -->
+    <div th:if="${tabPermissions != null}">
+        <!-- Tab navigation -->
+        <ul>
+            <li th:if="${tabPermissions.mail}" th:class="${activeTab == 'mail' ? 'active' : ''}">
+                <a href="#mail">Mail Forms</a>
+            </li>
+            <li th:if="${tabPermissions.eduroam}" th:class="${activeTab == 'eduroam' ? 'active' : ''}">
+                <a href="#eduroam">Eduroam Forms</a>
+            </li>
+            <!-- Add other tabs similarly -->
+        </ul>
+        
+        <!-- Tab content sections -->
+        <!-- For each tab type, show related forms and statistics -->
+    </div>
+    
+    <!-- Add the rest of your admin dashboard content -->
+</body>
+</html>

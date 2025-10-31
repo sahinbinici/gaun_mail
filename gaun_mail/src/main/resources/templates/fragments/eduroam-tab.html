@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Eduroam Başvuru İstatistikleri</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h5>Toplam Başvuru</h5>
+                                <h3 th:text="${eduroamStats.total}">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-warning">
+                                <h5>Bekleyen Başvuru</h5>
+                                <h3 th:text="${eduroamStats.pending}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eduroam Başvuru Tablosu -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Son Eduroam Başvuruları</h4>
+                    <div class="d-flex">
+                        <!-- Bekleyen Başvuruları İndir Butonu -->
+                        <a th:href="@{/admin/eduroam/pending-applications-text}" class="btn btn-outline-primary me-2" target="_blank">
+                            <i class="fas fa-download"></i> Bekleyen Başvuruları İndir
+                        </a>
+                        <!-- Filtre Seçenekleri -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="eduroamFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Filtrele
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="eduroamFilterDropdown">
+                                <li><a class="dropdown-item" th:href="@{/admin(status='PENDING', activeTab='eduroam')}">Bekleyen Başvurular</a></li>
+                                <li><a class="dropdown-item" th:href="@{/admin(status='APPROVED', activeTab='eduroam')}">Onaylanan Başvurular</a></li>
+                                <li><a class="dropdown-item" th:href="@{/admin(status='REJECTED', activeTab='eduroam')}">Reddedilen Başvurular</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/admin(filter='month', activeTab='eduroam')}">Son 1 Ay</a></li>
+                                <li><a class="dropdown-item" th:href="@{/admin(filter='last100', activeTab='eduroam')}">Son 100 Başvuru</a></li>
+                                <li><a class="dropdown-item" th:href="@{/admin(activeTab='eduroam')}">Tümünü Göster</a></li>
+                            </ul>
+                        </div>
+                        <!-- TC Kimlik No ile Arama -->
+                        <form th:action="@{/admin}" method="get" class="d-flex">
+                            <input type="hidden" name="activeTab" value="eduroam">
+                            <input type="text" name="tcKimlikNo" class="form-control me-2" placeholder="TC Kimlik No" th:value="${currentTcKimlikNo}">
+                            <button type="submit" class="btn btn-primary">Ara</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Şifre</th>
+                                    <th>Başvuru Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                    <th>Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="form : ${eduroamForms}" th:data-status="${form.isStatus() ? 'approved' : (form.isRejected() ? 'rejected' : 'pending')}">
+                                    <td>
+                                        <a href="#" onclick="showUserDetails(this)" 
+                                           th:data-username="${form.tcKimlikNo}"
+                                           style="text-decoration: underline;">
+                                            <span th:text="${form.tcKimlikNo}"></span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span th:text="${form.password}"></span>
+                                    </td>
+                                    <td th:text="${#temporals.format(form.applyDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td>
+                                        <span th:if="${form.isStatus()}" class="badge bg-success">Onaylandı</span>
+                                        <span th:if="${form.isRejected()}" class="badge bg-danger">Reddedildi</span>
+                                        <span th:if="${!form.isStatus() and !form.isRejected()}" class="badge bg-warning">Beklemede</span>
+                                    </td>
+                                    <td>
+                                        <div th:if="${!form.isStatus() and !form.isRejected()}">
+                                            <button class="btn btn-sm btn-success" 
+                                                    th:onclick="|activateForm('eduroam', ${form.id})|">
+                                                Onayla
+                                            </button>
+                                            <button class="btn btn-sm btn-danger reject-btn"
+                                                    th:data-form-id="${{form.id}}"
+                                                    data-form-type="eduroam">
+                                                Reddet
+                                            </button>
+                                        </div>
+                                        <div th:if="${form.isStatus() or form.isRejected()}">
+                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                    th:onclick="|deleteForm('eduroam', ${form.id})|">
+                                                Sil
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:if="${form.isRejected()}">
+                                            <small class="text-danger" th:text="${form.rejectionReason}"></small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

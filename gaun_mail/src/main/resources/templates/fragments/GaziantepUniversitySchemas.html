@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script th:fragment="organization-schema" type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Gaziantep Üniversitesi",
+        "alternateName": "GAÜN",
+        "url": "https://www.gantep.edu.tr",
+        "logo": "https://hesap.gantep.edu.tr/images/gaun_logo.png",
+        "sameAs": [
+            "https://www.facebook.com/gaziantepuniversitesi",
+            "https://twitter.com/gaunofficial",
+            "https://www.linkedin.com/school/gaziantep-universitesi"
+        ],
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Gaziantep",
+            "addressCountry": "TR"
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "technical support",
+            "url": "https://hesap.gantep.edu.tr"
+        }
+    }
+    </script>
+    
+    <script th:fragment="webapp-schema" type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "GAÜN E-Posta ve Eduroam Başvuru Sistemi",
+        "description": "Gaziantep Üniversitesi öğrenci ve personeli için e-posta hesabı ve eduroam başvuru sistemi",
+        "url": "https://hesap.gantep.edu.tr",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "TRY"
+        },
+        "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Gaziantep Üniversitesi"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Bu dosya sadece schema.org structured data içerir -->
+</body>
+</html>

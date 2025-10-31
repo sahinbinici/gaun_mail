@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Paneli</title>
+    <!-- Robots -->
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://hesap.gantep.edu.tr/admin" />
+    <!-- OpenGraph (optional) -->
+    <meta property="og:site_name" content="Gaziantep Üniversitesi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Admin Paneli" />
+    <meta property="og:description" content="GAÜN BİDB yönetici paneli" />
+    <meta property="og:url" content="https://hesap.gantep.edu.tr/admin" />
+    <meta property="og:image" content="https://hesap.gantep.edu.tr/images/gaun_logo.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <!-- CSRF token meta etiketleri -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+    <!-- JavaScript dosyaları -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/admin.js}"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/index}">GAÜN BİDB Başvuru Formları</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/user-management}">Kullanıcı Yönetimi</a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn btn-link nav-link">Çıkış Yap</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <!-- Ana İçerik -->
+            <div class="col-md-12">
+                <!-- Sekmeler -->
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('mail', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'mail' ? 'active' : ''}" data-bs-toggle="tab" href="#mail">Mail Başvuruları</a>
+                    </li>
+                    <li class="nav-item" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
+                        <a class="nav-link" th:classappend="${activeTab == 'eduroam' ? 'active' : ''}" data-bs-toggle="tab" href="#eduroam">Eduroam Başvuruları</a>
+                    </li>
+                </ul>
+
+                <!-- Sekme İçerikleri -->
+                <div class="tab-content">
+                    <!-- Mail Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'mail' ? 'show active' : ''}" id="mail" th:if="${tabPermissions.getOrDefault('mail', false)}">
+                        <div th:replace="fragments/mail-tab :: body"></div>
+                    </div>
+
+                    <!-- Eduroam Sekmesi -->
+                    <div class="tab-pane fade" th:classappend="${activeTab == 'eduroam' ? 'show active' : ''}" id="eduroam" th:if="${tabPermissions.getOrDefault('eduroam', false)}">
+                        <div th:replace="fragments/eduroam-tab :: body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Bilgileri Modal -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Kullanıcı Bilgileri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Öğrenci Bilgileri -->
+                    <div id="studentDetails" style="display: none;">
+                        <h6>Öğrenci Bilgileri</h6>
+                        <table class="table">
+                            <tr><td>Öğrenci No:</td><td id="student_ogrenciNo"></td></tr>
+                            <tr><td>TC Kimlik No:</td><td id="student_tcKimlikNo"></td></tr>
+                            <tr><td>Ad:</td><td id="student_ad"></td></tr>
+                            <tr><td>Soyad:</td><td id="student_soyad"></td></tr>
+                            <tr><td>Eposta:</td><td id="student_eposta1"></td></tr>
+                            <tr><td>Tel:</td><td id="student_gsm1"></td></tr>
+                            <tr><td>Fakülte:</td><td id="student_fakulte"></td></tr>
+                            <tr><td>Bölüm:</td><td id="student_bolumAd"></td></tr>
+                            <tr><td>Program:</td><td id="student_programAd"></td></tr>
+                            <tr><td>Sınıf:</td><td id="student_sinif"></td></tr>
+                        </table>
+                    </div>
+                    <!-- Personel Bilgileri -->
+                    <div id="staffDetails" style="display: none;">
+                        <h6>Personel Bilgileri</h6>
+                        <table class="table">
+                            <tr><td>TC Kimlik No:</td><td id="staff_tcKimlikNo"></td></tr>
+                            <tr><td>Ad:</td><td id="staff_ad"></td></tr>
+                            <tr><td>Soyad:</td><td id="staff_soyad"></td></tr>
+                            <tr><td>Tel:</td><td id="staff_gsm"></td></tr>
+                            <tr><td>Eposta:</td><td id="staff_eposta"></td></tr>
+                            <tr><td>Birim:</td><td id="staff_birim"></td></tr>
+                            <tr><td>Unvan:</td><td id="staff_unvan"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reddetme Modalı -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Başvuruyu Reddet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="formId">
+                    <input type="hidden" id="formType">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Red Sebebi</label>
+                        <textarea class="form-control" id="rejectionReason" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" id="confirmReject">Reddet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="content">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-wifi me-2"></i>
+                    Eduroam Başvuru
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Başvuru durumu kontrolü -->
+                <div th:if="${user != null}">
+                    <!-- Mevcut başvuru varsa başvuru durumunu göster -->
+                    <div th:if="${hasEduroamApplication == true}" class="row">
+                        <div class="col-12">
+                            <div class="info-group">
+                                <h5 class="card-title mb-4">Mevcut Başvuru Durumu</h5>
+                                <div th:with="eduroamForm=${@eduroamFormService.eduroamFormData(user.tcKimlikNo)}">
+                                    <div th:if="${eduroamForm != null}"
+                                        th:class="${eduroamForm.isStatus() ? 'alert alert-success' : (!eduroamForm.isRejected() ? 'alert alert-warning' : 'alert alert-danger')}">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Başvuru Durumu</label>
+                                                <h5 class="mb-0">
+                                                    <span
+                                                        th:text="${eduroamForm.isStatus() ? 'Onaylandı' : (!eduroamForm.isRejected() ? 'Beklemede' : 'Reddedildi')}"
+                                                        th:class="${eduroamForm.isStatus() ? 'badge bg-success' : (!eduroamForm.isRejected() ? 'badge bg-warning' : 'badge bg-danger')}">
+                                                    </span>
+                                                </h5>
+                                                <span th:if="${eduroamForm.isRejected()}">
+                                                        <br>
+                                                       <strong>Red Sebebi : </strong><span th:text="${eduroamForm.rejectionReason}"></span>
+                                                    </span>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="text-muted">Başvuru Tarihi</label>
+                                                <h5 class="mb-0"
+                                                    th:text="${#temporals.format(eduroamForm.applyDate, 'dd/MM/yyyy HH:mm')}">
+                                                </h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3" th:if="${!eduroamForm.isRejected()}">
+                                                <label class="text-muted">Kullanıcı Adı</label>
+                                                <h5 class="mb-0" th:text="${eduroamForm.tcKimlikNo}"></h5>
+                                            </div>
+                                            <div class="col-md-4 mb-3" th:if="${!eduroamForm.isRejected()}">
+                                                <label class="text-muted">Şifre</label>
+                                                <h5 class="mb-0" th:text="${eduroamForm.password}">
+                                                </h5>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                    <div class="col mb-3 mt-3" th:if="${!eduroamForm.isRejected() || !eduroamForm.isStatus() == false}">
+                                        <span class="alert alert-danger">Ortalama 1-3 iş günü içerisinde başvurunuz değerlendirilip <b>SMS</b> ile bilgilendirileceksiniz.</span>
+                                    </div>
+                                    <div>
+                                        <span th:if="${eduroamForm.isStatus()}">
+                                            <a href="https://eduroam.gantep.edu.tr/page.php?url=eduroam-baglanti-ayarlari-6">Eduroam bağlantısı ayarları için tıklayın..</a>
+                                        </span>
+                                    </div>
+                                    <br>
+                                    <div>
+                                        <i class="fas fa-info-circle me-2 text-warning"></i>
+                                        <small>Eduroam şifrenizi <a href="http://sof1.gantep.edu.tr/htlt.php" target="_blank">Eduroam</a> sayfasından değiştirebilirsiniz.</small>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-info-circle me-2 text-warning"></i>
+                                        <small>Kampüs dışında eduroam'a bağlanmak için <a href="http://proxy.gaziantep.edu.tr/" target="_blank">proxy</a> ayarlarını inceleyebilirsiniz.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Başvuru yoksa başvuru formunu göster -->
+                    <div th:if="${hasEduroamApplication == false}">
+                        <form id="eduroamForm" th:action="@{/eduroam/apply}" method="post"
+                            th:object="${eduroamFormDto}">
+                            <div class="row">
+                                <div class="col-md-6 mb-4" style="display: none">
+                                    <div class="info-group">
+                                        <label class="form-label" for="eduroamUsername">Öğrenci No</label>
+                                        <input type="text" class="form-control" id="eduroamUsername"
+                                            th:field="*{ogrenciNo}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="eduroamUsername">Kullanıcı Adı - TC Kimlik No</label>
+                                        <input type="text" class="form-control" id="tcKimlikNo"
+                                               th:field="*{tcKimlikNo}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="eduroamPassword">Şifre</label>
+                                        <input type="password"
+                                               class="form-control"
+                                               id="eduroamPassword"
+                                               th:field="*{password}"
+                                               pattern="^(?=.*[a-z])(?=.*\d)[a-z\d]{5,10}$"
+                                               title="5-10 karakter arası, en az bir küçük harf ve bir rakam içermelidir. Büyük harf ve özel karakter kabul edilmez.">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="info-group">
+                                        <label class="form-label" for="eduroamConfirmPassword">Şifre Tekrar</label>
+                                        <input type="password" class="form-control" id="eduroamConfirmPassword"
+                                            th:field="*{confirmPassword}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="eduroamStatus" th:field="*{status}" value="false">
+
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>Şifreniz 5-10 karakter arası olmalı,  en az bir küçük harf ve bir rakam içermelidir. Büyük harf ve özel karakter kabul edilmez.</small>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="button" class="btn btn-primary" onclick="showConfirmationPopup()">
+                                    <i class="fas fa-paper-plane me-2"></i>Başvuru Yap
+                                </button>
+                            </div>
+                        </form>
+                        <br>
+                        <div class="alert alert-secondary mt-3">
+                            <small>Eduroam Hesabınız var ve şifrenizi hatırlamıyorsanız, <a href="http://sof1.gantep.edu.tr/htlt.php" target="_blank">Eduroam</a> sayfasından sıfırlayabilirsiniz.</small>
+                        <br>
+                            <small>Eduroam hakkında daha detaylı destek için, <a href="https://eduroam.gaziantep.edu.tr/" target="_blank">EDUROAM bilgi sayfasını ziyaret edin.</a></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup Modal -->
+        <div class="modal fade" id="eduroamConfirmationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Başvuru Onayı</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <p>Bu web alanını talep eden kullanıcı;</p>
+                            <ul>
+                                <li>5651 sayılı kanun ile oluşabilecek her türlü sorumluluğu,</li>
+                                <li>GÜ-BİM Kabul Edilebilir Kullanım Politikasını,</li>
+                                <li>Daire Başkanlığımızın Bilgi Güvenliği Politikasını</li>
+                            </ul>
+                            <p>peşinen kabul etmiş sayılır.</p>
+
+                            <p>Bu politikalara aykırı davranışta bulunmayacağını, verilerinin çeşitli akademik ve idari
+                                işlemlerin yapılması, raporlanması, analiz ve değerlendirmelerin yapılması, istatistiki
+                                ve bilimsel verileri üretilmesi gibi amaçlarla kullanılabileceğini kabul ve taahhüt
+                                eder.</p>
+
+                            <p class="mt-2">
+                                <small class="text-muted">Ayrıntılı bilgi için
+                                    <a href="https://bidb.gantep.edu.tr" target="_blank">bidb.gantep.edu.tr</a>
+                                    adresini ziyaret ediniz.
+                                </small>
+                            </p>
+                        </div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="eduroamConfirmCheckbox">
+                            <label class="form-check-label" for="eduroamConfirmCheckbox">
+                                Yukarıdaki şartları okudum ve kabul ediyorum
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="button" class="btn btn-primary" id="eduroamSubmitButton" disabled>Onayla ve
+                            Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mevcut Eduroam Modal -->
+        <div class="modal fade" id="existingEduroamModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eduroam Hesabı Mevcut</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <p>Bu kullanıcı için daha önce eduroam başvurusu yapılmış.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="row">
+                <div class="col-12">
+                    <div class="info-group">
+                        <h5 class="text-danger mb-3">Destek ve Yardım</h5>
+                        <i>Eduroam hesap ve ayarları hakkında bilgi almak için aşağıdaki personel ile iletişime geçebilirsiniz</i>
+                        <hr>
+                        <h5 class="card-title mb-3"> Eduroam Hesap Yönetimi</h5>
+                        <label class="text-muted">Ad Soyad
+                            <h5 class="card-info mb-3">Derya KURTOĞLU</h5></label>
+                        <label class="text-muted">Tel
+                            <h5 class="card-info mb-3">0 342 317 19 52</h5></label>
+                        <label class="text-muted">E-Posta
+                            <h5 class="card-info mb-3">deryakurtoglu@gantep.edu.tr</h5></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reference to external JavaScript file -->
+        <script type="text/javascript" th:src="@{/js/eduroam.js}"></script>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/eduroam.css}">
+    </div>
+</body>
+
+</html>

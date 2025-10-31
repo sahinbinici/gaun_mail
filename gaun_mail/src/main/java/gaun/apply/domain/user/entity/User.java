@@ -1,0 +1,55 @@
+package gaun.apply.domain.user.entity;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_users_tc_kimlik_no", columnNames = "tc_kimlik_no")
+        })
+
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "identity_number", unique = true)
+    private String identityNumber;
+    @Column(name = "tc_kimlik_no", unique = true)
+    private String tcKimlikNo;
+    @Column(name = "password")
+    private String password;
+    @Column(name = "ad")
+    private String ad;
+    @Column(name = "soyad")
+    private String soyad;
+    @Column(name = "register_date")
+    private LocalDate registerDate = LocalDate.now();
+    @Column(name = "sms_code")
+    private String smsCode;
+    @Column(name = "sms_verified")
+    private boolean smsVerified = false;
+    @Column(name = "active")
+    private boolean active = true;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private List<Role> roles = new ArrayList<>();
+}

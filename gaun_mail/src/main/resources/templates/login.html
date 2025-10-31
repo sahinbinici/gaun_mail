@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gaziantep Üniversitesi E-Posta ve Eduroam Başvuru Sistemi - Öğrenci ve personel e-posta hesabı ve eduroam erişimi için başvuru yapabilirsiniz-hesap.gaziantep.edu.tr.">
+    <meta name="keywords" content="GAÜN, Gaziantep Üniversitesi, e-posta, eduroam, başvuru, öğrenci, personel, hesap.gaziantep.edu.tr">
+    <meta name="author" content="Gaziantep Üniversitesi Bilgi İşlem Daire Başkanlığı">
+    <meta name="robots" content="index, follow">
+    <meta name="google-site-verification" content="fpjZIrsx4pAv8KPkx2Lviej1yvOZ34HVKsM6sMve4wI" />
+    <title>GAÜN E-Posta ve Eduroam Başvuru Sistemi</title>
+    <link rel="canonical" href="https://hesap.gantep.edu.tr/login" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #fff !important;
+            margin-left: 1rem;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .navbar-brand small {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .navbar .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .navbar .nav-link.active {
+            color: #fff !important;
+            background: rgba(255,255,255,0.15);
+            border-radius: 4px;
+        }
+
+        .navbar-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-logo {
+            height: 45px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,.08);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: none;
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .nav-tabs {
+            border: none;
+            margin-bottom: -1px;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border: none;
+            color: #0d6efd;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            background: none;
+            border-bottom: 2px solid #0d6efd;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+        }
+
+        .btn-primary {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(13,110,253,.2);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .form-text {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        /* Form içindeki linkler için stil */
+        .form-group span a {
+            color: #0d6efd;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .form-group span a:hover {
+            text-decoration: underline;
+        }
+
+        /* Input ikonları için stil */
+        .input-group-text {
+            background: none;
+            border-right: none;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+        }
+        .nav-tabs { display: none !important; }
+
+        /* Toggle button styling */
+        #toggleButton {
+            color: #0d6efd !important; /* keep original text color */
+            background: #e7f1ff;       /* subtle background to stand out */
+            border: 2px solid #0d6efd;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.55rem 1.25rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        #toggleButton:hover,
+        #toggleButton:focus {
+            background: #d0e7ff;       /* slightly darker on hover */
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+            transform: translateY(-1px);
+            color: #0d6efd !important; /* ensure text color stays the same */
+            text-decoration: none;
+        }
+
+        #toggleButton:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Registration Required Modal -->
+    <!--
+    <div class="modal fade" id="registrationRequiredModal" tabindex="-1" aria-labelledby="registrationRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="registrationRequiredModalLabel">Dikkat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <p class="lead">Giriş yapabilmeniz için öncelikle <b>öğrenci numaranız</b> ve <b> OBS şifreniz</b> ile sisteme kayıt olmanız gerekmektedir.</p>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a th:href="@{/register}" class="btn btn-primary">Kayıt Ol</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <div class="navbar-logo-container">
+                <img th:src="@{/images/gaun_logo.png}" alt="GAÜN Logo" class="navbar-logo">
+                <img th:src="@{/images/bidb_logo.png}" alt="BİDB Logo" class="navbar-logo">
+            </div>
+            <a class="navbar-brand" th:href="@{/index}">
+                GAZİANTEP ÜNİVERSİTESİ<br>
+                <small>BİLGİ İŞLEM DAİRE BAŞKANLIĞI</small>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a id="helpLink" class="nav-link active" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle me-1"></i> Yardım
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger">
+                        Kullanıcı adı veya şifre hatalı.
+                    </div>
+                </div>
+                <div th:if="${param.logout}">
+                    <div class="alert alert-success">Çıkış yaptınız.</div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h4 class="mb-0">GAÜN E-Posta ve Eduroam Başvuru Sistemi</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h5 class="card-title">Kullanıcı Girişi</h5>
+                        </div>
+
+                        <ul class="nav nav-pills mb-4 justify-content-center" id="loginTabs">
+                            <li class="nav-item me-2">
+                                <a class="nav-link active px-4" id="student-tab" data-bs-toggle="pill" href="#student">Öğrenci</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-4" id="staff-tab" data-bs-toggle="pill" href="#staff">Personel</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Öğrenci Giriş Formu -->
+                            <div class="tab-pane fade show active" id="student">
+                                <form method="post" role="form" th:action="@{/login}" class="form-horizontal">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <div class="form-group mb-3">
+                                        <label class="control-label fw-bold">Öğrenci No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text"
+                                                   id="username"
+                                                   name="username"
+                                                   class="form-control"
+                                                   placeholder="Öğrenci Numaranızı Girin" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="control-label fw-bold">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password"
+                                                   id="password"
+                                                   name="password"
+                                                   class="form-control"
+                                                   placeholder="OBS Şifrenizi Girin" />
+                                        </div>
+                                        <small class="form-text text-danger">E-Devlet şifresi ile giriş yapılamaz!</small>
+                                    </div>
+
+                                    <div class="form-group d-grid gap-2 mb-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+                                    </div>
+                                    <!--
+                                    <div class="form-group text-center">
+                                        <p class="mb-1">Henüz hesabınız yok mu? <a th:href="@{/register}" class="fw-bold">Kayıt Ol</a></p>
+                                        <p class="text-muted small">**Sisteme Giriş Yapmak İçin Öncelikle Kayıt Olmalısınız.**</p>
+                                    </div>
+                                    -->
+                                </form>
+                            </div>
+
+                            <!-- Personel Giriş Formu -->
+                            <div class="tab-pane fade" id="staff">
+                                <form method="post" role="form" th:action="@{/login}" class="form-horizontal">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <div class="form-group mb-3">
+                                        <label class="control-label fw-bold">TC Kimlik No</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text"
+                                                   id="staffUsername"
+                                                   name="username"
+                                                   class="form-control"
+                                                   placeholder="TC Kimlik Numaranızı Girin"
+                                                   pattern="\d{11}"
+                                                   title="TC Kimlik No 11 haneli olmalıdır" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="control-label fw-bold">Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password"
+                                                   id="staffPassword"
+                                                   name="password"
+                                                   class="form-control"
+                                                   placeholder="Şifrenizi Girin" />
+                                        </div>
+                                    </div>
+                                    <p class="text-danger small text-bold">**Personel kullanıcılarının sisteme giriş yapabilmeleri için öncelikle kayıt olmaları gerekmektedir.**</p>
+                                    <div class="form-group d-grid gap-2 mb-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+                                    </div>
+                                    <div class="form-group text-center">
+                                        <p class="mb-1">Henüz hesabınız yok mu? <a th:href="@{/register}" class="fw-bold">Kayıt Ol</a></p>
+                                        <p class="mb-1">Şifrenizi mi unuttunuz? <a th:href="@{/forgot-password-staff}" class="fw-bold">Şifremi Unuttum</a></p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Şifre Kontrol Modal -->
+    <div class="modal fade" id="passwordCheckModal" tabindex="-1" aria-labelledby="passwordCheckModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="passwordCheckModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Dikkat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-key text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="mb-3">Şifrenizi kontrol ettiniz mi?</h5>
+                    <p class="text-muted">Lütfen OBS şifrenizi doğru girdiğinizden emin olun. E-devlet şifresi ile giriş yapılamamaktadır. Tekrar giriş yapmayı denedikten sonra yine hata alırsanız OBS'ye E-devlet ile giriş yapıp şifrenizi yenileyin.</p>
+                    <p class="text-danger small"><strong>Not:</strong> E-Devlet şifresi ile giriş yapılamaz!</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yardım Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Yardım</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Eduroam ve E-Posta başvurusunda bulunmak için öncelikle kayıt olmalısınız.</li>
+                        <li>Öğrenci numarası ve OBS şifresi ile kayıt olabilirsiniz. E-devlet şifresi ile kayıt olamazsınız.</li>
+                        <li>Kayıt olurken OBS'de bulunan cep telefonu numarasının güncel olduğuna emin olmalısınız aksi halde cep telefonunuza doğrulama kodu gönderilemeyecektir.</li>
+                        <li>Cep telefonunuza gelen kodu doğrulama ekranına girip doğrulayın.</li>
+                        <li>Kaydınız tamamlandıktan sonra sisteme giriş yapabilirsiniz.</li>
+                        <br>
+                        <h5>E-posta Başvurusu</h5>
+                        <li>E-posta hesabınız adınızın ilk harfi, soyadınızın ilk harfi ve öğrenci numaranızın son 6 hanesini alınarak belirlenmektedir.</li>
+                        <li>E-posta kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>E-posta hesabınızın şifresi otomatik olarak belirlenmektedir. Başvurunuz onaylandıktan sonra <a href="https://mail2.gaziantep.edu.tr/" target="_blank" rel="noopener noreferrer">mail2.gaziantep.edu.tr</a> giriş yapıp değiştirmelisiniz.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                        <br>
+                        <h5>Eduroam Başvurusu</h5>
+                        <li>Eduroam kullanıcı adınız TC Kimlik numaranız olarak belirlenmektedir.</li>
+                        <li>Eduroam kullanım sözleme ve gizlilik politikası ile ilgili bilgileri onaylamalısınız.</li>
+                        <li>Başvurunuz onaylandığında sms ile bilgilendirileceksiniz.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Get tab elements
+                const studentTab = document.getElementById('student-tab');
+                const staffTab = document.getElementById('staff-tab');
+
+                // Only proceed if both tabs exist
+                if (!studentTab || !staffTab) {
+                    console.warn('Tab elements not found');
+                    return;
+                }
+
+                // Function to update body class based on active tab
+                function updateBodyClass() {
+                    try {
+                        if (document.querySelector('#student-tab.active') !== null) {
+                            document.body.classList.remove('staff-mode');
+                            document.body.classList.add('student-mode');
+                        } else if (document.querySelector('#staff-tab.active') !== null) {
+                            document.body.classList.remove('student-mode');
+                            document.body.classList.add('staff-mode');
+                        }
+                    } catch (e) {
+                        console.error('Error updating body class:', e);
+                    }
+                }
+
+                // Set initial state
+                updateBodyClass();
+
+                // Update on tab change using event delegation
+                document.addEventListener('shown.bs.tab', function(e) {
+                    if (e.target && (e.target.id === 'student-tab' || e.target.id === 'staff-tab')) {
+                        updateBodyClass();
+                    }
+                });
+
+            } catch (e) {
+                console.error('Error initializing login page:', e);
+            }
+        });
+
+        // Show registration required modal when page loads (disabled - modal is commented out)
+        /*
+        document.addEventListener('DOMContentLoaded', function() {
+            var registrationModal = new bootstrap.Modal(document.getElementById('registrationRequiredModal'));
+            registrationModal.show();
+        });
+        */
+
+        // Show password check modal when student user has login error
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Check if there's an error parameter in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const hasError = urlParams.has('error');
+
+                // Check if student tab is active (default is student)
+                const studentTab = document.getElementById('student-tab');
+                const isStudentActive = studentTab && studentTab.classList.contains('active');
+
+                // Show modal only if there's an error and student tab is active
+                if (hasError && isStudentActive) {
+                    const passwordCheckModal = new bootstrap.Modal(document.getElementById('passwordCheckModal'));
+                    passwordCheckModal.show();
+                }
+            } catch (e) {
+                console.error('Error showing password check modal:', e);
+            }
+        });
+    </script>
+</body>
+</html>

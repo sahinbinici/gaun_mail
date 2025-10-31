@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Kullanıcı Yönetimi</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kullanıcı Yönetimi</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>TC Kimlik No</th>
+                                    <th>Ad</th>
+                                    <th>Soyad</th>
+                                    <th>Rol</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.tcKimlikNo}"></td>
+                                    <td th:text="${user.ad}"></td>
+                                    <td th:text="${user.soyad}"></td>
+                                    <td th:text="${user.roles}"></td>
+                                    <td>
+                                        <button class="btn btn-primary" th:onclick="'showUserDetails(\'' + ${user.tcKimlikNo} + '\')'">Detay</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html> 

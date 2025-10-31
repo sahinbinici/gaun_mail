@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- SEO Meta Tags Fragment -->
+    <th:block th:fragment="seo-meta(title, description, keywords, canonical, robots)">
+        <title th:text="${title + ' | Gaziantep Üniversitesi'}">Gaziantep Üniversitesi</title>
+        <meta name="description" th:content="${description}">
+        <meta name="keywords" th:content="${keywords}">
+        <meta name="author" content="Gaziantep Üniversitesi">
+        <meta name="robots" th:content="${robots}">
+        <link rel="canonical" th:href="${canonical}" />
+
+        <!-- OpenGraph -->
+        <meta property="og:site_name" content="Gaziantep Üniversitesi" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" th:content="${title}" />
+        <meta property="og:description" th:content="${description}" />
+        <meta property="og:url" th:content="${canonical}" />
+        <meta property="og:image" content="https://hesap.gantep.edu.tr/images/gaun_logo.png" />
+        <meta property="og:locale" content="tr_TR" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" th:content="${title}" />
+        <meta name="twitter:description" th:content="${description}" />
+        <meta name="twitter:image" content="https://hesap.gantep.edu.tr/images/gaun_logo.png" />
+    </th:block>
+</head>
+<body>
+    <!-- Bu dosya sadece fragment içerir -->
+</body>
+</html>

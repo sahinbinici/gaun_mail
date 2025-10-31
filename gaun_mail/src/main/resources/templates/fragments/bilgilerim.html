@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Kullanıcı Bilgileri
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Öğrenci Bilgileri -->
+                <div th:if="${userType == 'STUDENT' && student != null}" class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Öğrenci Numarası</label>
+                            <h5 th:text="${student.ogrenciNo}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Ad Soyad</label>
+                            <h5 th:text="${student.ad + ' ' + student.soyad}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Fakülte</label>
+                            <h5 th:text="${student.fakKod}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Bölüm</label>
+                            <h5 th:text="${student.bolumAd}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Program</label>
+                            <h5 th:text="${student.programAd}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Sınıf</label>
+                            <h5 th:text="${student.sinif}" class="mb-0"></h5>
+                        </div>
+                    </div> <!--
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label class="text-muted">Öğrenim Durumu</label>
+                            <h5>
+                                <span th:text="${student.durumu}"
+                                      th:class="${student.durumu == 'Aktif' ? 'badge bg-success' : 'badge bg-warning'}">
+                                </span>
+                            </h5>
+                        </div>
+                    </div> -->
+                </div>
+
+                <!-- Personel Bilgileri -->
+                <div th:if="${userType == 'STAFF' && staff != null}" class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">TC Kimlik No</label>
+                            <h5 th:text="${staff.tcKimlikNo}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Ad Soyad</label>
+                            <h5 th:text="${staff.ad + ' ' + staff.soyad}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Unvan</label>
+                            <h5 th:text="${staff.unvan}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="info-group">
+                            <label class="text-muted">Çalıştığı Birim</label>
+                            <h5 th:text="${staff.calistigiBirim}" class="mb-0"></h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kullanıcı bulunamadı mesajı -->
+                <div th:if="${(userType == 'STUDENT' && student == null) || (userType == 'STAFF' && staff == null)}"
+                     class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Kullanıcı bilgileri bulunamadı.
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .info-group {
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                height: 100%;
+            }
+            .info-group label {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+                display: block;
+            }
+            .info-group h5 {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            .card {
+                border: none;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+                border-radius: 12px;
+            }
+            .card-header {
+                border-radius: 12px 12px 0 0 !important;
+                padding: 1rem 1.5rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            .badge {
+                font-size: 0.9rem;
+                padding: 0.5em 1em;
+            }
+        </style>
+    </div>
+</body>
+</html>
