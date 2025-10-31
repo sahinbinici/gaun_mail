@@ -9,5 +9,8 @@
         <module name="maven-archiver" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bim-basvuru" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
